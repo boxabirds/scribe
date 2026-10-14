@@ -33,14 +33,14 @@ signature: name [name ("," name)*] ((label | "of") name)*              // DOC; F
 
 given: "given" name "is" typeexpr _NL
 produces: "produces" typeexpr _NL
-fails: "fails" "with" name_list _NL
+fails: "can" "fail" "with" name_list _NL                                  // SPEC 10.1: not `fails`, which looked like `fail`
 expect: "expect" line_condition
 ensure: "ensure" ensure_body _NL
        | "ensure" group                                                    -> ensure_group
        | "ensure" if_then                                                 -> ensure_if_then
 ensure_body: expr
-           | "if" "it" "succeeds" "," expr                                  -> on_success
-           | "if" "it" "fails" ["with" name ("or" name)*] "," expr          -> on_failure_case
+           | "on" "success" "," expr                                        -> on_success
+           | "on" "failure" [name ("or" name)*] "," expr                    -> on_failure_case
            | "if" logic "," expr                                             -> conditional   // SPEC 15
 changes: "changes" "only" place ("," place)* _NL                          // SPEC 13.2: several places
 uses_clause: "uses" name_list _NL
@@ -169,7 +169,7 @@ expr_stmt: (call | name | comma_call | "try" application | "try" comma_call) _NL
 and_op: "and" | "∧" | "&&"
 or_op: "or" | "∨" | "||"
 not_op: "not" | "¬" | "!"
-for_every: "for" "every" | "∀"
+for_every: "for" "all" | "∀"                                              // not `for every`, which looked like `for each`
 quantified: for_every name ["in" sum | "from" sum range_word sum | "as" typeexpr] "," condition
           | ("there" "is" | "∃") [article] name "in" sum "where" condition -> exists
 
@@ -178,7 +178,7 @@ quantified: for_every name ["in" sum | "from" sum range_word sum | "as" typeexpr
 // comma at the end of a line in a block is optional and, if present, must be
 // followed by another item of the same block (SPEC 11).
 group: group_kind "of" (_NL _INDENT group_item* group_last _DEDENT | inline_group _NL)
-group_kind: "all" | "any" | "none"
+group_kind: "all" | "any" | "not" "any"                                    // not `none`, which looked like `nothing`
 // on one line, an item cannot hold a word that covers the rest of the line
 // (a quantifier, `where`, a comprehension): it would swallow the items after it
 inline_group: inline_item ("," inline_item)+

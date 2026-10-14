@@ -2,7 +2,7 @@ to find_user name in database
     given name is an UntrustedText
     given database is the Database
     produces a User
-    fails with InvalidName
+    can fail with InvalidName
     uses database
     let checked be try check_user_name name
     return lookup checked in database

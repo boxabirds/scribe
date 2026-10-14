@@ -4,5 +4,5 @@ note Expected diagnostic: `and` joins conditions; separate a record's fields wit
 to decode text
     given text is Text
     produces a Value
-    fails with JSONDecodeError
+    can fail with JSONDecodeError
     fail with JSONDecodeError with msg "Extra data" and doc s and pos end

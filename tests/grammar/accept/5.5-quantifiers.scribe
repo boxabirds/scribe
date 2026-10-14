@@ -2,6 +2,6 @@ to check items for limit
     given items is a List of Int
     given limit is an Int
     produces Bool
-    ensure for every x in items, x ≤ limit
-    ensure for every j from 0 until count of items, item j of items ≤ limit
+    ensure for all x in items, x ≤ limit
+    ensure for all j from 0 until count of items, item j of items ≤ limit
     ensure there is an item in items where item ≤ limit

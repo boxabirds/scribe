@@ -2,7 +2,7 @@ to check items for limit
     given items is a List of Int
     given limit is an Int
     ensure
-        if for every x in items, x > 0
+        if for all x in items, x > 0
         then count of items < limit
     invariant all of
         limit > 0

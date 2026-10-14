@@ -138,7 +138,7 @@
   "component Checkout": "ok",
   "ensure": "fail",
   "enum OrderStatus": "ok",
-  "for every x in items, x ≤ result": "fail",
+  "for all x in items, x ≤ result": "fail",
   "hold input as open path for reading with files": "ok",
   "if all of": "ok",
   "interface Files": "ok",

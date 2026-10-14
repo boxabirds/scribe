@@ -59,6 +59,12 @@ RENAMES = [
      lambda m: ("an " if m.group(1)[0] in "AEIOUaeiou" else "a ") + m.group(1),
      "draft 0.4: `positive` and `non_empty` are contracts, not type words"),
     (r"\b(?:positive|non_empty) ", "", "draft 0.4: `positive` and `non_empty` are contracts, not type words"),
+    (r"\bif it succeeds,", "on success,", "draft 0.4: `ensure on success`"),
+    (r"\bif it fails with (\w+(?: or \w+)*),", r"on failure \1,", "draft 0.4: `ensure on failure`"),
+    (r"\bif it fails,", "on failure,", "draft 0.4: `ensure on failure`"),
+    (r"(?m)^(\s*)fails with\b", r"\1can fail with", "draft 0.4: `can fail with` replaces `fails with`"),
+    (r"\bfor every\b", "for all", "draft 0.4: `for all` replaces `for every`"),
+    (r"\bnone of\b", "not any of", "draft 0.4: `not any of` replaces `none of`"),
 ]
 
 

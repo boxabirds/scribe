@@ -3,6 +3,6 @@ interface Reader
         given buffer is an editable Bytes
         given reader is an editable Self
         produces a Count
-        fails with EndOfData, ReadFailed
+        can fail with EndOfData, ReadFailed
         ensure result ≤ count of buffer
         ensure "a reader that returns 0 without failing will later return data or fail"

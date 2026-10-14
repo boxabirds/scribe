@@ -89,3 +89,4 @@ Decisions from the review of readability and unambiguous presentation
 | 28 | `schema` and `migration` removed: a stored format is a type, and an upgrade is an operation | Approved; done |
 | 29 | `enum` replaces `choice` (Rust, Swift, Scala 3) | Approved; done |
 | 30 | Every keyword is a contract word, an instruction or a readability word, and no two look alike. Removed: `in state` (typestate), `matching`, `positive`, `non_empty`, `less`, `least`, `more`, `most`, `than`, `followed by`, `onto`, `over`, `using`, `anything but`; `, or else` becomes `, otherwise` | Approved; done |
+| 31 | Look-alikes replaced: `fails with` → `can fail with`; `ensure if it succeeds/fails` → `ensure on success/failure`; `for every` → `for all`; `none of` → `not any of` | Approved; done |

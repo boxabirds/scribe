@@ -2,7 +2,7 @@ to load_dashboard user with services
     given user is a UserId
     given services is the DashboardServices
     produces a Dashboard
-    fails with DashboardUnavailable
+    can fail with DashboardUnavailable
     uses services
     together
         let profile be fetch profile of user from services

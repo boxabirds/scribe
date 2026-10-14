@@ -35,7 +35,7 @@ Principles that follow from these and decide individual rules:
 | Words where words are clearer, symbols where symbols are | School-level maths symbols for arithmetic and comparison; words for logic and structure |
 | A promise is code, not commentary | Contracts are checked against the body on every build. A contract holds only conditions the compiler can check; explanations go in `note` lines |
 | Never overclaim | Every proof, verdict and report states the unchecked code (`trust` blocks) it rests on |
-| Nothing implicit that matters | No ambient authority, no implicit conversion, no missing value without a `maybe`, no failure without a `fails with` |
+| Nothing implicit that matters | No ambient authority, no implicit conversion, no missing value without a `maybe`, no failure without a `can fail with` |
 | If in doubt, make it a library | As in Rust, the language is kept minimal. A construct is language only if it cannot be an ordinary type or operation without losing what the compiler must check; everything else (capability narrowing, time, pipelines, serialisation) is a library |
 | Any expression wherever a value goes | No position in the grammar is limited to a name or a literal without a stated reason; types, not keywords, decide what fits. A value in a contract or a grant of authority must be a constant expression, because impact analysis compares it without running code |
 
@@ -88,7 +88,7 @@ Symbols are used only where school mathematics has already taught them to most r
 | Equal, not equal | `=`, `!=` | `==`, `≠` | `=`, `≠` |
 | And, or, not | `and`, `or`, `not` | `∧`, `&&`, `∨`, `\|\|`, `¬`, `!` | words |
 | Member of | `is in` | `∈` | `is in` |
-| For all, there is | `for every`, `there is` | `∀`, `∃` | words |
+| For all, there is | `for all`, `there is` | `∀`, `∃` | words |
 
 Rules:
 
@@ -211,11 +211,11 @@ to withdraw amount from account
     given amount is Money
     given account is an editable Account
     produces a Receipt
-    fails with InsufficientFunds
+    can fail with InsufficientFunds
     expect amount > 0
     expect account is open
-    ensure if it succeeds, balance of account = balance of account at entry - amount
-    ensure if it fails, balance of account = balance of account at entry
+    ensure on success, balance of account = balance of account at entry - amount
+    ensure on failure, balance of account = balance of account at entry
     changes only balance of account
 
     if amount > balance of account
@@ -294,17 +294,17 @@ Brackets group arithmetic only: `(a + b) * c`. They never group logic.
 
 ```
 ensure
-    if for every x in items, x > 0
+    if for all x in items, x > 0
     then count of items < limit
 ```
 
-Anything else is grouped by layout. A **condition group** is `all of`, `any of` or `none of` followed by its conditions, one per line in the block beneath, or several on one line separated by commas. Groups nest; a line inside a group holds one condition, with no `and` or `or`, so the group's header is the only thing joining its lines:
+Anything else is grouped by layout. A **condition group** is `all of`, `any of` or `not any of` followed by its conditions, one per line in the block beneath, or several on one line separated by commas. Groups nest; a line inside a group holds one condition, with no `and` or `or`, so the group's header is the only thing joining its lines:
 
 ```
 return all of
     status of order is in [Paid, Shipped]
     customer is active
-    none of
+    not any of
         order is disputed
         customer is suspended
     any of
@@ -357,12 +357,12 @@ A comprehension follows `of`, as above, or stands alone as a list in list bracke
 ### 5.5 Quantifiers and conditions
 
 ```
-for every x in items, x ≤ result
-for every j from 0 until low, item j of items < target
+for all x in items, x ≤ result
+for all j from 0 until low, item j of items < target
 there is an item in items where price of item > limit
 ```
 
-A word that opens a scope covers the rest of its line: `for every`, `there is`, `where`, a comprehension's `for each`, and `if …,` in an `ensure`. This is the same rule a statement header follows, and the only one: there is no other way for a scope to end. Any other grouping is written with a block (Section 5.2), so a quantifier is never one operand among others on a line.
+A word that opens a scope covers the rest of its line: `for all`, `there is`, `where`, a comprehension's `for each`, and `if …,` in an `ensure`. This is the same rule a statement header follows, and the only one: there is no other way for a scope to end. Any other grouping is written with a block (Section 5.2), so a quantifier is never one operand among others on a line.
 
 ### 5.6 Strings
 
@@ -374,13 +374,13 @@ Text in double quotes, with `{expression}` interpolation: `"Your order {id of or
 
 ## 6. Failures
 
-An operation lists every way it can fail. The compiler checks the list is complete: a body cannot fail in an undeclared way, and an operation that handles all its callees' failures has no `fails with` line.
+An operation lists every way it can fail. The compiler checks the list is complete: a body cannot fail in an undeclared way, and an operation that handles all its callees' failures has no `can fail with` line.
 
 ```
 to parse_port text
     given text is Text
     produces a Port
-    fails with NotANumber, OutOfRange
+    can fail with NotANumber, OutOfRange
 
     let number be try parse_int text
     if number < 1 or number > 65535
@@ -509,7 +509,7 @@ to load_dashboard user with services
     given user is a UserId
     given services is the DashboardServices
     produces a Dashboard
-    fails with DashboardUnavailable
+    can fail with DashboardUnavailable
     uses services
 
     together
@@ -549,10 +549,10 @@ A **contract** is what an operation requires and promises. It is the lines betwe
 | --- | --- | --- |
 | `given x is a T` | A parameter, its type and convention | Types |
 | `produces a T` | The result | Types |
-| `fails with A, B` | Every way it can fail | Compiler, completely |
+| `can fail with A, B` | Every way it can fail | Compiler, completely |
 | `uses`, `allocates` | Its effects and capabilities. Waiting needs a capability too, so it shows in `uses` (9.5) | Compiler, completely |
 | `expect condition` | What callers must ensure | Proof at call sites, or run-time check |
-| `ensure condition` | What it guarantees. Forms: `ensure if it succeeds, ...`, `ensure if it fails, ...`, `ensure if result is some p, ...` | Proof where the checker can; otherwise a run-time check, and reports say which (10.5) |
+| `ensure condition` | What it guarantees. Forms: `ensure on success, ...`, `ensure on failure, ...`, `ensure if result is some p, ...` | Proof where the checker can; otherwise a run-time check, and reports say which (10.5) |
 | `changes only x, y` | Everything else is untouched | Compiler |
 | `example call is value` | An exact result for an exact input | Run on every build |
 
@@ -569,7 +569,7 @@ to redirect_body for location
     example redirect_body for "/a" is "<a href=\"/a\">See Other</a>.\n\n"
 ```
 
-Properties generalise examples and run as generated tests: `property for every items as a List of Int, items is empty or largest of items is in items`.
+Properties generalise examples and run as generated tests: `property for all items as a List of Int, items is empty or largest of items is in items`.
 
 ### 10.3 Host-dependent behaviour
 
@@ -587,8 +587,8 @@ interface Files
         given source is a Path
         given target is a Path
         given files is an editable Self
-        fails with NotFound, TargetExists
-        ensure if it fails with TargetExists, not replaces_existing of files
+        can fail with NotFound, TargetExists
+        ensure on failure TargetExists, not replaces_existing of files
 ```
 
 An operation whose contract tests a host-dependent fact holds wherever the fact has the value it tests for; a contract that tests none must hold on every host. Each host binding, the implementation of a capability's interface for one host, gives every fact its value. The toolchain supplies the host bindings, and they are the only place a particular operating system is named.
@@ -657,9 +657,9 @@ component Checkout
             given customer is a CustomerId
             given request_id is a RequestId
             produces an Order
-            fails with EmptyCart, OutOfStock, PaymentDeclined, RefundFailed
+            can fail with EmptyCart, OutOfStock, PaymentDeclined, RefundFailed
             expect cart is not empty
-            ensure if it succeeds, status of result is Paid
+            ensure on success, status of result is Paid
             uses payments, inventory
 
 ```
@@ -681,7 +681,7 @@ interface Reader
         given buffer is an editable Bytes
         given reader is an editable Self
         produces a Count
-        fails with EndOfData, ReadFailed
+        can fail with EndOfData, ReadFailed
         ensure result ≤ count of buffer
 ```
 
@@ -840,13 +840,13 @@ These are the decisions this draft does not settle. Each names what blocks it. A
 | 3 | `allocates` as a contract clause, with the allocator passed as context | Proposed | Measuring how many contracts it adds lines to |
 | 4 | ~~A rule language for system files~~ | Removed | System files are removed; `scribe query` answers reach and flow questions from the code (8.1) |
 | 5 | Possessive paths: `account's balance` | Settled | Allowed, never mixed with `of` in one path (5.1) |
-| 6 | Reduce the keyword set (now 77 hard, 7 soft) | Open | Experiment 1, the comprehension test, extended to compare candidate words for the same idea: for example `hold` against `with` and `lease` |
+| 6 | Reduce the keyword set (now 74 hard, 7 soft) | Open | Experiment 1, the comprehension test, extended to compare candidate words for the same idea: for example `hold` against `with` and `lease` |
 | 7 | Parser strategy: the grammar is LALR(1) with no conflicts (Appendix A); whether the compiler's parser is generated from it or written by hand | Open | Comparing the error messages each gives on the pilot's real mistakes |
 | 8 | Code generator for WebAssembly, the version 1 target: a back end of our own, or one built on LLVM or Cranelift | Open | A compile-time benchmark on the pilot corpus |
 | 9 | Solver for proving contracts | Open | Choosing a solver that is fast and gives stable results across versions |
 | 10 | Localized views beyond English | Open | Round-trip proof for at least one other language |
 | 11 | Which host bindings impact analysis compares by default (10.3) | Open | Re-expressing the replay's platform-specific breakages with it |
-| 12 | Type rules for failures as values: how a failure `enum` relates to `fails with`, and how impact analysis compares a failure's fields | Open | Roadmap phase 5, with the translation wave that needs them |
+| 12 | Type rules for failures as values: how a failure `enum` relates to `can fail with`, and how impact analysis compares a failure's fields | Open | Roadmap phase 5, with the translation wave that needs them |
 | 13 | ~~Cost bounds (`cost at most`)~~ | Removed | A cost bound is not an instruction the program carries out; speed is measured by tools outside the language |
 | 14 | A condition group as the condition of an `if` or `repeat while` | Settled | `then` or `do` on its own line between the two blocks (5.2) |
 
@@ -854,7 +854,7 @@ These are the decisions this draft does not settle. Each names what blocks it. A
 
 The reference grammar is `grammar/scribe.lark` (version 0.3) in this project; `scribe-grammar-v0.2.lark` is the version the pilot measured. It is an Earley grammar: it states the language precisely but is not yet a production parser. `tools/check_grammar.py` tests it against a file per construct in this specification, a file per forbidden form, this specification's code blocks and the pilot corpora.
 
-**Vocabulary.** 84 reserved words: 77 hard keywords, which can never be names, and 7 soft keywords, which are names everywhere except in the position that gives them meaning. The articles `a`, `an` and `the` are hard. A few two-word phrases are read by the lexer as one token, so a parser looking one token ahead sees both words: `for each`, `at entry` and `, otherwise`; a comma that ends a line is read with the line's end. None of this changes the text.
+**Vocabulary.** 81 reserved words: 74 hard keywords, which can never be names, and 7 soft keywords, which are names everywhere except in the position that gives them meaning. The articles `a`, `an` and `the` are hard. A few two-word phrases are read by the lexer as one token, so a parser looking one token ahead sees both words: `for each`, `at entry` and `, otherwise`; a comma that ends a line is read with the line's end. None of this changes the text.
 
 **No special rules.** The grammar is unambiguous by construction. Converted to Bison it has no LALR(1) conflicts, which proves that no text has two readings, and `tools/check_lalr.py` fails the build if one appears. `tools/check_grammar.py` also parses every test, every code block in this specification and the pilot corpora with no disambiguation applied. The pilot's rules D1 and D2 are now the grammar's own structure (Section 5.5), mixing `and` with `or` is a condition group (Section 5.2), and a label word belongs to the outermost call on its line because an argument is one term: a labelled call inside an argument is in brackets.
 
@@ -915,7 +915,7 @@ What the replay changed in this specification:
 - Records can be built with fields by name: `a Point with x as 1, y as 2` (5.3). One element can be set: `set item i of heap to x`. `do nothing` fills a branch with nothing to do (4.2).
 - Every statement and every clause is one line; no clause continues onto the next (2.6).
 - A line that can be read two ways is not readable. Where a reading would otherwise depend on a rule, the language makes the structure visible instead (1):
-    - conditions that mix `and` and `or` are condition groups, `all of`, `any of` and `none of`, one condition per line, nesting like statement blocks; commas at the ends of their lines are optional, checked if present, and drawn by the review view (2.6, 5.2);
+    - conditions that mix `and` and `or` are condition groups, `all of`, `any of` and `not any of`, one condition per line, nesting like statement blocks; commas at the ends of their lines are optional, checked if present, and drawn by the review view (2.6, 5.2);
     - a word that opens a scope covers the rest of its line, replacing the pilot's rules D1 and D2 (5.5);
     - brackets group arithmetic only, and a comprehension standing alone is a list in list brackets (5.2, 5.4);
     - `-`, `some` and `try` apply to the next term; `not` negates only a whole condition (5.2);
@@ -933,10 +933,11 @@ What the replay changed in this specification:
 - Source never names an operating system. A difference between hosts is a fact about a capability, declared in its interface; this replaces clauses scoped `on <platform>` (10.3).
 - Source text describes only the program's instructions and what is checked about them. Removed for that reason: cost bounds (`cost at most`); prose, whether a component's `about` section, a `because` reason, an informal quoted clause or an `assumes` fact (explanations go in `note` lines); a `corrects` line, which described an earlier version; assurance tiers and `proof` blocks (the compiler proves what it can and reports how each clause was held; `assert` and `trust` are body statements); version numbers and schema compatibility modes, which belong in the package file; and a system's `components`, `authority` and `wiring`, which repeated what the entry point does in code (10.1, 10.5, 10.6, 11.1, 11.3, 11.5).
 - Every contract feature must be enforceable, and the language has no concept of time. Removed for that reason: `idempotent by`, which nothing can enforce; `deadline`, time comparisons (`is after`, `is before`), date literals and built-in time types, which are standard-library operations on a clock capability; `may block`, which repeated what `uses` shows; `varies by host`, since a host-dependent fact is an ordinary operation of a capability's interface; and system files, whose questions `scribe query` answers from the code (3.6, 9.1, 10.1, 10.3, 11.5).
-- If in doubt, make it a library, as Rust does. Moved out of the language for that reason: capability narrowing (`attenuated`, and the `files`, `network`, `host`, `port`, `under`, `read only` descriptions) is standard-library operations; labels and `declassifies` became distinct types and named conversions; `define` predicates became operations that produce a `Bool`; `implies` went, since aligned `if` / `then` lines say it; pipelines, protocols and schemas with migrations became library code; clauses scoped `in build` went; a component's `may` section went, since all authority starts at the entry point; record members lost the word `field`; and a quantifier over a type is written `for every x as T` (1, 3.2, 5.2, 8, 9.3, 10, 11).
+- If in doubt, make it a library, as Rust does. Moved out of the language for that reason: capability narrowing (`attenuated`, and the `files`, `network`, `host`, `port`, `under`, `read only` descriptions) is standard-library operations; labels and `declassifies` became distinct types and named conversions; `define` predicates became operations that produce a `Bool`; `implies` went, since aligned `if` / `then` lines say it; pipelines, protocols and schemas with migrations became library code; clauses scoped `in build` went; a component's `may` section went, since all authority starts at the entry point; record members lost the word `field`; and a quantifier over a type is written `for all x as T` (1, 3.2, 5.2, 8, 9.3, 10, 11).
 - A condition group may be the condition of an `if` or `repeat while`, with `then` or `do` on its own line between the two blocks (5.2).
 - `enum` replaces `choice`, following Rust, Swift and Scala 3; no popular language uses `choice` (3.3).
 - Every keyword is a contract word, an instruction (flow, storage, loops) or a word that makes a line read as English, and no two keywords look alike. Removed for that reason: typestate (`in state`; distinct types do it, as in Rust); `matching`, `positive` and `non_empty` (contracts and distinct types say these); the comparison words `less`, `least`, `more`, `most`, `than` (the school symbols `<`, `≤`, `>`, `≥` remain); `followed by` (a library `join`); the labels `onto`, `over` and `using`; `anything but` (name the failures instead); and `, or else`, which looked like `otherwise` and is now `, otherwise` (2.3, 3.5, 4.1, 7.3, 9.1).
+- Look-alike keywords are replaced: the contract `fails with` (next to the statement `fail with`) is `can fail with`; `ensure if it succeeds` and `ensure if it fails` are `ensure on success` and `ensure on failure`; the quantifier `for every` (next to the loop `for each`) is `for all`; and the group `none of` (next to the value `nothing`) is `not any of` (5.2, 5.5, 6, 10.1).
 - Scribe is not described as a systems language. Having no garbage collector is a choice about memory management, managed at compile time as in Rust, not about the kind of software Scribe is for (1, 7).
 
 ### B.4 Earlier documents

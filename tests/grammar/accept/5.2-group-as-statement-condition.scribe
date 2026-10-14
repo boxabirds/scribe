@@ -8,7 +8,7 @@ to settle account for amount
             overdraft_allowed of account
     then
         subtract amount from balance of account
-    otherwise if none of account is frozen, account is closed
+    otherwise if not any of account is frozen, account is closed
     then
         flag account
     otherwise

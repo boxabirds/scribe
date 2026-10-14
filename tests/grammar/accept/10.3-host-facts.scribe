@@ -7,5 +7,5 @@ interface Files
         given source is a Path
         given target is a Path
         given files is an editable Self
-        fails with NotFound, TargetExists
-        ensure if it fails with TargetExists, not replaces_existing of files
+        can fail with NotFound, TargetExists
+        ensure on failure TargetExists, not replaces_existing of files

@@ -1,5 +1,0 @@
-to remove path in files
-    given path is a Path
-    given files is an editable Files
-    fails with NotFound, PermissionDenied
-    ensure if it fails with anything but NotFound, path is in names of files

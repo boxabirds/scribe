@@ -11,6 +11,7 @@ hard assert
 hard at
 hard be
 hard by
+hard can
 hard changes
 hard choose
 hard component
@@ -20,11 +21,9 @@ hard do
 hard each
 hard ensure
 hard enum
-hard every
 hard example
 hard expect
 hard fail
-hard fails
 hard failure
 hard for
 hard from
@@ -38,11 +37,9 @@ hard interface
 hard into
 hard invariant
 hard is
-hard it
 hard let
 hard mod
 hard model
-hard none
 hard not
 hard nothing
 hard of
@@ -83,4 +80,4 @@ soft entry
 soft maybe
 soft needs
 soft provides
-soft succeeds
+soft success

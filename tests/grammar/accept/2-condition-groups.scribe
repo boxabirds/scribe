@@ -6,7 +6,7 @@ to may_refund order for customer
     return all of
         status of order is in [Paid, Shipped],
         customer is active,
-        none of
+        not any of
             order is flagged_as_fraud,
             order is disputed,
             customer is suspended

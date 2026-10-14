@@ -1,7 +1,7 @@
 to port_or_default text
     given text is Text
     produces a Port
-    fails with Unexpected
+    can fail with Unexpected
     handle
         return try parse_port text
     on failure NotANumber or OutOfRange as problem

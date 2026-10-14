@@ -83,7 +83,7 @@ one reading on its own (spec Section 1).
 | Check | Result |
 | --- | --- |
 | Conformance tests, one per construct (`tests/grammar/accept`) | 45 of 45 parse with one reading |
-| Forbidden forms (`tests/grammar/reject`) | 45 of 45 rejected |
+| Forbidden forms (`tests/grammar/reject`) | 43 of 43 rejected |
 | Spec code blocks | 21 of 23; the other 2 are fragments, not whole programs |
 | Pilot doc examples, repaired | 20 of 42; the 22 others use forms the language has since removed or moved to libraries: capability descriptions, labels, `define`, tiers and proof blocks, owners, protocols, pipelines, schemas, manifests' `may` sections, typestate, `matching`, time, system files and workflows. Each file's result is in `tests/grammar/expected.json` |
 | Pilot doc examples, as written | 16 of 42; examples 22 and 30 were two of the pilot's silent misreadings, and are now errors |

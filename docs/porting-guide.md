@@ -26,20 +26,20 @@ anywhere else it goes in parentheses: `if (gcd a, b) = 1`.
 Every line of Scribe has exactly one reading, so a condition never relies on
 precedence between `and`, `or` and `not`. A chain of only `and`, or only `or`,
 fits on one line. Anything that mixes them becomes a condition group:
-`all of`, `any of` or `none of`, with one condition per line beneath it.
+`all of`, `any of` or `not any of`, with one condition per line beneath it.
 
 | Source | Scribe |
 | --- | --- |
 | `paid and shipped` | `paid and shipped` |
 | `a and (b or c)` | `all of` / `a` / `any of b, c` on the lines below, as shown next |
-| `not (a or b)` | `none of a, b` |
+| `not (a or b)` | `not any of a, b` |
 | `!a && b` | `all of` / `not a` / `b`: `not` never sits inside a chain |
 | `x > 0 ? y : z` | `if` statements; a condition is never a value chooser |
 
 ```
 return all of
     status of order is in [Paid, Shipped]
-    none of order is disputed, customer is suspended
+    not any of order is disputed, customer is suspended
     any of
         days_since_payment of order ≤ 30
         all of customer is premium, days_since_payment of order ≤ 90
@@ -66,7 +66,7 @@ fixed-width unsigned types, so they need no precedence:
 
 ## Reserved words
 
-Scribe reserves more words than most languages: 77 hard keywords, which can
+Scribe reserves more words than most languages: 74 hard keywords, which can
 never be names, and 7 soft keywords, which are keywords only inside their own
 phrase and ordinary names everywhere else. Scribe is written by machines and
 read by people, so a word reserved to make a line unambiguous costs readers
@@ -99,7 +99,7 @@ make this easier than the list suggests:
 | `type` | Declares a type | Kinds of thing, discriminators | `kind`, `category`, `variety` |
 | `set` | Changes a variable or field | Collections, setters | `members`, `seen`, `put` |
 | `handle` | Handles failures | File and resource handles | `file_handle`, `descriptor`, `token` |
-| `fail`, `fails`, `failure` | Failures and their handling | Error flags and error values | `failed`, `error`, `problem` |
+| `fail`, `failure` | Failures and their handling: `fail with`, `on failure` | Error flags and error values | `failed`, `error`, `problem` |
 | `try` | Passes a failure up | Retry counters, attempts | `attempt`, `try_count` |
 | `stop`, `skip` | Leave or continue a loop | Flags and control variables | `halted`, `should_stop`, `skipped` |
 | `hold` | Holds a resource for a block | Holding state | `held`, `holding`, `keep` |
@@ -119,11 +119,11 @@ make this easier than the list suggests:
 | `while`, `until` | Loop and range words | End times | `end_time`, `due`, `limit` |
 | `from`, `to` | Argument labels | Senders and recipients, range ends | `sender`, `recipient`, `start`, `end`, `source`, `target` |
 | `in`, `into`, `for`, `with`, `by`, `as`, `of` | Argument labels | Inputs, options, units | `input`, `options`, `unit`, a name for what it holds |
-| `it` | `if it succeeds` in contracts | Iterators, the current item | `item`, `current`, `element` |
+| `can` | `can fail with`, the failures an operation may produce | Permission flags | `allowed`, `able` |
 | `mod` | Remainder | Modules, modulus | `module_name`, `modulus` |
 | `some`, `nothing` | Present and absent values of a `maybe` | Rarely names; `some` in some query code | `any_of`, `empty` |
 | `let`, `var` | Bindings | Template variables | `variable`, `binding` |
-| `all`, `any`, `none` | Condition groups: `all of`, `any of`, `none of` | Collection helpers, flags | `everything`, `any_found`, `none_found`, `empty` |
+| `all`, `any` | Condition groups `all of`, `any of`, `not any of`; the quantifier `for all` | Collection helpers, flags | `everything`, `any_found`, `empty` |
 | `only` | `changes only`, `read only` | Filters and flags | `sole`, `exclusive`, `just_one` |
 
 ### Other hard keywords
@@ -135,7 +135,7 @@ These are rarely names in other languages, so they seldom need renaming.
 | `and`, `or`, `not` | Logic |
 | `is` | Tests: equality with words, variants, predicates, membership |
 | `at` | `starts at`, `at entry` |
-| `each`, `every`, `there` | `for each`, `for every`, `there is` |
+| `each`, `there` | `for each`, `there is` |
 | `if`, `otherwise`, `on` | Branches, `on failure` |
 | `be`, `starts` | `let x be`, `var x starts at` |
 | `through` | Ranges that include their end |
