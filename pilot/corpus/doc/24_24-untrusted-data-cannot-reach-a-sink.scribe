@@ -1,0 +1,9 @@
+to find_user name using database
+    given name is Text labelled untrusted
+    given database is a Database
+    produces a maybe User
+    fails with InvalidName, DatabaseError
+    uses database
+
+    let query be "select * from users where name = {name}"
+    ...

@@ -1,0 +1,53 @@
+note Translated from cpython Lib/bisect.py, bisect_right (lines 21 to 54).
+
+note GAP: type parameters with an ordering bound - T and K are used below as in `Queue of T`, but the doc never shows how an operation introduces its own type parameters, nor how to require that K supports `is less than`
+note GAP: operation-typed parameter - key is a function passed as a value; the doc has no type for an operation, so `an operation taking a T producing a K` is invented
+note WORKAROUND: default and keyword arguments - Python defaults lo to 0, hi to None and key to None, and key is keyword-only; Scribe has no defaults, so every caller must spell `from 0 to nothing by nothing`, and the label word `by` stands in for the keyword
+to bisect_right x in a from lo to hi by key
+    given x is a K
+    given a is a List of T
+    given lo is an Int
+    given hi is a maybe Int
+    given key is a maybe operation taking a T producing a K
+    note UNCLEAR: the docstring says "assuming a is sorted", but `sorted` is only defined in the doc for a List of Int, and with a key the list is sorted by key, not by its own values
+    expect a is sorted
+    produces an Int
+    fails with ValueError
+    note UNCLEAR: the docstring's guarantee uses the resolved hi (count of a when hi is nothing), which only exists in the body, so the header cannot name it; it is written here only for the defaults the docstring describes
+    ensure (lo is 0 and hi is nothing and key is nothing) implies (for every j from 0 until result, item j of a is at most x)
+    ensure (lo is 0 and hi is nothing and key is nothing) implies (for every j from result until count of a, item j of a is more than x)
+
+    if lo is less than 0
+        note UNCLEAR: whether `because` may follow a `fail with` statement to carry the exception message; the doc shows it only on header clauses
+        fail with ValueError because "lo must be non-negative"
+    note WORKAROUND: parameters cannot be reassigned, so Python's in-place `lo` and `hi` become new variables, and `high` needs a placeholder start because `choose` is a statement, not an expression
+    var low starts at lo
+    var high starts at 0
+    choose hi
+        when some given_hi
+            set high to given_hi
+        when nothing
+            set high to count of a
+    note Python compares with `<` only, to match __lt__ in list.sort
+    choose key
+        when nothing
+            note GAP: in this branch x is a K and the items are T, so the comparison needs T to be K; the doc has no way to say that a type parameter is fixed when an optional argument is absent
+            repeat while low is less than high
+                decreases high - low
+                note UNCLEAR: whether `/` on Int truncates, floors or gives a fraction; Python `//` floors, and the doc's examples 3 and 10 suggest whole-number division
+                let mid be (low + high) / 2
+                note UNCLEAR: what `item mid of a` does when mid is out of range; Python raises IndexError when hi is more than len(a)
+                if x is less than item mid of a
+                    set high to mid
+                otherwise
+                    set low to mid + 1
+        when some key_function
+            repeat while low is less than high
+                decreases high - low
+                let mid be (low + high) / 2
+                note GAP: calling an operation held in a variable - `key_function (item mid of a)` is invented; the doc's calls only name declared operations with their label words
+                if x is less than key_function (item mid of a)
+                    set high to mid
+                otherwise
+                    set low to mid + 1
+    give back low

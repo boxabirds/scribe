@@ -1,0 +1,33 @@
+{
+  "id": "F26",
+  "behaviour_preserved": "approximate",
+  "gaps": [
+    {"category": "default, optional and keyword arguments",
+     "construct": "nine parameters defaulting to None (tzinfo to True), fold keyword-only; callers write d.replace(day=1)",
+     "description": "No defaults and no keyword arguments, so every call must pass nine positional values, mostly 'nothing'; this destroys the purpose of replace, which is to name only the fields that change.",
+     "kind": "gap"},
+    {"category": "objects, methods and self",
+     "construct": "type(self)(...) constructs an instance of the receiver's own subclass",
+     "description": "No self, no subclasses and no way to say 'build a value of the same type as this one'; the result is always a plain DateTime, so subclasses lose their type.",
+     "kind": "gap"},
+    {"category": "missing values",
+     "construct": "tzinfo=True sentinel: True keeps, None clears, a value sets",
+     "description": "maybe has two states, but the original needs three; a three-variant choice TzinfoChange is declared, which changes the caller's spelling.",
+     "kind": "workaround"},
+    {"category": "missing values",
+     "construct": "if x is None: x = self.x, repeated nine times",
+     "description": "There is no 'value of a maybe, or else this default' expression outside together's 'or else none'; each field needs a var plus a four-line choose, turning 18 lines into about 45.",
+     "kind": "workaround"},
+    {"category": "pattern matching",
+     "construct": "a branch where nothing happens (keep the old value)",
+     "description": "choose requires every case, and there is no 'do nothing' statement; whether a when branch containing only a note is valid is not stated.",
+     "kind": "unclear"},
+    {"category": "time and clocks",
+     "construct": "a broken-down local datetime with fold and optional tzinfo",
+     "description": "The doc offers 'instant' and 'calendar date' as distinct types but no naive or zoned wall-clock date-time with a fold flag, so a plain record of Ints is used.",
+     "kind": "workaround"}
+  ],
+  "doc_rules_contradicted": [],
+  "invented_syntax": ["to replace self year month ... (nine bare positional parameters with no label words)"],
+  "notes": "Optional keyword arguments with defaults are the whole interface of this function, and Scribe has no answer; a record-update form ('self with day 1') would solve this case and many like it. The nine-fold choose repetition is the clearest density-budget failure in my set. The doc's 'or else' wording in example 37 suggests a natural spelling for maybe defaults if it were made general."
+}

@@ -1,0 +1,32 @@
+note Source: Go bufio/scan.go, (*Scanner).setErr.
+
+note GAP: errors as stored values - Go keeps the first error in a field of type error, and
+note io.EOF is one particular value of that open interface type. Scribe failures are names in
+note `fails with` lines, not values that can be stored or compared. A closed choice stands in
+note for the open error interface, so errors from any io.Reader cannot be added later.
+choice ScanError
+    EndOfFile
+    TooLong
+    NegativeAdvance
+    AdvanceTooFar
+    BadReadCount
+    FinalToken
+    ReaderError with reason as Text
+
+type Scanner
+    field err as a maybe ScanError
+
+note setErr records the first non-EOF error.
+note WORKAROUND: Go's receiver (s *Scanner) becomes an editable parameter; there are no methods.
+to set_err err on scanner
+    given err is a ScanError
+    given scanner is an editable Scanner
+
+    note WORKAROUND: Go tests `s.err == nil || s.err == io.EOF` in one condition. A maybe value
+    note can only be opened with `choose`, so the two cases become two `when` branches.
+    choose err of scanner
+        when nothing
+            set err of scanner to some err
+        when some current
+            if current is EndOfFile
+                set err of scanner to some err

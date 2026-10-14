@@ -1,0 +1,13 @@
+choice Shape
+    Circle with radius as a positive Length
+    Rectangle with width as a positive Length and height as a positive Length
+
+to area_of shape
+    given shape is a Shape
+    produces an Area
+
+    choose shape
+        when Circle with radius
+            give back pi * radius * radius
+        when Rectangle with width and height
+            give back width * height

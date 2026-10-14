@@ -1,0 +1,61 @@
+note Source: cpython/Lib/json/decoder.py, JSONDecoder.decode (lines 353-362). Python, error handling.
+note Return the Python representation of `s` (a str instance containing a JSON document).
+
+type JSONDecoder
+    note fields (object_hook, parse_float, strict, ...) omitted; only raw_decode is used here
+
+note GAP: dynamic value type - Python returns `obj` of any type (dict, list, str, int, float, bool, None). The doc has no "any" type; a choice is declared instead, which is closed where the Python result is open (object_hook can return any object).
+choice JsonValue
+    JsonObject with members as a List of JsonMember
+    JsonArray with elements as a List of JsonValue
+    JsonString with text as Text
+    JsonNumber with number as a Number
+    JsonTrue
+    JsonFalse
+    JsonNull
+
+type JsonMember
+    field key as Text
+    field value as a JsonValue
+
+note JSONDecodeError carries msg, doc, pos (and derived lineno, colno).
+note GAP: failure with a payload - `fails with` and `fail with` only show bare names. Python raises JSONDecodeError("Extra data", s, end) with a message, the document and a position. Invented: `fail with JSONDecodeError with msg "Extra data" and doc s and pos end`, borrowing the `with ... and ...` form of choice variants.
+note UNCLEAR: whether a failure is a type that can be declared; written here as a type.
+type JSONDecodeError
+    field msg as Text
+    field doc as Text
+    field pos as a Nat
+
+note WORKAROUND: tuple result - raw_decode returns (obj, end). The doc has no tuples or multiple results, so a record type is declared just to carry the pair.
+type DecodeResult
+    field obj as a JsonValue
+    field end as a Nat
+
+to raw_decode s from idx with decoder
+    given s is Text
+    given idx is a Nat
+    given decoder is a JSONDecoder
+    produces a DecodeResult
+    fails with JSONDecodeError
+
+note WHITESPACE is a module-level compiled regex `[ \t\n\r]*`; `.match(s, pos).end()` gives the index after the whitespace run.
+to skip_whitespace s from pos
+    given s is Text
+    given pos is a Nat
+    produces a Nat
+
+note WORKAROUND: default argument used for speed - `_w=WHITESPACE.match` binds a global regex method as a default parameter so lookups are local. The doc has no default arguments and no first-class functions; the parameter is dropped and skip_whitespace is called directly. Callers that passed their own `_w` cannot be expressed.
+note WORKAROUND: method and self - `decode` is a method; `self` becomes an explicit parameter `decoder`.
+to decode s with decoder
+    given s is Text
+    given decoder is a JSONDecoder
+    produces a JsonValue
+    fails with JSONDecodeError
+
+    let start be skip_whitespace s from 0
+    let decoded be try raw_decode s from start with decoder
+    let end be skip_whitespace s from end of decoded
+    note UNCLEAR: `count of s` for the length of Text - the doc shows `count of` only on lists and `length` only in a refinement (`Text with length 1 through 100`).
+    if end is not count of s
+        fail with JSONDecodeError with msg "Extra data" and doc s and pos end
+    give back obj of decoded

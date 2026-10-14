@@ -1,0 +1,23 @@
+to search target in sorted_items
+    given target is an Int
+    given sorted_items is a List of Int
+    expect sorted_items is sorted
+    produces a maybe Position
+    ensure if result is some p, item p of sorted_items is target
+    ensure if result is nothing, target is not in sorted_items
+
+    var low starts at 0
+    var high starts at count of sorted_items
+    repeat while low is less than high
+        invariant 0 is at most low and low is at most high and high is at most count of sorted_items
+        invariant for every j from 0 until low, item j of sorted_items is less than target
+        invariant for every j from high until count of sorted_items, item j of sorted_items is more than target
+        decreases high - low
+        let middle be low + (high - low) / 2
+        if item middle of sorted_items is target
+            give back some middle
+        otherwise if item middle of sorted_items is less than target
+            set low to middle + 1
+        otherwise
+            set high to middle
+    give back nothing

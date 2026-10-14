@@ -1,0 +1,141 @@
+note Translated from CPython Lib/tempfile.py TemporaryFile (lines 703 to 776), the Linux branch.
+note Create and return a temporary file. The file has no name, and will cease to exist when it is closed.
+
+note Helpers, declared briefly.
+
+choice FileMode
+    note WORKAROUND: Python's mode is a string such as "w+b" tested with `"b" not in mode`; a choice is used instead
+    ReadWriteBinary
+    ReadWriteText
+    note ... the other io.open modes
+
+choice OutputType
+    TextNames
+    ByteNames
+
+type SanitizedParams
+    field prefix as Text
+    field suffix as Text
+    field dir as a Path
+    field output_type as an OutputType
+
+choice FileObject
+    note GAP: a value whose kind depends on mode at run time - io.open returns a BufferedRandom, a TextIOWrapper or a FileIO, all "file-like"; the doc has no interface type, so a choice is used
+    Binary with stream as an editable BufferedFile
+    Text_stream with stream as an editable TextFile
+    Raw with stream as an editable RawFile
+
+to text_encoding encoding
+    given encoding is a maybe Text
+    produces Text
+
+to sanitize_params prefix suffix dir using files
+    given prefix is a maybe Text
+    given suffix is a maybe Text
+    given dir is a maybe Path
+    given files is a FileSystem
+    produces a SanitizedParams
+    uses files
+
+to open_tmpfile_in dir with flags using files
+    given dir is a Path
+    given flags is an OpenFlags
+    given files is a FileSystem
+    produces a FileDescriptor
+    fails with IsADirectoryError, OSError
+    uses files
+
+to mkstemp_inner dir prefix suffix flags output_type using files
+    given dir is a Path
+    given prefix is Text
+    given suffix is Text
+    given flags is an OpenFlags
+    given output_type is an OutputType
+    given files is a FileSystem
+    produces a FileDescriptor and a Path
+    fails with OSError
+    uses files
+
+to unlink name using files
+    given name is a Path
+    given files is a FileSystem
+    fails with OSError
+    uses files
+
+to close_descriptor fd using files
+    given fd is a consumed FileDescriptor
+    given files is a FileSystem
+    uses files
+
+to open_stream fd with mode and buffering and newline and encoding and errors using memory
+    given fd is a consumed FileDescriptor
+    given mode is a FileMode
+    given buffering is an Int
+    given newline is a maybe Text
+    given encoding is a maybe Text
+    given errors is a maybe Text
+    given memory is an Allocator
+    produces a FileObject
+    fails with OSError, OutOfMemory
+    uses memory
+
+note GAP: module-level mutable state - Python's `global _O_TMPFILE_WORKS` is a flag shared by every caller and written on failure; the doc has no module variable, so a guess is written
+module var o_tmpfile_works starts at true
+
+note GAP: default and keyword arguments - Python has mode='w+b', buffering=-1, encoding=None, newline=None, suffix=None, prefix=None, dir=None and keyword-only errors=None; the doc has no defaults, so every caller must pass all eight
+to temporary_file mode buffering encoding newline suffix prefix dir errors using files and memory
+    given mode is a FileMode
+    given buffering is an Int
+    given encoding is a maybe Text
+    given newline is a maybe Text
+    given suffix is a maybe Text
+    given prefix is a maybe Text
+    given dir is a maybe Path
+    given errors is a maybe Text
+    given files is a FileSystem
+    given memory is an Allocator
+    produces a FileObject
+    fails with OSError, OutOfMemory
+    note UNCLEAR: the operation reads and writes o_tmpfile_works; the doc has no way to list module state in uses, so it is listed as if it were a capability
+    uses files, memory, o_tmpfile_works
+    note GAP: an operation that returns an open linear resource - example 19 only shows `hold`, which releases on exit; here the file must outlive the operation and be closed by the caller, and the doc does not say how a produces line marks that
+
+    note WORKAROUND: Python rebinds the parameter encoding; a new name is used because the doc never sets a parameter
+    var chosen_encoding starts at encoding
+    if mode is not ReadWriteBinary
+        set chosen_encoding to some text_encoding encoding
+
+    let params be sanitize_params prefix suffix dir using files
+
+    note GAP: bit operations on open flags - Python computes (flags | O_TMPFILE) & ~O_CREAT & ~O_EXCL; the doc has no bitwise or, and, not, so set-like words are invented
+    let flags be bin_openflags
+    if o_tmpfile_works
+        let tmp_flags be flags with o_tmpfile without o_creat without o_excl
+        note WORKAROUND: Python passes a nested opener closure that writes fd through nonlocal, so io.open can call back into it; the doc has no closures, so the descriptor is opened first and then handed to open_stream
+        handle
+            let fd be try open_tmpfile_in dir of params with tmp_flags using files
+            let file be try open_stream fd with mode and buffering and newline and chosen_encoding and errors using memory
+            note GAP: reflection - Python walks getattr(file, 'buffer', file) then getattr(raw, 'raw', raw) and sets raw.name = fd; the doc has no attribute lookup by name and no way to set a field on an object reached through another
+            note set name of raw_of file to fd
+            give back file
+        on failure IsADirectoryError
+            note Linux kernel older than 3.11 ignores the O_TMPFILE flag: O_TMPFILE is read as O_DIRECTORY. Set the flag to false to not try again.
+            set o_tmpfile_works to false
+        on failure OSError
+            note The filesystem of the directory does not support O_TMPFILE.
+            note WORKAROUND: Python's `pass` swallows the error and falls through; the doc says an on failure line may not be empty, so a pointless binding stands in for "do nothing and fall back"
+            let fallback be true
+    note Fall back to mkstemp_inner.
+
+    let created be try mkstemp_inner dir of params prefix of params suffix of params flags output_type of params using files
+    note UNCLEAR: mkstemp_inner returns a pair (fd, name); the doc has no tuple type or destructuring, so `fd of created` and `name of created` are assumed
+    let fd be fd of created
+    handle
+        try unlink name of created using files
+    note GAP: catch everything, clean up, and re-raise - Python's `except BaseException: close(fd); raise` catches any exception including KeyboardInterrupt; the doc only names specific failures and has no re-raise of an unnamed one
+    on failure OSError as problem
+        close_descriptor fd using files
+        fail with problem
+    let file be try open_stream fd with mode and buffering and newline and chosen_encoding and errors using memory
+    note set name of raw_of file to fd  (same reflection gap as above)
+    give back file

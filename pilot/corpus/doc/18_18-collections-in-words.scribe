@@ -1,0 +1,10 @@
+to total_paid orders
+    given orders is a List of Order
+    produces Money
+    ensure result is sum of total_of order for each order in orders where status of order is Paid
+
+    var total starts at zero_money
+    for each order in orders
+        if status of order is Paid
+            set total to total + total_of order
+    give back total

@@ -1,0 +1,5 @@
+let rate be 0.2
+var attempts starts at 0
+
+set attempts to attempts + 1
+set rate to 0.3

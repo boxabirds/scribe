@@ -1,0 +1,29 @@
+{
+  "id": "F29",
+  "behaviour_preserved": "approximate",
+  "gaps": [
+    {"category": "generics and type parameters",
+     "construct": "_class=HTTPMessage: a class object passed in so the parser constructs a caller-chosen Message subclass",
+     "description": "No class values, no type parameters on operations (only on types, as in `Queue of T`), and no interface/subtyping to say 'some subclass of Message'. The parameter had to be dropped and the result fixed to HTTPMessage.",
+     "kind": "gap"},
+    {"category": "default, optional and keyword arguments",
+     "construct": "keyword argument with a default value (_class=HTTPMessage)",
+     "description": "No defaults or keyword arguments; normally one would add a second operation or make it required, but here the value itself is inexpressible.",
+     "kind": "workaround"},
+    {"category": "characters, bytes and strings",
+     "construct": "bytes.decode('iso-8859-1')",
+     "description": "The doc has Bytes and Text but no named encodings or decode operation; the phrase `decode ... as iso_8859_1` is invented.",
+     "kind": "gap"},
+    {"category": "characters, bytes and strings",
+     "construct": "b''.join(header_lines)",
+     "description": "No join for Bytes lists; declared a helper.",
+     "kind": "workaround"},
+    {"category": "objects, methods and self",
+     "construct": "email.parser.Parser(...).parsestr(...) constructing a parser object and calling a method",
+     "description": "No constructors or methods; collapsed into one operation, which is fine here because the object is used once.",
+     "kind": "workaround"}
+  ],
+  "doc_rules_contradicted": [],
+  "invented_syntax": ["decode joined as iso_8859_1", "join_bytes"],
+  "notes": "The body is three clean lines; the cost is entirely in the headers of helpers that Python takes for granted (join, decode, parse) and in allocation becoming an explicit capability. The docstring's reasoning (why bytes, not a TextIOWrapper) has no natural home other than `note` lines; a `because` on the operation would fit if it were allowed there."
+}

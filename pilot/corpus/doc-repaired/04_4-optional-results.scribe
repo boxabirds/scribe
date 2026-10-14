@@ -1,0 +1,23 @@
+to find target in items
+    given target is an Int
+    given items is a List of Int
+    produces a maybe Position
+    ensure if result is some p, item p of items is target
+    ensure if result is nothing, target is not in items
+
+    for each i from 0 until count of items
+        invariant for every j from 0 until i, item j of items is not target
+        if item i of items is target
+            give back some i
+    give back nothing
+
+to describe_search target in items
+    given target is an Int
+    given items is a List of Int
+    produces Text
+
+    choose find target in items
+        when some p
+            give back "found at position {p}"
+        when nothing
+            give back "not found"

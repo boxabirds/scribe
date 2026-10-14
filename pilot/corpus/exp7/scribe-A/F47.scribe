@@ -1,0 +1,36 @@
+note Translation of HMAC.update from CPython (Lib/hmac.py).
+note Feed data from msg into this hashing object.
+
+note GAP: the HMAC object holds either a native _hmac object (from OpenSSL or HACL*) or a pure-Python _inner hash, and the other is None. Both have an update method, called through duck typing. The doc has no interfaces or dynamic dispatch, so the two kinds are a choice, and `Hash` stands for any hashlib hash object, whose concrete kind the doc cannot name.
+choice HmacState
+    Native with hmac as a NativeHmac
+    Pure with inner as a Hash and outer as a Hash
+
+type HMAC
+    field state as an HmacState
+    field digest_size as a Nat
+    field block_size as a Nat
+
+to update_native hmac with msg
+    given hmac is an editable NativeHmac
+    given msg is Bytes
+    uses hmac
+
+to update_hash hash with msg
+    given hash is an editable Hash
+    given msg is Bytes
+    uses hash
+
+note WORKAROUND: a method on self becomes an operation with the HMAC as an editable argument.
+note UNCLEAR: the original mutates the hash object that a field refers to. The doc says changing an editable argument is not an effect, but a native hash may hold foreign state. `uses` on the helpers is a guess at how that is shown.
+note UNCLEAR: `self._hmac or self._inner` relies on None being false. With a choice there is no None, but the doc does not say whether a field reached through `choose` on an editable record is itself editable.
+to update hmac_object with msg
+    given hmac_object is an editable HMAC
+    given msg is Bytes
+    note WORKAROUND: Python accepts any bytes-like object (bytes, bytearray, memoryview). The doc has no interface for this, so msg is Bytes.
+
+    choose state of hmac_object
+        when Native with hmac
+            update_native hmac with msg
+        when Pure with inner and outer
+            update_hash inner with msg

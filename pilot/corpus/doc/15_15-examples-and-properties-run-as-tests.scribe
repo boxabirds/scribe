@@ -1,0 +1,4 @@
+example largest [3, 9, 2] is 9
+example largest [5] is 5
+example find 7 in [1, 7, 7] is some 1
+property for every items that is a non-empty List of Int, largest items is in items

@@ -1,0 +1,60 @@
+note Translation of Erlang/OTP calendar.erl offset_string_adjustment/3
+
+choice OffsetError
+    BadOffset
+    note WORKAROUND: Erlang raises a badmatch or case_clause exception when Tz is malformed (too short, bad sign, bad separator) and badarg from list_to_integer on non-digits; Scribe needs every failure named, so the distinct crashes collapse into one invented BadOffset
+
+to parse_int text
+    given text is Text
+    produces an Int
+    fails with NotANumber
+    note list_to_integer, as used in example 6 of the doc
+
+to offset_string_adjustment time and unit for tz
+    given time is an Int
+    given unit is a TimeUnit
+    given tz is Text
+    produces an Int
+    fails with BadOffset
+    note UNCLEAR: time and unit are ignored by every clause; the doc does not say whether an unused parameter is allowed, warned or needs a marker like Erlang's leading underscore
+    note WORKAROUND: the result is a number of seconds as a plain Int; the doc's units-in-types (example 17) would make this a Duration, but the original is unitless and the sign carries meaning, so no unit is claimed
+
+    if tz is "Z" or tz is "z"
+        give back 0
+
+    note GAP: destructuring a string as a list of characters - Erlang matches [Sign, H1, H2 | MinutesDiff] = Tz; the doc has no list or string pattern, no character type and no substring operation, so `character i of tz` and `characters i until j of tz` are invented
+    if count of tz is less than 3
+        fail with BadOffset
+    let sign be character 0 of tz
+    let rest be characters 3 until count of tz of tz
+
+    let hour be handle_bad_offset (characters 1 until 3 of tz)
+
+    var minutes starts at 0
+    if count of rest is 0
+        set minutes to 0
+    otherwise if count of rest is 3 and character 0 of rest is ":"
+        set minutes to handle_bad_offset (characters 1 until 3 of rest)
+    otherwise
+        fail with BadOffset
+    note WORKAROUND: the Erlang `case MinutesDiff of [$:, M1, M2] -> ...; [] -> 0` is a match on list shape; `choose` only matches variants and maybe values, so it becomes an if chain on length and content
+
+    let adjustment be 3600 * hour + 60 * minutes
+    if sign is "-"
+        give back 0 - adjustment
+        note UNCLEAR: unary minus is not shown in the doc; `0 - adjustment` is used
+    otherwise if sign is "+"
+        give back adjustment
+    otherwise
+        fail with BadOffset
+
+to handle_bad_offset digits
+    given digits is Text
+    produces an Int
+    fails with BadOffset
+    note WORKAROUND: a helper only to turn NotANumber into BadOffset; the doc's `handle` must wrap a whole block and give back from it, so mapping one failure name to another inline needs a separate operation
+
+    handle
+        give back try parse_int digits
+    on failure NotANumber
+        fail with BadOffset

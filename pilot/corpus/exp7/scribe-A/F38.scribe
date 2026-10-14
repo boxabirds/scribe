@@ -1,0 +1,52 @@
+note Translated from CPython Lib/concurrent/futures/_base.py Future.set_result (lines 543 to 556).
+note Sets the return value of work associated with the future.
+note Should only be used by Executor implementations and unit tests.
+
+choice FutureState
+    Pending
+    Running
+    Cancelled
+    Cancelled_and_notified
+    Finished
+
+note GAP: generics and type parameters - the result can be any Python object; the doc shows `of T` only on a type declaration, so Future of T is used and an operation on it has nowhere to introduce T
+type Future of T
+    field condition as a Condition
+    field state as a FutureState
+    field result as a maybe T
+    note GAP: shared mutable references - waiters are objects owned elsewhere (one per wait() or as_completed() call) and held here by reference so they can be told about this future; the doc has no shared reference type
+    field waiters as a List of shared Waiter
+    note GAP: closures and stored callbacks - done callbacks are stored functions run later; the doc has no type for a stored operation
+    field done_callbacks as a List of Callback
+
+to add_result future to waiter
+    given future is a Future of T
+    given waiter is an editable shared Waiter
+    uses waiter
+
+to invoke_callbacks future
+    given future is a Future of T
+    note UNCLEAR: the callbacks can do anything; the doc cannot say "uses whatever the stored callbacks use"
+    uses callbacks
+
+note GAP: objects, methods and self - set_result is a method on Future, called from another thread through a shared reference; the doc has no self and treats `editable` as exclusive ownership, which cannot be true for an object two threads hold
+to set_result result on future
+    given result is a T
+    given future is an editable shared Future of T
+    fails with InvalidStateError
+    note GAP: concurrency, threads and locks - the doc says values are never shared mutably between tasks and there is nothing for a lock to protect; this operation exists to mutate shared state under a lock and wake other threads, so `uses` lists the lock as if it were a capability
+    uses condition of future, waiter, callbacks
+
+    note GAP: holding a lock for a block - Python's `with self._condition:` acquires a re-entrant lock and releases it on every exit; `hold` is shown only for files, so `hold ... locked` is a guess at the form
+    hold guard as locked condition of future
+        note WORKAROUND: Python tests membership in a set literal; the doc shows `is in` only on lists, so a list literal of variants is used
+        if state of future is in [Cancelled, Cancelled_and_notified, Finished]
+            note GAP: formatted repr of an object in the message - '{}: {!r}'.format(self._state, self) needs a repr of the whole future; the doc's failures carry no message and there is no repr
+            fail with InvalidStateError
+        set result of future to some result
+        set state of future to Finished
+        for each waiter in waiters of future
+            add_result future to waiter
+        note GAP: condition variables - notify_all wakes every thread waiting on the condition; the doc has no wait or notify
+        notify_all condition of future
+    invoke_callbacks future

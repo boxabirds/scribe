@@ -1,0 +1,25 @@
+{
+  "id": "F16",
+  "behaviour_preserved": "approximate",
+  "gaps": [
+    {"category": "error types and exceptions",
+     "construct": "an error stored in a struct field and compared against the sentinel io.EOF",
+     "description": "Scribe failures exist only as names in `fails with` / `fail with` / `on failure`; they are not values. A closed `choice ScanError` stands in, which cannot hold arbitrary errors returned by the wrapped io.Reader (approximated by a `ReaderError with reason as Text` variant).",
+     "kind": "gap"},
+    {"category": "interfaces and dynamic dispatch",
+     "construct": "the open `error` interface type",
+     "description": "No interface or open sum type exists, so the set of storable errors is fixed when ScanError is declared.",
+     "kind": "workaround"},
+    {"category": "missing values",
+     "construct": "s.err == nil || s.err == io.EOF in one boolean test",
+     "description": "A maybe value cannot be tested inline (`err of scanner is nothing` is not shown as valid) and its payload needs `choose`, so a one-line condition becomes a choose with two branches and a duplicated set line.",
+     "kind": "workaround"},
+    {"category": "objects, methods and self",
+     "construct": "method with pointer receiver (s *Scanner)",
+     "description": "No methods; the receiver becomes an `editable` parameter. This works but loses method-call syntax and grouping with the type.",
+     "kind": "workaround"}
+  ],
+  "doc_rules_contradicted": [],
+  "invented_syntax": [],
+  "notes": "Small function, but it shows that Scribe has no 'error value' concept: any API that records, defers or compares errors (bufio, database drivers, retry loops) must invent a parallel choice type outside the failure system. Consider either letting failures be first-class values of a choice, or allowing `is nothing` / `is some` tests on maybe values without a full choose."
+}

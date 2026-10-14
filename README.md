@@ -3,32 +3,51 @@
 A systems language for code written by machines and reviewed by people. The
 specification is [docs/spec.md](docs/spec.md) (draft 0.3).
 
+| Folder | What it is |
+| --- | --- |
+| `docs/` | The specification |
+| `grammar/`, `tools/` | The reference grammar and its tools. These change as the language does |
+| `pilot/` | The record of the pilot (experiments 3 and 7, spec Appendix B.1), kept as it ran. Do not edit |
+
 ## Reference grammar
 
-`grammar/scribe-grammar-v0.2.lark` is the Earley grammar from the pilot
-(spec Appendix A). It is the oracle a production parser will be tested
-against, not a production parser itself.
+`grammar/scribe.lark` is the Earley grammar of spec Appendix A, built from
+`grammar/scribe.lark.tmpl`. It states the language precisely and is the oracle
+a production parser will be tested against; it is not a production parser.
 
     pip install -r requirements.txt
-    python3 tools/parse.py --spec docs/spec.md    # every code block in the spec
-    python3 tools/parse.py FILE...
+    python3 tools/build_grammar.py grammar/scribe.lark.tmpl grammar/scribe.lark
+    python3 tools/run3.py grammar/scribe.lark FILE_OR_DIR...
 
-The grammar expects layout as tokens (`⏎` end of line, `⇥` indent, `⇤`
-dedent, `⟪…⟫` prose) and every keyword as its own token, so it runs with
-Lark's standard lexer behind `tools/prelex.py`. Both tools are
-reconstructions: the pilot's own pre-lexer and runner (`tools/` in
-`scribe-pilot-wave1.zip`) are not in this repository, and neither are rules
-D1 and D2, which the pilot applied after parsing.
+`tools/pre.py` turns layout into tokens (`⏎` end of line, `⇥` indent, `⇤`
+dedent, `⟪…⟫` prose) and `tools/run3.py` parses with every reading kept, then
+applies rules D1 and D2. To parse the code in the specification:
+
+    python3 tools/spec_blocks.py docs/spec.md /tmp/spec
+    python3 tools/run3.py grammar/scribe.lark /tmp/spec
+
+These started as copies of the pilot's tools. One change since: the pilot's
+`build_grammar.py` ordered keywords of equal length by Python's set order, so
+the built grammar's bytes changed from run to run (the language it accepts did
+not). Ties are now broken by spelling.
 
 ### The grammar against spec 0.3
 
-20 of the 27 Scribe code blocks in the spec parse with exactly one tree.
+21 of the 26 Scribe code blocks in the specification parse with exactly one
+reading; one of them (5.4) needs rule D1. The other 5 use what draft 0.3 added
+after the v0.2 grammar:
 
-| Block | Result | Why |
-| --- | --- | --- |
-| 5.4 comprehension | ambiguous | `where` scope; rule D1 resolves it after parsing |
-| 10.2 examples | error | `example` as a contract clause; v0.2 allows it only at top level |
-| 10.3 platform scoping | error | `on <platform>` and `in build` are new in 0.3 |
-| 10.6 corrections | error | `corrects` is new in 0.3 (the block is also a fragment) |
-| 11.2 interfaces | error | `interface` is new in 0.3 |
-| 12.3 correction | error | a fragment, not a whole item |
+| Section | Construct |
+| --- | --- |
+| 10.2 | `example` as a contract clause (v0.2 allows it only at top level) |
+| 10.3 | `on <platform>` and `in build` scoping |
+| 10.6, 12.3 | `corrects` |
+| 11.2 | `interface` |
+
+## The pilot
+
+`pilot/` is `scribe-pilot-wave1.zip`; its README lists the commands to repeat
+it. Its grammar and tools match `results/checksums-final.txt`, and re-running
+experiment 3 reproduces the recorded output byte for byte (33 of 42 doc
+examples as written, 42 of 42 repaired). [pilot/ARCHIVE.md](pilot/ARCHIVE.md)
+lists what differs from the zip.

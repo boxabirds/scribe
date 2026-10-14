@@ -1,0 +1,157 @@
+note Translation of tokio sync/oneshot.rs Sender::poll_closed
+
+note GAP: poll-based futures - the original is a hand-written Future step: it is called repeatedly by an executor with a task Context, returns Ready or Pending, and registers a Waker so the executor knows when to call again; the doc's only concurrency forms are `together`, `pipeline` and `workflow`, which hide scheduling entirely, so the Poll result, the Context and the Waker are all declared here as opaque types
+choice Poll
+    Ready
+    Pending
+
+type TaskContext
+type Waker
+
+note GAP: atomic state shared between two tasks - inner.state is an AtomicUsize read and updated by both Sender and Receiver with Acquire/AcqRel ordering; the doc forbids values shared mutably between tasks and has no atomics or memory ordering, so `SharedState` is a capability whose operations stand for the atomic loads and read-modify-writes
+type StateBits
+    note a snapshot of the bit flags (VALUE_SENT, CLOSED, TX_TASK_SET, RX_TASK_SET) read from the atomic
+
+define bits is closed
+    given bits is a StateBits
+define bits is tx_task_set
+    given bits is a StateBits
+
+type SharedState
+    note opaque: an atomic word shared with the Receiver
+
+to load_state from shared with acquire_ordering
+    given shared is a SharedState
+    produces a StateBits
+    uses shared
+    note GAP: memory ordering - the doc has no way to name Acquire, so `with acquire_ordering` is an invented label word that only records the intent
+
+to unset_tx_task in shared
+    given shared is a SharedState
+    produces a StateBits
+    uses shared
+
+to set_tx_task in shared
+    given shared is a SharedState
+    produces a StateBits
+    uses shared
+
+note GAP: unsafe cell access - inner.tx_task is an UnsafeCell<MaybeUninit<Waker>> whose validity is guarded by the TX_TASK_SET bit, and every access is inside `unsafe`; the doc's only escape hatch is `trust` with a reason and owner, so each unsafe block becomes a `trust` line before an operation on an opaque TaskSlot
+type TaskSlot
+
+to will_wake slot with context
+    given slot is a TaskSlot
+    given context is a TaskContext
+    produces a Bool
+    uses slot
+
+to drop_task in slot
+    given slot is an editable TaskSlot
+    uses slot
+
+to set_task in slot from context
+    given slot is an editable TaskSlot
+    given context is a TaskContext
+    uses slot
+
+type Inner
+    field state as a SharedState
+    field tx_task as a TaskSlot
+
+type Sender
+    field inner as a maybe Inner
+    note GAP: inner is an Option<Arc<Inner>>; Arc is reference-counted shared ownership with the Receiver, and the doc has no shared-ownership pointer, only owned values and editable borrows
+
+type Budget
+    note the coop budget guard returned by poll_proceed
+
+to trace_leaf context
+    given context is a TaskContext
+    produces a Poll
+    uses context
+
+to poll_proceed context
+    given context is a TaskContext
+    produces a maybe Budget
+    uses context
+    note `nothing` stands for Pending: the task has used its budget and has been woken to yield
+
+to made_progress budget
+    given budget is a consumed Budget
+    uses budget
+    note GAP: RestoreOnPending - the Rust guard restores the budget when it is dropped unless made_progress was called; that is a destructor with behaviour, and the doc's `hold` only releases resources, it cannot run different code depending on whether a method was called first
+
+to poll_closed sender with context
+    given sender is an editable Sender
+    given context is an editable TaskContext
+    produces a Poll
+    fails with SenderHasNoInner
+    uses context
+    note WORKAROUND: `self.inner.as_ref().unwrap()` panics if inner is None; Scribe has no panic, so the unwrap becomes a named failure the original does not declare
+    note UNCLEAR: whether `uses` must also list inner's state and tx_task, which are reached through a field of the editable sender but are shared with another task
+
+    note GAP: the `ready!` macro - returns Pending early from the enclosing function if the inner poll is Pending; the doc has no macros, so each use is spelled out as a `choose`
+    choose trace_leaf context
+        when Pending
+            give back Pending
+        when Ready
+            note continue
+
+    note Keep track of task budget
+    var coop starts at nothing
+    choose poll_proceed context
+        when nothing
+            give back Pending
+        when some budget
+            set coop to some budget
+    note WORKAROUND: the budget guard must be consumed by made_progress on every Ready path and simply dropped on the Pending path; with a `consumed` linear Budget, the Pending path at the end would leak it, so the guard is held in a maybe var and the rule is only kept by the notes below
+    note UNCLEAR: whether a linear value inside a `maybe` var is tracked; the doc shows linearity only for files and connections
+
+    var inner_found starts at nothing
+    choose inner of sender
+        when nothing
+            fail with SenderHasNoInner
+        when some value
+            set inner_found to some value
+    note WORKAROUND: the doc's `choose` binds the payload only inside the arm, so to use `inner` for the rest of the body it is copied out into a var, which then needs a second `choose` at every use; below `inner` is written as if it were bound
+    note GAP: binding a maybe payload for the rest of the block (an unwrap-or-fail); the doc has no `let x be try ...` form for maybe values
+
+    var state starts at load_state from (state of inner) with acquire_ordering
+
+    if state is closed
+        made_progress coop
+        give back Ready
+
+    if state is tx_task_set
+        trust "TX_TASK_SET is set, so tx_task holds an initialised waker that only this sender touches" owner tokio_maintainers
+        let will_notify be will_wake (tx_task of inner) with context
+
+        if not will_notify
+            set state to unset_tx_task in (state of inner)
+
+            if state is closed
+                note Set the flag again so that the waker is released in drop
+                let ignored be set_tx_task in (state of inner)
+                note WORKAROUND: the Rust code discards the result of set_tx_task; the doc shows no statement form for calling an operation and ignoring its result
+                made_progress coop
+                give back Ready
+            otherwise
+                trust "TX_TASK_SET was just cleared by this sender, so no other side reads tx_task" owner tokio_maintainers
+                drop_task in (tx_task of inner)
+
+    if not (state is tx_task_set)
+        note Attempt to set the task
+        trust "TX_TASK_SET is clear, so this sender has exclusive access to tx_task" owner tokio_maintainers
+        set_task in (tx_task of inner) from context
+
+        note Update the state
+        set state to set_tx_task in (state of inner)
+
+        if state is closed
+            made_progress coop
+            give back Ready
+
+    give back Pending
+
+choice SenderFailure
+    SenderHasNoInner

@@ -1,0 +1,6 @@
+var total starts at 0
+together
+    for each a in first_half
+        set total to total + a
+    for each b in second_half
+        set total to total + b

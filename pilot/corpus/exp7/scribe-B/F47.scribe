@@ -1,0 +1,31 @@
+note F47: CPython Lib/hmac.py, HMAC.update
+
+note GAP: interfaces and dynamic dispatch - _hmac (a C-accelerated HMAC object) and _inner (a hashlib hash object) are different classes that both have an update method, and the call is dispatched on whichever one is present; the doc has no interface or method declaration, so Hasher stands for "anything with update"
+type Hmac
+    note WORKAROUND: Python uses None for "no fast HMAC object"; here it is a maybe field
+    field fast_hmac as a maybe Hasher
+    field inner as a maybe Hasher
+    field outer as a maybe Hasher
+
+to update_hasher hasher with msg
+    given hasher is an editable Hasher
+    given msg is Bytes
+
+to update hmac with msg
+    note UNCLEAR: the docstring says "Feed data from msg into this hashing object"; Python accepts any bytes-like object (bytes, bytearray, memoryview), and the doc has only Bytes
+    given hmac is an editable Hmac
+    given msg is Bytes
+    note WORKAROUND: in Python `self._hmac or self._inner` relies on truthiness, and when neither is set the call fails with AttributeError on None; Scribe has no truthiness, so both are matched explicitly and the impossible case becomes a named failure
+    fails with NoHashState
+
+    note WORKAROUND: `inst = a or b` followed by one call becomes a nested choose; changing a value held inside a maybe field needs it bound by the choose, and the doc does not say whether that binding is editable in place
+    note UNCLEAR: whether `when some h` on an editable field binds h by reference so that update_hasher changes the hasher inside hmac, or binds a copy
+    choose fast_hmac of hmac
+        when some h
+            update_hasher h with msg
+        when nothing
+            choose inner of hmac
+                when some h
+                    update_hasher h with msg
+                when nothing
+                    fail with NoHashState

@@ -1,0 +1,37 @@
+{
+  "id": "F12",
+  "behaviour_preserved": "approximate",
+  "gaps": [
+    {"category": "error types and exceptions",
+     "construct": "raise JSONDecodeError(\"Extra data\", s, end) - an exception carrying a message, the document and a position",
+     "description": "The doc only shows failures as bare names (`fail with OutOfRange`); there is no way to attach data to a failure. Invented `fail with JSONDecodeError with msg ... and doc ... and pos ...`.",
+     "kind": "gap"},
+    {"category": "interfaces and dynamic dispatch",
+     "construct": "Result of any Python type (dict/list/str/int/float/bool/None, or whatever object_hook returns)",
+     "description": "No dynamic or open 'any' type; a closed JsonValue choice was declared, which cannot represent object_hook/parse_float custom results.",
+     "kind": "gap"},
+    {"category": "default, optional and keyword arguments",
+     "construct": "_w=WHITESPACE.match default parameter, and keyword argument idx=",
+     "description": "No default or keyword arguments and no function values; the parameter is dropped and the helper called directly, so callers overriding _w cannot be expressed.",
+     "kind": "workaround"},
+    {"category": "objects, methods and self",
+     "construct": "Method on JSONDecoder using self.raw_decode",
+     "description": "No methods; self becomes an explicit `with decoder` parameter.",
+     "kind": "workaround"},
+    {"category": "collections and iteration",
+     "construct": "Tuple return and unpacking: obj, end = self.raw_decode(...)",
+     "description": "No tuples or multiple results; a single-use record type DecodeResult is declared and fields read with `of`.",
+     "kind": "workaround"},
+    {"category": "characters, bytes and strings",
+     "construct": "len(s) on a str, and regex match of whitespace",
+     "description": "The doc shows `count of` only for lists and `length` only in a refinement; it is unclear which gives the length of Text. Regex matching has no vocabulary, so it is hidden behind a declared helper.",
+     "kind": "unclear"}
+  ],
+  "doc_rules_contradicted": [],
+  "invented_syntax": [
+    "fail with JSONDecodeError with msg \"Extra data\" and doc s and pos end",
+    "a failure declared as a `type`",
+    "Number (type name for JSON numbers)"
+  ],
+  "notes": "Simple control flow translates cleanly and the `fails with` header is a real improvement over Python's invisible raise. The two blockers are failures that carry data (almost every real exception does) and the absence of a dynamic/any type for decoders that return host-language objects."
+}

@@ -1,0 +1,12 @@
+workflow nightly_billing for date
+    given date is a CalendarDate
+    produces a BillingSummary
+    runs at most once per date
+    survives restarts
+    uses billing
+
+    let accounts be list_billable_accounts for date in billing
+    for each account in accounts
+        remember progress by account
+        try bill account for date in billing
+    give back summary of accounts

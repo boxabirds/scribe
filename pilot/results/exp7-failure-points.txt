@@ -1,0 +1,31 @@
+failure points: A 107 in 1912 code lines;  B 26 in 513
+  27    7  operation signature: several parameters or new label words
+   5    9  other
+  13    0  references, sharing and atomics
+   9    4  name collides with a reserved word
+   7    2  generic and multi-parameter types
+   8    0  failures carrying data or a reason
+   8    0  several capabilities in a signature
+   7    0  slices and ranges as arguments
+   4    3  operation types, lambdas and callbacks
+   5    1  empty branch or bare give back
+   5    0  record construction with named fields
+   5    0  bit operations
+   2    0  predicate definitions with parameters
+   2    0  assertion inside a body
+
+== other
+   F10:67 let cutoff be 2 to the power (size - 1)
+   F11:77 give back some try text_from ordered using memory
+   F14:83 module var o_tmpfile_works starts at true
+   F28:27 uses r of reader
+   F30:28 give back some keys_result of command
+   F21:67 repeat while byte_at p in line is a space_byte
+   F21:85 if here is byte "\\" and next is byte "x" and third is a hex_digit and fourth is a hex_digit
+   F21:90 otherwise if here is byte "\\" and next is not byte "\0"
+   F21:105 otherwise if here is byte "\""
+   F21:111 otherwise if here is byte "\0"
+   F21:114 otherwise
+   F21:123 if next is not byte "\0" and not (next is a space_byte)
+   F31:20 when Node with l and v and d and r
+   F38:29 uses callbacks of future

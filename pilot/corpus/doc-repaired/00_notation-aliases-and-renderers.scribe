@@ -1,0 +1,1 @@
+invariant 0 <= low <= high <= count of sorted_items

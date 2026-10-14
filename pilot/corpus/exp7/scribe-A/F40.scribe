@@ -1,0 +1,39 @@
+note Source: CPython Lib/dbm/dumb.py, _Database.iterkeys.
+note After close(), self._index is set to None, so iter(None) raises TypeError, which is
+note turned into dbm.dumb.error('DBM object has already been closed').
+
+note WORKAROUND: the closed state is an index of None in Python. Here it is a maybe field.
+note Example 20's `type Connection in state Closed or Open` would check this at compile time,
+note but the original detects use-after-close at run time, so a run-time check is kept.
+type Database
+    field index as a maybe Map of Key to Position
+
+note GAP: iterators - Python returns a lazy iterator over the live dict, which raises
+note RuntimeError if the dict changes during iteration. The doc has no iterator or generator
+note type; returning a List copies every key, which changes cost and loses the
+note "changed during iteration" check.
+note GAP: map type - _index is a dict from key to (offset, size). The doc has no Map; an
+note invented `Map of Key to Position` and `keys of` are used.
+to keys of index using memory
+    given index is a Map of Key to Position
+    given memory is an Allocator
+    produces a List of Key
+    fails with OutOfMemory
+    uses memory
+
+to iterkeys of database using memory
+    given database is a Database
+    given memory is an Allocator
+    produces a List of Key
+    fails with DatabaseClosed, OutOfMemory
+    uses memory
+
+    note WORKAROUND: Python catches the TypeError from iter(None) and re-raises a different
+    note error `from None`, hiding the cause. In Scribe the closed case is tested directly, so
+    note there is no exception to translate. The message text "DBM object has already been
+    note closed" becomes the failure name DatabaseClosed, since failures carry no message.
+    choose index of database
+        when nothing
+            fail with DatabaseClosed
+        when some index
+            give back try keys of index using memory

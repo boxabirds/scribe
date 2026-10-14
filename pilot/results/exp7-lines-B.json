@@ -1,0 +1,163 @@
+{
+ "F01.scribe": {
+  "code_lines": 40,
+  "parsed_lines": 0,
+  "failing_lines": [
+   [
+    5,
+    "to bisect_right x in a from lo below hi with key"
+   ]
+  ]
+ },
+ "F15.scribe": {
+  "code_lines": 13,
+  "parsed_lines": 13,
+  "failing_lines": []
+ },
+ "F21.scribe": {
+  "code_lines": 111,
+  "parsed_lines": 78,
+  "failing_lines": [
+   [
+    67,
+    "repeat while byte_at p in line is a space_byte"
+   ],
+   [
+    85,
+    "if here is byte \"\\\\\" and next is byte \"x\" and third is a hex_digit and fourth is a hex_digit"
+   ],
+   [
+    90,
+    "otherwise if here is byte \"\\\\\" and next is not byte \"\\0\""
+   ],
+   [
+    105,
+    "otherwise if here is byte \"\\\"\""
+   ],
+   [
+    111,
+    "otherwise if here is byte \"\\0\""
+   ],
+   [
+    114,
+    "otherwise"
+   ],
+   [
+    123,
+    "if next is not byte \"\\0\" and not (next is a space_byte)"
+   ]
+  ]
+ },
+ "F25.scribe": {
+  "code_lines": 33,
+  "parsed_lines": 33,
+  "failing_lines": []
+ },
+ "F26.scribe": {
+  "code_lines": 94,
+  "parsed_lines": 14,
+  "failing_lines": [
+   [
+    19,
+    "to new_datetime year and month and day and hour and minute and second and microsecond and tzinfo and fold"
+   ],
+   [
+    39,
+    "to replace self with year and month and day and hour and minute and second and microsecond and tzinfo and fold"
+   ]
+  ]
+ },
+ "F31.scribe": {
+  "code_lines": 13,
+  "parsed_lines": 3,
+  "failing_lines": [
+   [
+    5,
+    "choice Map of K and V"
+   ],
+   [
+    11,
+    "given f is an Operation taking a K and a V"
+   ],
+   [
+    12,
+    "given m is a Map of K and V"
+   ],
+   [
+    20,
+    "when Node with l and v and d and r"
+   ],
+   [
+    17,
+    "when Empty"
+   ]
+  ]
+ },
+ "F35.scribe": {
+  "code_lines": 20,
+  "parsed_lines": 9,
+  "failing_lines": [
+   [
+    9,
+    "field timefunc as an Operation producing a Number"
+   ],
+   [
+    10,
+    "field delayfunc as an Operation taking a Number"
+   ],
+   [
+    14,
+    "to new_scheduler with timefunc and delayfunc using memory"
+   ]
+  ]
+ },
+ "F38.scribe": {
+  "code_lines": 32,
+  "parsed_lines": 15,
+  "failing_lines": [
+   [
+    14,
+    "field result as a maybe Value"
+   ],
+   [
+    20,
+    "field done_callbacks as a List of Operation taking a Future"
+   ],
+   [
+    29,
+    "uses callbacks of future"
+   ],
+   [
+    31,
+    "to set_result result on future"
+   ]
+  ]
+ },
+ "F41.scribe": {
+  "code_lines": 137,
+  "parsed_lines": 65,
+  "failing_lines": [
+   [
+    30,
+    "to rio_read size bytes from rdb into buffer"
+   ],
+   [
+    88,
+    "to server_log level message using log"
+   ],
+   [
+    95,
+    "to report_corrupt_rdb message using log, server_state"
+   ],
+   [
+    112,
+    "to rdb_load_lzf_string_object from rdb with flags using memory, log, server_state"
+   ]
+  ]
+ },
+ "F47.scribe": {
+  "code_lines": 20,
+  "parsed_lines": 20,
+  "failing_lines": []
+ }
+}

@@ -1,0 +1,27 @@
+note Translated from CPython Lib/heapq.py _siftdown (lines 221 to 233).
+note The leading underscore that marks the Python function private is dropped; the doc has no visibility marker outside a component's provides list.
+
+note UNCLEAR: the doc shows headers with label words (`withdraw amount from account`) but never three bare parameters in a row; they are written side by side here
+to siftdown heap startpos pos
+    note GAP: a type parameter with an ordering bound - the doc only shows T on `type Queue of T`; a free operation cannot introduce T or require that items of T can be compared with "is less than"
+    given heap is an editable List of T where T is Ordered
+    given startpos is a Nat
+    given pos is a Nat
+    note UNCLEAR: Python raises IndexError if pos is out of range; the doc does not say whether `item pos of heap` needs a proof, fails, or stops the program, so no fails with line is written
+
+    let newitem be item pos of heap
+    note WORKAROUND: Python rebinds the parameter pos; the doc never sets a parameter, so a var copy is used
+    var current starts at pos
+    note Follow the path to the root, moving parents down until finding a place newitem fits.
+    repeat while current is more than startpos
+        decreases current - startpos
+        note WORKAROUND: (pos - 1) >> 1 is a shift; the doc has no bit operations, so division by 2 is used, which is the same for a non-negative number
+        let parentpos be (current - 1) / 2
+        let parent be item parentpos of heap
+        if newitem is less than parent
+            note UNCLEAR: the doc never sets a list element; `set item i of list to x` is assumed by analogy with `set balance of account to ...`
+            set item current of heap to parent
+            set current to parentpos
+            skip
+        stop
+    set item current of heap to newitem

@@ -1,0 +1,19 @@
+note Translated from go src/encoding/csv/reader.go, nextRune (lines 292 to 295).
+
+note GAP: a Unicode code point type - Go's rune; the doc has Text and Bytes but no character or code point type, so Rune is assumed to exist
+note GAP: utf8.DecodeRune returns two values (the rune and its byte width) and never fails: empty or invalid input gives U+FFFD with width 0 or 1; the record below stands in for the pair
+type Decoded_rune
+    field rune as a Rune
+    field size as a Nat
+
+to decode_rune b
+    given b is Bytes
+    produces a Decoded_rune
+
+to next_rune b
+    given b is Bytes
+    produces a Rune
+
+    note WORKAROUND: Go discards the second result with `_`; Scribe has no discard or destructuring, so the whole record is bound and one field read
+    let decoded be decode_rune b
+    give back rune of decoded

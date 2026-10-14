@@ -1,0 +1,97 @@
+note Source: node/lib/events.js, EventEmitter.init (lines 332-354). JavaScript, I/O (adversarial).
+
+note GAP: map from event name to listeners with a null prototype - `{ __proto__: null }` is a dictionary keyed by strings or symbols. The doc has List but no Map/Dictionary type. Invented: `a Map from EventKey to Listeners` and `an empty Map`.
+note GAP: symbol-keyed properties - `this[kShapeMode]` and `this[kCapture]` are hidden properties keyed by module-private Symbols. Modelled as ordinary fields.
+note GAP: missing fields that may be absent or undefined - `_events`, `_maxListeners` and the options object may be undefined. Modelled with `maybe`.
+type EventEmitter
+    field events as a maybe Map from EventKey to Listeners
+    field events_count as a Nat
+    field shape_mode as a Bool
+    field max_listeners as a maybe Number
+    field capture as a Bool
+
+type EventEmitterOptions
+    note GAP: dynamic value type - `opts.captureRejections` can be any JS value; validateBoolean checks at run time that it is a boolean. Modelled as `maybe Unknown`.
+    field capture_rejections as a maybe Unknown
+
+note validateBoolean throws ERR_INVALID_ARG_TYPE if value is not a boolean.
+to validate_boolean value named name
+    given value is an Unknown
+    given name is Text
+    produces a Bool
+    fails with InvalidArgType
+
+note GAP: prototype chain - `ObjectGetPrototypeOf(this)._events` reads the `_events` of the object this one inherits from, and `EventEmitter.prototype[kCapture]` reads module-level mutable state (EventEmitter.captureRejections writes it). Scribe has no inheritance, prototypes or module state. Invented: `prototype_of` as an operation and `default_capture` as a field of a capability passed in.
+to prototype_of emitter
+    given emitter is an EventEmitter
+    produces a maybe EventEmitter
+
+type EmitterDefaults
+    field default_capture as a Bool
+
+note WORKAROUND: `this` - init is called with `this` bound to a new or subclass instance (EventEmitter.call(this, opts)). It becomes an editable parameter.
+note WORKAROUND: optional argument - `opts` may be omitted. It becomes `a maybe EventEmitterOptions`.
+note UNCLEAR: allocation - `{ __proto__: null }` allocates; the doc says any allocating operation must take an Allocator. Added `memory`.
+to init emitter with opts using defaults and memory
+    given emitter is an editable EventEmitter
+    given opts is a maybe EventEmitterOptions
+    given defaults is an EmitterDefaults
+    given memory is an Allocator
+    fails with InvalidArgType, OutOfMemory
+    uses defaults, memory
+
+    note GAP: identity comparison - `this._events === proto._events` asks whether two references point at the same object (shared with the prototype). Scribe has no reference identity; `is` compares values. Invented: `is the same object as`.
+    var events_shared starts at false
+    choose prototype_of emitter
+        when some proto
+            if events of emitter is the same object as events of proto
+                set events_shared to true
+        when nothing
+            set events_shared to false
+    if events of emitter is nothing or events_shared
+        set events of emitter to some (an empty Map using memory)
+        set events_count of emitter to 0
+        set shape_mode of emitter to false
+    otherwise
+        set shape_mode of emitter to true
+
+    note WORKAROUND: `||=` on a falsy value - `this._maxListeners ||= undefined` turns any falsy value (0, NaN, null, undefined) into undefined and leaves the property as an own property. With a typed maybe Number only 0 can be falsy; NaN has no spelling and own-property creation has no meaning.
+    choose max_listeners of emitter
+        when some limit
+            if limit is 0
+                set max_listeners of emitter to nothing
+        when nothing
+            set max_listeners of emitter to nothing
+
+    note WORKAROUND: optional chaining with truthiness - `opts?.captureRejections` is truthy for any non-false, non-zero, non-empty value. The truthiness test is approximated by `is_truthy`, which the doc does not have.
+    note WORKAROUND: no-op branch - `choose` must handle every case, and the doc shows no way to write an empty `when` arm, so the `nothing` arms below repeat an assignment that changes nothing.
+    note UNCLEAR: `var raw_capture starts at nothing` - the doc does not say how the type of a variable is fixed when its first value is `nothing`, and has no type annotation on `var`.
+    var capture_given starts at false
+    var raw_capture starts at nothing
+    choose opts
+        when some options
+            choose capture_rejections of options
+                when some value
+                    if is_truthy value
+                        set capture_given to true
+                        set raw_capture to some value
+                when nothing
+                    set capture_given to false
+        when nothing
+            set capture_given to false
+
+    if capture_given
+        choose raw_capture
+            when some value
+                note `Boolean(opts.captureRejections)` is the value itself once validated
+                set capture of emitter to try validate_boolean value named "options.captureRejections"
+            when nothing
+                set capture of emitter to default_capture of defaults
+    otherwise
+        note Assigning the capture field directly saves an expensive prototype lookup in a very sensitive hot path.
+        set capture of emitter to default_capture of defaults
+
+note helper for JavaScript truthiness; Scribe has no implicit conversion, so this has to be an explicit operation
+to is_truthy value
+    given value is an Unknown
+    produces a Bool

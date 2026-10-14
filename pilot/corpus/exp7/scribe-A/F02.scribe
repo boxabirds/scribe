@@ -1,0 +1,27 @@
+note Translated from Go sort.Search (go/src/sort/search.go, lines 58 to 73).
+
+to search n f
+    given n is an Int
+    note GAP: a parameter whose type is an operation - Go passes f as func(int) bool; the doc has no type for an operation value, so "an Operation from Int to Bool" is a guess
+    given f is an Operation from Int to Bool
+    produces an Int
+    note UNCLEAR: Go lets f do anything (read state, do I/O). The doc has no way to say "uses whatever f uses", so this header is pure only if every f passed in is pure
+
+    note Define f(-1) is false and f(n) is true.
+    var i starts at 0
+    var j starts at n
+    repeat while i is less than j
+        invariant i is 0 or not f (i - 1)
+        invariant j is n or f j
+        decreases j - i
+        note WORKAROUND: Go writes int(uint(i+j) >> 1) to avoid overflow; the doc has no unsigned reinterpretation and no shift, so the overflow-free form from example 10 is used
+        let h be i + (j - i) / 2
+        note i is at most h, and h is less than j
+        if not f h
+            note preserves f(i - 1) is false
+            set i to h + 1
+        otherwise
+            note preserves f(j) is true
+            set j to h
+    note i is j, f(i - 1) is false, and f(j) is true, so the answer is i
+    give back i

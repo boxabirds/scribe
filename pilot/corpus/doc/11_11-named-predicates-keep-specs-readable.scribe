@@ -1,0 +1,8 @@
+define items is sorted
+    given items is a List of Int
+    holds when for every i from 0 until count of items - 1, item i of items is at most item (i + 1) of items
+
+define items is a permutation of others
+    given items is a List of Int
+    given others is a List of Int
+    holds when for every x, occurrences of x in items is occurrences of x in others

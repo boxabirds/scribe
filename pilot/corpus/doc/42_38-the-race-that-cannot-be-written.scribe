@@ -1,0 +1,4 @@
+together
+    let first be sum of first_half
+    let second be sum of second_half
+give back first + second

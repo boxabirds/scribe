@@ -1,0 +1,29 @@
+{
+  "id": "F25",
+  "behaviour_preserved": "approximate",
+  "gaps": [
+    {"category": "characters, bytes and strings",
+     "construct": "value[0] (first byte) and value[1:] (substring)",
+     "description": "The doc has no slice or first-byte phrase for Text ('last 4 digits of card' in example 25 is the only hint). Two body-less helpers, text_until and text_after, were declared to stand in.",
+     "kind": "workaround"},
+    {"category": "characters, bytes and strings",
+     "construct": "sign != '-' && sign != '+' (byte compared with character literals)",
+     "description": "No character or byte literal exists, so the sign is taken as a one-character Text and compared with \"-\" and \"+\".",
+     "kind": "workaround"},
+    {"category": "error types and exceptions",
+     "construct": "x, rem, err := leadingInt(...): multiple return values with an error value",
+     "description": "No tuples or multiple results; the two values become a declared record type and err becomes a failure that is handled. Works, but the helper's signature has to change shape.",
+     "kind": "workaround"},
+    {"category": "error types and exceptions",
+     "construct": "value[0] panics on an empty string",
+     "description": "The doc does not say what indexing or slicing past the end of Text does (failure, precondition, or compile-time proof obligation), so the panic path is unspecified in the translation.",
+     "kind": "unclear"},
+    {"category": "error types and exceptions",
+     "construct": "statements that follow a failure check, after the error has been handled",
+     "description": "Every doc example puts the remaining logic inside the handle block; whether code may continue after 'on failure' lines, and how variables bound inside handle are scoped, is not shown.",
+     "kind": "unclear"}
+  ],
+  "doc_rules_contradicted": [],
+  "invented_syntax": [],
+  "notes": "Go's 0-as-'no offset' sentinel was kept as Int rather than turned into a maybe, to preserve behaviour; idiomatic Scribe would return 'maybe Count'. The final 'count of value - count of remainder' is right whether Text counts bytes or characters, but the doc never says which, and most string code will depend on it. Behaviour is marked approximate only because of the empty-input panic."
+}

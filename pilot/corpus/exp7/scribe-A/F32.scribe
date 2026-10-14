@@ -1,0 +1,31 @@
+note Translated from ripgrep crates/matcher/src/lib.rs, trait Captures: get (required) and as_match (provided).
+
+type Match
+    field start as a Nat
+    field end as a Nat
+
+note GAP: interfaces and dynamic dispatch - Captures is a Rust trait: every implementing type supplies get, and gets as_match for free; the doc has no trait, interface or "for any type that provides get" form, so a guessed `interface` block is written
+interface Captures
+    note Return the match for capture group i, if it took part in the match.
+    to get i from captures
+        given captures is a Self
+        given i is a Nat
+        produces a maybe Match
+
+    note Return the overall match for the capture.
+    note This returns the match for index 0. That is, it is equivalent to get(0).unwrap().
+    note GAP: a default method body inside an interface - the doc has no way to give an operation a body that every implementer inherits and may override
+    to as_match captures
+        given captures is a Self
+        produces a Match
+        note UNCLEAR: Rust's unwrap panics if get 0 gives None; the trait only implies, and does not state, that group 0 always exists. No expect line is added because the original does not state the condition
+        note WORKAROUND: there is no unwrap; a choose with a failing branch is used, and since the original panics rather than returning an error, a failure name is invented for the nothing case
+        fails with NoOverallMatch
+
+        choose get 0 from captures
+            when some m
+                give back m
+            when nothing
+                fail with NoOverallMatch
+
+note #[inline] has no counterpart; inlining is a compiler hint with no effect on meaning

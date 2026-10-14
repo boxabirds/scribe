@@ -1,0 +1,8 @@
+to split_lines text using memory
+    given text is Text
+    given memory is an Allocator
+    produces a List of Text
+    fails with OutOfMemory
+    uses memory
+
+let lines be try split_lines text using memory

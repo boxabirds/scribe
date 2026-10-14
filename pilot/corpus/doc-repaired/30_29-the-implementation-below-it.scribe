@@ -1,0 +1,16 @@
+to place_order cart for customer with request_id
+    if cart is empty
+        fail with EmptyCart
+    let reservation be try reserve lines of cart in inventory
+    handle
+        let receipt be try charge customer for total of cart in payments with key request_id
+        let order be an Order from cart, receipt with status Paid
+        handle
+            try save order in store
+        on failure StoreUnavailable
+            try refund receipt in payments
+            fail with StoreUnavailable
+        give back order
+    on failure PaymentDeclined or StoreUnavailable as problem
+        release reservation in inventory
+        fail with problem

@@ -1,0 +1,18 @@
+to import_orders source into store using memory
+    given source is a File of Rows
+    given store is an Orders_store
+    given memory is an Allocator
+    produces an ImportSummary
+    fails with ImportFailed
+    ensure "every row read is either saved or listed in rejects of result"
+    uses source, store, memory
+
+    pipeline
+        stage read_rows from source
+        queue of at most 100 rows
+        stage parse_row, 4 at a time
+        queue of at most 100 orders
+        stage save_order into store, 2 at a time
+    on failure in any stage
+        stop all stages
+        fail with ImportFailed

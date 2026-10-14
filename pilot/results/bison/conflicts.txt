@@ -1,0 +1,3 @@
+scribe.y: warning: 172 shift/reduce conflicts [-Wconflicts-sr]
+scribe.y: warning: 20 reduce/reduce conflicts [-Wconflicts-rr]
+scribe.y: note: rerun with option '-Wcounterexamples' to generate conflict counterexamples

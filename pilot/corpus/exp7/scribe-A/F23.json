@@ -1,0 +1,33 @@
+{
+  "id": "F23",
+  "behaviour_preserved": "exact",
+  "gaps": [
+    {"category": "unsafe and raw memory",
+     "construct": "NUL-terminated char* walked with a++ / b++ and read past the shorter string up to its terminator",
+     "description": "No pointers or terminated strings; modelled as Bytes plus a byte_at helper that returns 0 at or past the end. Behaviour matches for well-formed C strings, but the type no longer says the input is unbounded and borrowed.",
+     "kind": "workaround"},
+    {"category": "missing values",
+     "construct": "null pointer checks zLeft==0 and zRight==0",
+     "description": "Expressible as maybe Bytes with two nested chooses; the four-way null handling takes 10 lines instead of 4, and the `when some right` arm must bind a name it never uses.",
+     "kind": "workaround"},
+    {"category": "integer overflow and wrapping",
+     "construct": "post-decrement inside the loop condition, N-- > 0, and the later N<0 test",
+     "description": "No assignment inside expressions (by design), so the side effect in the condition was unrolled; the C trick of using N<0 to mean 'ran out of budget' had to be re-derived as remaining <= 0, which is a behaviour-preserving but non-obvious rewrite.",
+     "kind": "workaround"},
+    {"category": "global or module state",
+     "construct": "static const UpperToLower[] lookup table",
+     "description": "The doc does not say whether a module-level constant (`let` outside an operation) is allowed or how a table literal of 256 bytes is written; replaced by a pure operation header.",
+     "kind": "unclear"},
+    {"category": "numeric types and conversions",
+     "construct": "(unsigned char *) cast and byte arithmetic producing a signed int difference",
+     "description": "No byte type or casts are documented; Byte was declared as a refined Int, and the subtraction is assumed to give an Int.",
+     "kind": "unclear"},
+    {"category": "characters, bytes and strings",
+     "construct": "calling an operation on a parenthesised argument: upper_to_lower (byte_at i of left)",
+     "description": "The doc shows parentheses only for arithmetic grouping and `item (i + 1) of items`; nesting one call inside another call's argument is not shown.",
+     "kind": "unclear"}
+  ],
+  "doc_rules_contradicted": [],
+  "invented_syntax": ["Byte (as a refined Int type)", "-1 as a negative literal"],
+  "notes": "The `no assignment inside expressions` rule did exactly what it promises here: the C condition hides a decrement whose off-by-one effect on the final N<0 test is easy to misread, and the Scribe version makes it explicit. Pointer-walking string code needs a documented answer for terminated strings and borrowed byte views."
+}

@@ -1,0 +1,52 @@
+note Translation of _parse_header_lines from CPython (Lib/http/client.py).
+note Parses only RFC 5322 headers from header lines.
+note
+note email Parser wants to see strings rather than bytes.
+note But a TextIOWrapper around self.rfile would buffer too many bytes
+note from the stream, bytes which we later need to read as bytes.
+note So we read the correct bytes here, as bytes, for email Parser
+note to parse.
+
+note GAP: a class passed as a value - `_class=HTTPMessage` lets the caller choose which Message subclass the parser builds. The doc has no type parameters on operations, no interfaces and no class values, so the result is fixed to HTTPMessage and the `_class` argument is dropped.
+type HTTPMessage
+    field headers as a List of Header
+
+type Header
+    field name as Text
+    field value as Text
+
+note GAP: there is no named text encoding in the doc. `decode ... as iso_8859_1` is a guess at the phrase. Latin-1 maps every byte to a character, so it cannot fail.
+to decode bytes as iso_8859_1 using memory
+    given bytes is Bytes
+    given memory is an Allocator
+    produces Text
+    fails with OutOfMemory
+    uses memory
+
+note email.parser.Parser(_class=_class).parsestr(hstring). The Parser object is built and used once, so it is reduced to one operation.
+to parse_message from text using memory
+    given text is Text
+    given memory is an Allocator
+    produces an HTTPMessage
+    fails with OutOfMemory
+    uses memory
+
+note GAP: no operation joins a list of Bytes. `join_bytes` is a guessed helper for b''.join.
+to join_bytes parts using memory
+    given parts is a List of Bytes
+    given memory is an Allocator
+    produces Bytes
+    fails with OutOfMemory
+    uses memory
+
+note WORKAROUND: `_class` is a keyword argument with a default. Scribe has no defaults or keyword arguments, and no class values, so the parameter is removed rather than made required.
+to parse_header_lines header_lines using memory
+    given header_lines is a List of Bytes
+    given memory is an Allocator
+    produces an HTTPMessage
+    fails with OutOfMemory
+    uses memory
+
+    let joined be try join_bytes header_lines using memory
+    let hstring be try decode joined as iso_8859_1 using memory
+    give back try parse_message from hstring using memory

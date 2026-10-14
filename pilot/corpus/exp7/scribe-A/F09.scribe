@@ -1,0 +1,54 @@
+note Translation of Dafny Std.Collections.Seq.MergeSortedWith
+
+note GAP: a function-typed parameter - the original takes lessThanOrEq: (T, T) -> bool; the doc has no type for an operation value and no way to call a parameter as an operation, so `given less_than_or_eq is an Operation from T and T to Bool` and the call `less_than_or_eq of (x, y)` are invented
+note UNCLEAR: generic type parameter T - the doc only shows `type Queue of T`, never a generic operation, so how T is introduced on a `to` header (and Dafny's (!new) restriction) is guessed
+
+define items is sorted_by order
+    given items is a List of T
+    given order is an Operation from T and T to Bool
+    holds when for every i from 0 until count of items - 1, order of (item i of items, item (i + 1) of items)
+
+define order is a total_ordering
+    given order is an Operation from T and T to Bool
+
+to lemma_new_first_element_still_sorted_by x and items with order
+    note UNCLEAR: lemma declarations - the doc names `use lemma` inside a proof block but never shows how a lemma with parameters is declared
+    given x is a T
+    given items is a List of T
+    given order is an Operation from T and T to Bool
+
+to merge_sorted_with left and right by less_than_or_eq
+    given left is a List of T
+    given right is a List of T
+    given less_than_or_eq is an Operation from T and T to Bool
+    expect left is sorted_by less_than_or_eq
+    expect right is sorted_by less_than_or_eq
+    expect less_than_or_eq is a total_ordering
+    produces a List of T
+    ensure left followed by right is a permutation of result
+    ensure result is sorted_by less_than_or_eq
+    note WORKAROUND: Dafny's multiset(left + right) == multiset(result) is written with the doc's `is a permutation of` predicate from example 11, which is defined only for List of Int there
+    note UNCLEAR: recursion has no `decreases` line here; the doc requires `decreases` only for `repeat while`, and says nothing about termination of recursive operations (Dafny infers count of left + count of right)
+
+    if count of left is 0
+        give back right
+    otherwise if count of right is 0
+        give back left
+    otherwise if less_than_or_eq of (item 0 of left, item 0 of right)
+        let rest be merge_sorted_with (rest_of left) and right by less_than_or_eq
+        note WORKAROUND: Dafny's slice left[1..] has no doc form; `rest_of left` is an assumed library operation
+        give back [item 0 of left] followed by rest
+    otherwise
+        let rest be merge_sorted_with left and (rest_of right) by less_than_or_eq
+        give back [item 0 of right] followed by rest
+
+    proof
+        note GAP: per-branch proof steps - Dafny calls the lemma and asserts left == [left[0]] + left[1..] inside each branch; the doc's proof block is a single trailing block with no way to attach a hint to one branch
+        use lemma lemma_new_first_element_still_sorted_by
+        assert left is [item 0 of left] followed by rest_of left
+        assert right is [item 0 of right] followed by rest_of right
+
+to rest_of items
+    given items is a List of T
+    expect count of items is at least 1
+    produces a List of T

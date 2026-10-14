@@ -1,0 +1,31 @@
+note Translated from go src/os/tempfile.go, prefixAndSuffix (lines 64 to 76).
+
+note WORKAROUND: Go returns three values (prefix, suffix, err); Scribe has one result and a separate failure channel, so the two strings become a record and err becomes `fails with`
+type Prefix_and_suffix
+    field prefix as Text
+    field suffix as Text
+
+note IsPathSeparator is OS-specific ('/' on Unix, '/' or '\' on Windows); it is declared here as a pure helper
+to is_path_separator c
+    given c is a Byte
+    produces a Bool
+
+to prefix_and_suffix pattern
+    given pattern is Text
+    produces a Prefix_and_suffix
+    fails with PatternHasSeparator
+
+    note GAP: indexing the bytes of a Text - Go's pattern[i] is a byte, not a character; the doc never says whether `item i of` a Text gives a byte, a character or is allowed at all, so `bytes of pattern` is invented to make the byte view explicit
+    let pattern_bytes be bytes of pattern
+    for each i from 0 until count of pattern_bytes
+        if is_path_separator (item i of pattern_bytes)
+            fail with PatternHasSeparator
+    note GAP: searching Text from the end and slicing it by byte position - bytealg.LastIndexByteString and pattern[:pos], pattern[pos+1:] have no counterpart; `last position of ... in ...` and `slice of ... from ... until ...` are invented, written to match the doc's `maybe Position` and `until` conventions
+    note UNCLEAR: how to write a single character or byte literal such as '*'; the doc only has double-quoted Text, so "*" is used
+    note UNCLEAR: how to build a record value; the doc shows only `an Order from cart and receipt with status Paid`, which does not say how fields are matched, so the field-naming form from `choice` declarations is borrowed
+    note UNCLEAR: `count of pattern` could mean bytes or characters; byte count is used, as in Go
+    choose last position of "*" in pattern
+        when some pos
+            give back a Prefix_and_suffix with prefix as slice of pattern from 0 until pos and suffix as slice of pattern from pos + 1 until count of pattern_bytes
+        when nothing
+            give back a Prefix_and_suffix with prefix as pattern and suffix as ""

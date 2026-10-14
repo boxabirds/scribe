@@ -1,0 +1,250 @@
+// Scribe surface grammar, pilot version 0.1 (experiment 3)
+//
+// Written from "Scribe: Syntax Philosophy and Worked Examples" (doc rev 62).
+// Conventions in comments:
+//   DOC     rule taken directly from a rule or table in the doc
+//   EX n    rule needed by worked example n and consistent with the doc's rules
+//   SPECIAL rule needed by one example only; counted in the results as a special rule
+//
+// The pre-lexer (tools/pre.py) supplies INDENT, DEDENT and NEWLINE marks.
+// No rule here uses the symbol table: the parser never knows which names are
+// types, variants, units, operations or predicates.
+
+start: (item)*
+
+?item: operation | workflow | define | typedecl | choice | protocol
+     | schema | migration | component | system | example | property
+     | stmt
+
+// ---------------------------------------------------------------- blocks
+block: _NL _INDENT stmt+ _DEDENT
+
+// ---------------------------------------------------------------- operations
+// DOC: "to withdraw amount from account" - verb, first parameter, label words
+operation: "to" signature _NL [_INDENT clause* stmt* proof? _DEDENT]
+workflow: "workflow" signature _NL _INDENT clause* stmt* _DEDENT            // EX 40
+signature: NAME [NAME] (label NAME)*
+
+?clause: given | produces | fails | expect | ensure | changes | uses_clause
+       | tier | idempotent | declassifies | deadline | runs | survives | holds
+
+given: "given" NAME "is" typeexpr _NL
+produces: "produces" typeexpr _NL
+fails: "fails" "with" name_list _NL
+expect: "expect" expr [because] _NL
+ensure: "ensure" ensure_body [because] _NL
+ensure_body: expr
+           | "if" "it" "succeeds" "," expr                                     -> on_success
+           | "if" "it" "fails" ["with" "anything" "but" NAME] "," expr          -> on_failure_case
+           | "if" expr "," expr                                                 -> conditional
+changes: "changes" "only" expr _NL                                              // EX 8
+uses_clause: "uses" name_list _NL
+tier: "tier" NAME ["for" NAME ("," NAME "for" "everything" "else")?] _NL        // EX 13, 14, 28
+idempotent: "idempotent" "by" name_list _NL                                     // EX 28
+declassifies: "declassifies" NAME "to" NAME because _NL                         // EX 25
+deadline: "deadline" quantity _NL                                               // EX 37
+runs: "runs" "at" "most" "once" "per" NAME _NL                                  // SPECIAL EX 40
+survives: "survives" "restarts" _NL                                             // SPECIAL EX 40
+holds: "holds" "when" expr _NL                                                  // EX 11
+because: "because" STRING                                                       // DOC
+
+name_list: NAME ("," NAME)*
+
+// ---------------------------------------------------------------- types
+// DOC: "given amount is a positive Money", "given account is an editable Account"
+typeexpr: [article] modifier* type_name type_suffix*
+article: "a" | "an" | "the"
+modifier: "positive" | "editable" | "consumed" | "maybe"
+type_name: NAME ["of" type_name]                                                // List of Int
+?type_suffix: "with" NAME range                       -> refine_range         // EX 1, 12, 14
+            | "limited" "to" ["host"] STRING          -> limited              // EX 19, 20
+            | "labelled" NAME                         -> labelled             // EX 24, 25
+            | "in" "state" NAME ("or" NAME)*          -> in_state             // EX 20
+            | "as" NAME                               -> role                 // EX 27
+            | "matching" NAME                         -> matching             // EX 12
+            | "less" "than" expr                      -> refine_less          // EX 12
+            | "at" "most" quantity                    -> refine_at_most       // EX 27
+range: expr range_word expr
+range_word: "until" | "through"
+
+// ---------------------------------------------------------------- declarations
+typedecl: "type" NAME ["of" NAME] ["in" "state" NAME ("or" NAME)*] ["is" typeexpr] _NL [_INDENT member+ _DEDENT]
+?member: "field" NAME "as" typeexpr _NL               -> field
+       | "model" NAME "as" expr _NL                   -> model
+       | "invariant" expr [because] _NL               -> type_invariant
+choice: "choice" NAME _NL _INDENT variant+ _DEDENT                              // EX 5, 16
+variant: NAME ["with" field_decl ("and" field_decl)*] _NL
+field_decl: NAME "as" typeexpr
+define: "define" NAME "is" predicate_phrase _NL _INDENT clause+ _DEDENT         // EX 11
+predicate_phrase: [article] NAME ["of" NAME]
+
+example: "example" expr _NL                                                     // EX 15
+property: "property" "for" "every" NAME "that" "is" typeexpr "," expr _NL       // SPECIAL EX 15
+
+// ---------------------------------------------------------------- protocols
+protocol: "protocol" NAME _NL _INDENT proto_step+ _DEDENT                       // EX 27
+?proto_step: role_send
+           | "repeat" _NL _INDENT proto_step+ _DEDENT "until" role_send -> proto_repeat
+role_send: NAME "sends" message_spec _NL
+         | NAME "sends" "one" "of" message_spec ("," "or" message_spec)+ _NL    -> role_send_choice
+message_spec: NAME ["with" field_decl ("and" field_decl)*]
+
+// ---------------------------------------------------------------- components and systems
+component: "component" NAME "version" version _NL _INDENT comp_section+ _DEDENT // EX 28, 34, 36
+?comp_section: "about" PROSE _NL                                  -> about
+             | "needs" _NL _INDENT need+ _DEDENT                  -> needs
+             | "may" _NL _INDENT may_line+ _DEDENT                -> may
+             | "assumes" _NL _INDENT assumption+ _DEDENT          -> assumes
+             | "provides" _NL _INDENT operation+ _DEDENT          -> provides
+             | "failure" _NL _INDENT failure_line+ _DEDENT        -> failure_section
+             | tier
+need: NAME "from" version "as" NAME _NL [_INDENT "uses" name_list _NL _DEDENT]
+may_line: "nothing" "of" "its" "own" _NL                                        // SPECIAL EX 28
+assumption: expr "assumed" "owner" NAME "monitor" monitor_policy _NL
+monitor_policy: "checking" | "sampling" quantity
+?failure_line: "domain" NAME _NL                                              -> domain
+             | "retry" NAME "at" "most" INT "times" "with" "backoff" quantity because _NL -> retry   // SPECIAL EX 28
+
+system: "system" NAME "version" version _NL _INDENT sys_section+ _DEDENT        // EX 32
+?sys_section: "components" _NL _INDENT (NAME version _NL)+ _DEDENT                  -> components
+            | "authority" _NL _INDENT authority_line+ _DEDENT                   -> authority
+            | "wiring" _NL _INDENT wiring_line+ _DEDENT                         -> wiring
+            | "failure" "domains" _NL _INDENT domain_line+ _DEDENT              -> failure_domains
+            | "rules" _NL _INDENT rule_line+ _DEDENT                            -> rules
+?authority_line: "root" "gives" NAME grant _NL                                  -> grant_line
+               | "nothing" "else" "holds" "authority" _NL                       -> no_other_authority   // SPECIAL
+grant: "network" "host" STRING "port" INT
+     | "database" STRING access
+access: "read" "only" | "read" "and" "write"
+wiring_line: NAME "needs" name_list ["(" "read" "operations" "only" ")"] _NL
+?domain_line: NAME "contains" name_list _NL                                     -> domain_members
+            | "a" "failure" "in" NAME "must" "not" "stop" NAME _NL              -> isolation   // SPECIAL
+?rule_line: "only" NAME "can" "reach" "host" STRING _NL                         -> reach_rule   // SPECIAL
+          | "no" "value" "labelled" NAME "leaves" NAME _NL                      -> flow_rule    // SPECIAL
+          | NAME "cannot" "write" "to" "database" STRING _NL                    -> write_rule   // SPECIAL
+
+schema: "schema" NAME "version" INT "compatibility" NAME _NL _INDENT schema_field+ _DEDENT   // EX 30
+?schema_field: NAME "as" typeexpr ["added" "in" "version" INT] _NL
+             | NAME "reserved" "removed" "in" "version" INT _NL                -> reserved_field
+migration: "migration" NAME "from" "version" INT "to" "version" INT "turning" NAME "into" NAME _NL _INDENT ensure+ _DEDENT
+
+// ---------------------------------------------------------------- statements
+?stmt: let | var | set | give_back | fail | try_stmt | if_stmt | for_each
+     | repeat_while | invariant | decreases | choose | handle | hold
+     | together | pipeline | remember | stop | skip | trust | run | elided
+     | expr_stmt
+
+let: "let" NAME "be" expr ["," "or" "else" expr] _NL                            // DOC; "or else" EX 37
+var: "var" NAME "starts" "at" expr _NL                                          // DOC
+set: "set" expr "to" expr _NL                                                   // DOC
+give_back: "give" "back" expr _NL                                               // DOC
+fail: "fail" "with" NAME _NL                                                    // DOC
+try_stmt: "try" expr _NL                                                        // DOC
+if_stmt: "if" expr block ("otherwise" "if" expr block)* ["otherwise" block]      // DOC
+for_each: "for" "each" NAME "from" expr range_word expr block                   // DOC
+        | "for" "each" NAME "in" expr block                        -> for_each_in
+repeat_while: "repeat" "while" expr block                                       // DOC
+invariant: "invariant" expr [because] _NL                                       // DOC
+decreases: "decreases" expr _NL                                                 // DOC
+choose: "choose" expr _NL _INDENT when+ _DEDENT                                 // DOC
+when: "when" pattern block
+pattern: "some" NAME                              -> some_pattern
+       | "nothing"                                -> nothing_pattern
+       | NAME ["with" NAME ("and" NAME)*]         -> variant_pattern
+handle: "handle" block on_failure+                                              // DOC
+on_failure: "on" "failure" NAME ("or" NAME)* ["as" NAME] block
+          | "on" "failure" "in" "any" "stage" block                -> on_stage_failure   // SPECIAL EX 39
+hold: "hold" NAME "as" expr block                                               // EX 19
+together: "together" block                                                      // EX 37
+pipeline: "pipeline" _NL _INDENT pipe_item+ _DEDENT [on_failure]                 // EX 39
+?pipe_item: "stage" expr ["," INT "at" "a" "time"] _NL                          -> stage
+          | "queue" "of" "at" "most" INT NAME _NL                               -> queue
+remember: "remember" "progress" "by" NAME _NL                                   // SPECIAL EX 40
+stop: "stop" ["all" "stages"] _NL                                               // DOC; "all stages" SPECIAL
+skip: "skip" _NL                                                                // DOC
+trust: "trust" STRING "owner" NAME _NL                                          // EX 14
+run: "run" NAME "with" NAME ("and" NAME)* _NL                                   // SPECIAL EX 22
+proof: "proof" _NL _INDENT proof_stmt+ _DEDENT                                  // EX 13
+?proof_stmt: "use" "lemma" NAME _NL                              -> use_lemma
+           | "assert" expr _NL                                   -> assert_stmt
+elided: ELIDED _NL                                                              // corpus placeholder only
+expr_stmt: expr _NL
+
+// ---------------------------------------------------------------- expressions
+// DOC rule 10: mixing "and" with "or" needs parentheses, so a chain is all-and or all-or.
+?expr: logic ["implies" logic]                                  -> implication
+?logic: negation ("and" negation)+                              -> and_chain
+      | negation ("or" negation)+                               -> or_chain
+      | negation
+?negation: "not" negation                                       -> not_
+         | quantified
+         | comparison
+// DOC: "for every x in items, ...", "there is an item in items where ..."
+quantified: "for" "every" NAME ["in" sum | "from" sum range_word sum] "," expr
+          | "there" "is" [article] NAME "in" sum "where" expr      -> exists
+
+// DOC: comparison words; notation table adds the symbol aliases.
+?comparison: concat
+           | concat (comp_op concat)+                           -> compare
+           | concat "is" [article] NAME "of" concat             -> predicate_of    // EX 11 define use site
+           | concat "is" "some" NAME                            -> is_some         // DOC
+comp_op: "is" | "=" | "=="
+       | "is" "not" | "!=" | "≠"
+       | "is" "less" "than" | "<"
+       | "is" "more" "than" | ">"
+       | "is" "at" "most" | "<=" | "≤"
+       | "is" "at" "least" | ">=" | "≥"
+       | "is" "in" | "in" | "∈"
+       | "is" "not" "in"
+       | "is" "after" | "is" "not" "after" | "is" "before"            // EX 41
+
+// sequences: "contents at entry followed by value" (EX 9)
+?concat: sum ("followed" "by" sum)*
+?sum: product (("+" | "-") product)*
+?product: unary (("*" | "/" | "mod") unary)*
+?unary: "-" unary -> neg
+      | postfix
+?postfix: application ["at" "entry"]                             // DOC "x at entry"
+
+// Application. DOC: "X of Y" is field access; calls take label words.
+// No symbol table, so a call is any name followed by operands and label words.
+?application: of_expr
+            | call
+            | comprehension
+call: NAME operand+ (label operand)*
+    | NAME (label operand)+
+    | NAME operand* "where" expr                                -> call_where     // EX 24, 41
+?operand: of_expr
+of_expr: atom "of" application                                   -> of_access
+       | atom
+comprehension: application "for" "each" NAME "in" application ["where" logic]   // DOC EX 18
+label: "from" | "for" | "with" | "in" | "into" | "onto" | "over" | "using"
+     | "to" | "by" | "as" | "under" | "of"
+
+?atom: NAME
+     | INT | DECIMAL | VERSION | STRING
+     | "result" -> result
+     | "nothing" -> nothing
+     | "some" atom -> some
+     | "(" expr ")"
+     | "[" [expr ("," expr)*] "]" -> list
+     | quantity
+     | "date" DATE -> date
+     | "pi" -> pi
+quantity: (INT | DECIMAL) NAME                                   // EX 17: "30 seconds"
+
+version: VERSION | DECIMAL | INT
+
+// ---------------------------------------------------------------- terminals
+_NL: "⏎"
+_INDENT: "⇥"
+_DEDENT: "⇤"
+ELIDED: "⋯"
+PROSE: /⟪[^⟫]*⟫/
+STRING: /"([^"\\]|\\.)*"/
+DATE.3: /\d{4}-\d{2}-\d{2}/
+VERSION.2: /\d+\.\d+\.\d+/
+DECIMAL.1: /\d+\.\d+/
+INT: /\d+/
+NAME: /[A-Za-z][A-Za-z0-9_]*/
+%ignore /[ \t\n]+/

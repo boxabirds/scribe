@@ -1,0 +1,66 @@
+note Translated from cpython Lib/configparser.py, RawConfigParser._handle_rest (lines 1123 to 1135).
+
+note Helper types, reduced to the fields this method reads or writes
+type Parse_state
+    field cursect as a maybe Section
+    field indent_level as an Int
+    field cur_indent_level as an Int
+    field lineno as an Int
+
+type Line
+    field clean as Text
+
+note GAP: a regular-expression match object - SECTCRE is a compiled regex with a named group `header`; the doc says "Patterns get names, not sigils" but shows no pattern type, no match result, and no way to read a named group, so Pattern and Match are assumed and `match of` and `header of` are invented
+type Match
+    field header as Text
+
+note WORKAROUND: the parser object (`self`) becomes a parameter; its methods _handle_header and _handle_option become operations that take it
+type Raw_config_parser
+    field allow_unnamed_section as a Bool
+    field sectcre as a Pattern
+
+to handle_header st with section_name for fpname in parser
+    given parser is an editable Raw_config_parser
+    given st is an editable Parse_state
+    given section_name is a Section_name
+    given fpname is Text
+    fails with DuplicateSectionError
+
+to handle_option st with line for fpname in parser
+    given parser is an editable Raw_config_parser
+    given st is an editable Parse_state
+    given line is a Line
+    given fpname is Text
+    fails with ParsingError
+
+note GAP: UNNAMED_SECTION is a module-level sentinel object (`_UnnamedSection()`) passed where a section name string is expected; the doc has no global constants or singleton objects, so Section_name is a choice with a special variant
+choice Section_name
+    Named with name as Text
+    Unnamed
+
+note WORKAROUND: Python's `self` is the receiver; here it is the labelled parameter `parser`
+note GAP: dynamic dispatch - self._handle_header and self._handle_option are looked up on the object, so a subclass (ConfigParser, or a user subclass) can override them; the calls below are fixed to one operation, and the doc has no interface or override mechanism
+to handle_rest st with line for fpname in parser
+    given parser is an editable Raw_config_parser
+    given st is an editable Parse_state
+    given line is a Line
+    given fpname is Text
+    note UNCLEAR: Python lets any exception from _handle_header or _handle_option pass through; the failures listed here are the ones those helpers raise in the original, and the doc does not say whether `fails with` may name a failure that carries data (fpname, lineno, line)
+    fails with MissingSectionHeaderError, DuplicateSectionError, ParsingError
+
+    note a section header or option header?
+    if allow_unnamed_section of parser and cursect of st is nothing
+        try handle_header st with Unnamed for fpname in parser
+
+    set indent_level of st to cur_indent_level of st
+    note is it a section header?
+    let mo be match of sectcre of parser against clean of line
+    note WORKAROUND: Python tests `not mo and st.cursect is None` and then dispatches on mo again; in Scribe the maybe must be opened with `choose`, so the missing-header test moves inside the `nothing` branch
+    choose mo
+        when some m
+            try handle_header st with Named with name as header of m for fpname in parser
+        when nothing
+            if cursect of st is nothing
+                note GAP: failure with a payload - Python raises MissingSectionHeaderError(fpname, st.lineno, line); the doc's `fail with` names a failure but never shows it carrying values, so `with ... and ...` is invented
+                fail with MissingSectionHeaderError with file as fpname and lineno as lineno of st and line as line
+            try handle_option st with line for fpname in parser

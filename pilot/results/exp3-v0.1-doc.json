@@ -1,0 +1,1110 @@
+[
+ {
+  "file": "corpus/doc/00_notation-aliases-and-renderers.scribe",
+  "status": "ambiguous",
+  "ambiguities": [
+   {
+    "line": 1,
+    "source": "invariant 0 <= low <= high <= count of sorted_items",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   }
+  ],
+  "error": null,
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/01_1-a-pure-function-with-a-refined-input.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": [
+   {
+    "line": 5,
+    "text": "name",
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "file": "corpus/doc/02_2-a-loop-with-its-reasoning-attached.scribe",
+  "status": "ambiguous",
+  "ambiguities": [
+   {
+    "line": 11,
+    "source": "invariant for every j from 0 through i - 1, item j of items is at most best",
+    "readings": [
+     "call",
+     "call"
+    ]
+   },
+   {
+    "line": 13,
+    "source": "set best to item i of items",
+    "readings": [
+     "call",
+     "call"
+    ]
+   },
+   {
+    "line": 12,
+    "source": "if item i of items is more than best",
+    "readings": [
+     "call",
+     "call"
+    ]
+   },
+   {
+    "line": 3,
+    "source": "expect count of items is at least 1",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   },
+   {
+    "line": 8,
+    "source": "var best starts at item 0 of items",
+    "readings": [
+     "call",
+     "call"
+    ]
+   },
+   {
+    "line": 9,
+    "source": "for each i from 1 until count of items",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   }
+  ],
+  "error": null,
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/03_3-ranges-that-cannot-be-misread.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/04_4-optional-results.scribe",
+  "status": "ambiguous",
+  "ambiguities": [
+   {
+    "line": 9,
+    "source": "invariant for every j from 0 until i, item j of items is not target",
+    "readings": [
+     "call",
+     "call"
+    ]
+   },
+   {
+    "line": 10,
+    "source": "if item i of items is target",
+    "readings": [
+     "call",
+     "call"
+    ]
+   },
+   {
+    "line": 5,
+    "source": "ensure if result is some p, item p of items is target",
+    "readings": [
+     "call",
+     "call"
+    ]
+   },
+   {
+    "line": 5,
+    "source": "ensure if result is some p, item p of items is target",
+    "readings": [
+     "compare",
+     "is_some"
+    ]
+   },
+   {
+    "line": 8,
+    "source": "for each i from 0 until count of items",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   },
+   {
+    "line": 19,
+    "source": "choose find target in items",
+    "readings": [
+     "call",
+     "compare"
+    ]
+   }
+  ],
+  "error": null,
+  "interpolations": [
+   {
+    "line": 21,
+    "text": "p",
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "file": "corpus/doc/05_5-choices-with-exhaustive-matching-and-u.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/06_6-failure-is-visible-propagated-or-handl.scribe",
+  "status": "fail",
+  "ambiguities": [],
+  "error": {
+   "line": 6,
+   "column": 15,
+   "token": "try",
+   "source": "let number be try parse_int text"
+  },
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/07_7-binding-versus-mutation.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/08_8-a-full-contract-with-success-and-failu.scribe",
+  "status": "ambiguous",
+  "ambiguities": [
+   {
+    "line": 7,
+    "source": "ensure if it succeeds, balance of account is balance of account at entry - amount",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   },
+   {
+    "line": 7,
+    "source": "ensure if it succeeds, balance of account is balance of account at entry - amount",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   },
+   {
+    "line": 7,
+    "source": "ensure if it succeeds, balance of account is balance of account at entry - amount",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   },
+   {
+    "line": 8,
+    "source": "ensure if it fails, balance of account is balance of account at entry",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   },
+   {
+    "line": 8,
+    "source": "ensure if it fails, balance of account is balance of account at entry",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   },
+   {
+    "line": 8,
+    "source": "ensure if it fails, balance of account is balance of account at entry",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   },
+   {
+    "line": 7,
+    "source": "ensure if it succeeds, balance of account is balance of account at entry - amount",
+    "readings": [
+     "compare",
+     "predicate_of"
+    ]
+   },
+   {
+    "line": 8,
+    "source": "ensure if it fails, balance of account is balance of account at entry",
+    "readings": [
+     "compare",
+     "predicate_of"
+    ]
+   },
+   {
+    "line": 11,
+    "source": "if amount is more than balance of account",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   },
+   {
+    "line": 13,
+    "source": "set balance of account to balance of account - amount",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   },
+   {
+    "line": 9,
+    "source": "changes only balance of account",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   },
+   {
+    "line": 13,
+    "source": "set balance of account to balance of account - amount",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   }
+  ],
+  "error": null,
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/09_9-a-type-with-an-invariant-and-a-model.scribe",
+  "status": "fail",
+  "ambiguities": [],
+  "error": {
+   "line": 7,
+   "column": 10,
+   "token": "value",
+   "source": "to push value onto queue"
+  },
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/10_10-a-repeat-while-loop-with-a-variant.scribe",
+  "status": "ambiguous",
+  "ambiguities": [
+   {
+    "line": 13,
+    "source": "invariant for every j from 0 until low, item j of sorted_items is less than target",
+    "readings": [
+     "call",
+     "call"
+    ]
+   },
+   {
+    "line": 14,
+    "source": "invariant for every j from high until count of sorted_items, item j of sorted_items is more than target",
+    "readings": [
+     "call",
+     "call"
+    ]
+   },
+   {
+    "line": 12,
+    "source": "invariant 0 is at most low and low is at most high and high is at most count of sorted_items",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   },
+   {
+    "line": 14,
+    "source": "invariant for every j from high until count of sorted_items, item j of sorted_items is more than target",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   },
+   {
+    "line": 17,
+    "source": "if item middle of sorted_items is target",
+    "readings": [
+     "call",
+     "call"
+    ]
+   },
+   {
+    "line": 19,
+    "source": "otherwise if item middle of sorted_items is less than target",
+    "readings": [
+     "call",
+     "call"
+    ]
+   },
+   {
+    "line": 6,
+    "source": "ensure if result is some p, item p of sorted_items is target",
+    "readings": [
+     "call",
+     "call"
+    ]
+   },
+   {
+    "line": 6,
+    "source": "ensure if result is some p, item p of sorted_items is target",
+    "readings": [
+     "compare",
+     "is_some"
+    ]
+   },
+   {
+    "line": 10,
+    "source": "var high starts at count of sorted_items",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   }
+  ],
+  "error": null,
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/11_11-named-predicates-keep-specs-readable.scribe",
+  "status": "ambiguous",
+  "ambiguities": [
+   {
+    "line": 8,
+    "source": "holds when for every x, occurrences of x in items is occurrences of x in others",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   },
+   {
+    "line": 8,
+    "source": "holds when for every x, occurrences of x in items is occurrences of x in others",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   },
+   {
+    "line": 8,
+    "source": "holds when for every x, occurrences of x in items is occurrences of x in others",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   },
+   {
+    "line": 8,
+    "source": "holds when for every x, occurrences of x in items is occurrences of x in others",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   },
+   {
+    "line": 8,
+    "source": "holds when for every x, occurrences of x in items is occurrences of x in others",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   },
+   {
+    "line": 8,
+    "source": "holds when for every x, occurrences of x in items is occurrences of x in others",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   },
+   {
+    "line": 8,
+    "source": "holds when for every x, occurrences of x in items is occurrences of x in others",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   },
+   {
+    "line": 3,
+    "source": "holds when for every i from 0 until count of items - 1, item i of items is at most item (i + 1) of items",
+    "readings": [
+     "call",
+     "call"
+    ]
+   },
+   {
+    "line": 3,
+    "source": "holds when for every i from 0 until count of items - 1, item i of items is at most item (i + 1) of items",
+    "readings": [
+     "call",
+     "call"
+    ]
+   },
+   {
+    "line": 3,
+    "source": "holds when for every i from 0 until count of items - 1, item i of items is at most item (i + 1) of items",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   },
+   {
+    "line": 8,
+    "source": "holds when for every x, occurrences of x in items is occurrences of x in others",
+    "readings": [
+     "compare",
+     "compare",
+     "compare",
+     "compare",
+     "predicate_of"
+    ]
+   }
+  ],
+  "error": null,
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/12_12-refinement-types.scribe",
+  "status": "fail",
+  "ambiguities": [],
+  "error": {
+   "line": 1,
+   "column": 29,
+   "token": "value",
+   "source": "type Percent is an Int with value 0 through 100"
+  },
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/13_13-proof-hints-are-separate-foldable-and.scribe",
+  "status": "ambiguous",
+  "ambiguities": [
+   {
+    "line": 5,
+    "source": "ensure for every i from 0 until count of items, item i of result is item (count of items - 1 - i) of items",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   },
+   {
+    "line": 5,
+    "source": "ensure for every i from 0 until count of items, item i of result is item (count of items - 1 - i) of items",
+    "readings": [
+     "call",
+     "call"
+    ]
+   },
+   {
+    "line": 5,
+    "source": "ensure for every i from 0 until count of items, item i of result is item (count of items - 1 - i) of items",
+    "readings": [
+     "call",
+     "call"
+    ]
+   },
+   {
+    "line": 4,
+    "source": "ensure count of result is count of items",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   },
+   {
+    "line": 4,
+    "source": "ensure count of result is count of items",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   },
+   {
+    "line": 4,
+    "source": "ensure count of result is count of items",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   },
+   {
+    "line": 12,
+    "source": "assert count of result is count of items",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   },
+   {
+    "line": 12,
+    "source": "assert count of result is count of items",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   },
+   {
+    "line": 12,
+    "source": "assert count of result is count of items",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   },
+   {
+    "line": 5,
+    "source": "ensure for every i from 0 until count of items, item i of result is item (count of items - 1 - i) of items",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   },
+   {
+    "line": 4,
+    "source": "ensure count of result is count of items",
+    "readings": [
+     "compare",
+     "predicate_of"
+    ]
+   },
+   {
+    "line": 12,
+    "source": "assert count of result is count of items",
+    "readings": [
+     "compare",
+     "predicate_of"
+    ]
+   }
+  ],
+  "error": null,
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/14_14-tiers-and-escape-hatches-are-explicit.scribe",
+  "status": "fail",
+  "ambiguities": [],
+  "error": {
+   "line": 3,
+   "column": 22,
+   "token": "value",
+   "source": "produces an Int with value 1 through 6"
+  },
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/15_15-examples-and-properties-run-as-tests.scribe",
+  "status": "fail",
+  "ambiguities": [],
+  "error": {
+   "line": 4,
+   "column": 39,
+   "token": "-",
+   "source": "property for every items that is a non-empty List of Int, largest items is in items"
+  },
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/16_16-records-and-choices.scribe",
+  "status": "fail",
+  "ambiguities": [],
+  "error": {
+   "line": 11,
+   "column": 30,
+   "token": "Int",
+   "source": "field quantity as a Positive Int"
+  },
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/17_17-units-and-time-are-types.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/18_18-collections-in-words.scribe",
+  "status": "ambiguous",
+  "ambiguities": [
+   {
+    "line": 4,
+    "source": "ensure result is sum of total_of order for each order in orders where status of order is Paid",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   },
+   {
+    "line": 4,
+    "source": "ensure result is sum of total_of order for each order in orders where status of order is Paid",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   },
+   {
+    "line": 4,
+    "source": "ensure result is sum of total_of order for each order in orders where status of order is Paid",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   },
+   {
+    "line": 4,
+    "source": "ensure result is sum of total_of order for each order in orders where status of order is Paid",
+    "readings": [
+     "comprehension",
+     "comprehension"
+    ]
+   },
+   {
+    "line": 4,
+    "source": "ensure result is sum of total_of order for each order in orders where status of order is Paid",
+    "readings": [
+     "comprehension",
+     "comprehension"
+    ]
+   },
+   {
+    "line": 4,
+    "source": "ensure result is sum of total_of order for each order in orders where status of order is Paid",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   },
+   {
+    "line": 4,
+    "source": "ensure result is sum of total_of order for each order in orders where status of order is Paid",
+    "readings": [
+     "of_access",
+     "comprehension",
+     "comprehension"
+    ]
+   },
+   {
+    "line": 4,
+    "source": "ensure result is sum of total_of order for each order in orders where status of order is Paid",
+    "readings": [
+     "of_access",
+     "comprehension",
+     "comprehension"
+    ]
+   },
+   {
+    "line": 4,
+    "source": "ensure result is sum of total_of order for each order in orders where status of order is Paid",
+    "readings": [
+     "comprehension",
+     "comprehension"
+    ]
+   },
+   {
+    "line": 8,
+    "source": "if status of order is Paid",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   },
+   {
+    "line": 4,
+    "source": "ensure result is sum of total_of order for each order in orders where status of order is Paid",
+    "readings": [
+     "compare",
+     "compare",
+     "predicate_of"
+    ]
+   }
+  ],
+  "error": null,
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/19_19-a-resource-that-must-be-released.scribe",
+  "status": "fail",
+  "ambiguities": [],
+  "error": {
+   "line": 9,
+   "column": 12,
+   "token": "try",
+   "source": "give back try read_line from input"
+  },
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/20_20-a-protocol-the-compiler-enforces.scribe",
+  "status": "fail",
+  "ambiguities": [],
+  "error": {
+   "line": 3,
+   "column": 34,
+   "token": "network",
+   "source": "to open_connection address using network"
+  },
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/21_21-allocation-is-visible.scribe",
+  "status": "fail",
+  "ambiguities": [],
+  "error": {
+   "line": 8,
+   "column": 15,
+   "token": "try",
+   "source": "let lines be try split_lines text using memory"
+  },
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/22_22-authority-enters-at-one-place-and-is-.scribe",
+  "status": "fail",
+  "ambiguities": [],
+  "error": {
+   "line": 1,
+   "column": 9,
+   "token": "root",
+   "source": "to main root"
+  },
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/24_24-untrusted-data-cannot-reach-a-sink.scribe",
+  "status": "fail",
+  "ambiguities": [],
+  "error": {
+   "line": 1,
+   "column": 25,
+   "token": "database",
+   "source": "to find_user name using database"
+  },
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/25_24-untrusted-data-cannot-reach-a-sink.scribe",
+  "status": "fail",
+  "ambiguities": [],
+  "error": {
+   "line": 1,
+   "column": 19,
+   "token": "try",
+   "source": "let valid_name be try check name as UserName"
+  },
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/26_25-declassification-is-named-justified-a.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": [
+   {
+    "line": 6,
+    "text": "last 4 digits of card",
+    "status": "ambiguous"
+   }
+  ]
+ },
+ {
+  "file": "corpus/doc/27_26-pure-means-pure.scribe",
+  "status": "fail",
+  "ambiguities": [],
+  "error": {
+   "line": 5,
+   "column": 13,
+   "token": "try",
+   "source": "let rate be try fetch_tax_rate"
+  },
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/28_27-a-protocol-declared-once-checked-on-b.scribe",
+  "status": "fail",
+  "ambiguities": [],
+  "error": {
+   "line": 12,
+   "column": 49,
+   "token": "every",
+   "source": "ensure if it succeeds, checksum sent is hash of every Chunk data received"
+  },
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/29_28-the-manifest.scribe",
+  "status": "fail",
+  "ambiguities": [],
+  "error": {
+   "line": 19,
+   "column": 15,
+   "token": "the",
+   "source": "charging with the same key twice charges once               assumed owner payments_team monitor checking"
+  },
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/30_29-the-implementation-below-it.scribe",
+  "status": "fail",
+  "ambiguities": [],
+  "error": {
+   "line": 4,
+   "column": 21,
+   "token": "try",
+   "source": "let reservation be try reserve lines of cart in inventory"
+  },
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/31_30-a-versioned-schema-and-a-checked-migr.scribe",
+  "status": "fail",
+  "ambiguities": [],
+  "error": {
+   "line": 11,
+   "column": 18,
+   "token": "field",
+   "source": "ensure for every field other than note, that field of new is that field of old"
+  },
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/33_32-the-system-file.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/35_34-a-rule-that-catches-a-quiet-mistake.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/38_36-the-fix-and-the-order-to-deploy-in.scribe",
+  "status": "fail",
+  "ambiguities": [],
+  "error": {
+   "line": 16,
+   "column": 15,
+   "token": "try",
+   "source": "let order be try place_order cart for customer with request_id in checkout"
+  },
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/40_37-doing-several-things-at-once.scribe",
+  "status": "fail",
+  "ambiguities": [],
+  "error": {
+   "line": 13,
+   "column": 12,
+   "token": "a",
+   "source": "give back a Dashboard from profile and orders and alerts"
+  },
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/41_38-the-race-that-cannot-be-written.scribe",
+  "status": "fail",
+  "ambiguities": [],
+  "error": {
+   "line": 3,
+   "column": 11,
+   "token": "a",
+   "source": "for each a in first_half"
+  },
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/42_38-the-race-that-cannot-be-written.scribe",
+  "status": "ambiguous",
+  "ambiguities": [
+   {
+    "line": 2,
+    "source": "let first be sum of first_half",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   },
+   {
+    "line": 3,
+    "source": "let second be sum of second_half",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   }
+  ],
+  "error": null,
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/43_39-a-pipeline-with-a-bounded-queue.scribe",
+  "status": "fail",
+  "ambiguities": [],
+  "error": {
+   "line": 7,
+   "column": 8,
+   "token": "every",
+   "source": "ensure every row read is either saved or listed in rejects of result"
+  },
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/44_40-work-that-survives-a-restart.scribe",
+  "status": "fail",
+  "ambiguities": [],
+  "error": {
+   "line": 1,
+   "column": 30,
+   "token": "date",
+   "source": "workflow nightly_billing for date"
+  },
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/46_41-time-and-ordering-are-written-down.scribe",
+  "status": "fail",
+  "ambiguities": [],
+  "error": {
+   "line": 7,
+   "column": 8,
+   "token": "every",
+   "source": "remove every s from sessions where expires_at of s is not after now using clock"
+  },
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/47_review-view-canonical.scribe",
+  "status": "ambiguous",
+  "ambiguities": [
+   {
+    "line": 11,
+    "source": "invariant for every j from 0 through i - 1, item j of items is at most best",
+    "readings": [
+     "call",
+     "call"
+    ]
+   },
+   {
+    "line": 13,
+    "source": "set best to item i of items",
+    "readings": [
+     "call",
+     "call"
+    ]
+   },
+   {
+    "line": 12,
+    "source": "if item i of items is more than best",
+    "readings": [
+     "call",
+     "call"
+    ]
+   },
+   {
+    "line": 3,
+    "source": "expect count of items is at least 1",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   },
+   {
+    "line": 8,
+    "source": "var best starts at item 0 of items",
+    "readings": [
+     "call",
+     "call"
+    ]
+   },
+   {
+    "line": 9,
+    "source": "for each i from 1 until count of items",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   }
+  ],
+  "error": null,
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/48_compact-view.scribe",
+  "status": "ambiguous",
+  "ambiguities": [
+   {
+    "line": 11,
+    "source": "invariant for every j from 0 through i - 1, item j of items <= best",
+    "readings": [
+     "call",
+     "call"
+    ]
+   },
+   {
+    "line": 13,
+    "source": "set best to item i of items",
+    "readings": [
+     "call",
+     "call"
+    ]
+   },
+   {
+    "line": 12,
+    "source": "if item i of items > best",
+    "readings": [
+     "call",
+     "call"
+    ]
+   },
+   {
+    "line": 10,
+    "source": "invariant best in items",
+    "readings": [
+     "call",
+     "compare"
+    ]
+   },
+   {
+    "line": 3,
+    "source": "expect count of items >= 1",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   },
+   {
+    "line": 8,
+    "source": "var best starts at item 0 of items",
+    "readings": [
+     "call",
+     "call"
+    ]
+   },
+   {
+    "line": 9,
+    "source": "for each i from 1 until count of items",
+    "readings": [
+     "of_access",
+     "call"
+    ]
+   }
+  ],
+  "error": null,
+  "interpolations": []
+ }
+]

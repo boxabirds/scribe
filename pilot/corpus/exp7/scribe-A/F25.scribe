@@ -1,0 +1,35 @@
+note Translated from go src/time/format.go, parseSignedOffset (lines 1508 to 1523).
+
+note leadingInt in Go returns (x uint64, rem string, err error); err is set only when the digits overflow. If there are no leading digits it gives x = 0 and rem = s with no error.
+type Leading_int
+    field x as a Nat
+    field rem as Text
+
+to leading_int s
+    given s is Text
+    produces a Leading_int
+    fails with LeadingIntOverflow
+
+to parse_signed_offset value
+    given value is Text
+    produces an Int
+
+    note UNCLEAR: Go's value[0] panics on an empty string (callers never pass one); the doc has no panic and does not say what an out-of-range index does, and adding `expect count of value is at least 1` would invent a precondition the original does not state, so none is written
+    note GAP: byte indexing and slicing of Text - `byte 0 of value` and `slice of value from 1 until count of value` are invented; the doc has no Text indexing or substring form
+    note UNCLEAR: whether `count of` a Text is in bytes or characters; Go's len is bytes
+    let sign be byte 0 of value
+    note UNCLEAR: no character literal in the doc; '-' and '+' are written as one-character Text, which would then compare a Byte with Text, against "is compares like with like only"
+    if sign is not "-" and sign is not "+"
+        give back 0
+    let rest be slice of value from 1 until count of value
+    note WORKAROUND: Go tests `err != nil` with a value in hand; here the failure is handled and turned into the same result 0, which needs a handle block wrapping the rest of the body
+    handle
+        let parsed be try leading_int rest
+        note fail if nothing consumed by leading_int
+        if rem of parsed is rest
+            give back 0
+        if x of parsed is more than 23
+            give back 0
+        give back count of value - count of rem of parsed
+    on failure LeadingIntOverflow
+        give back 0

@@ -1,0 +1,34 @@
+note F35: CPython Lib/sched.py, scheduler.__init__
+note WORKAROUND: Scribe has no classes or constructors; __init__ becomes an operation that produces a new Scheduler record, and self disappears
+
+type Scheduler
+    field queue as a List of Event
+    note GAP: locks - the doc says values are never shared mutably between tasks, so "there is nothing for a lock to protect" (example 38) and it has no lock type; a reentrant lock stored in a record has no spelling, so ReentrantLock is an invented type
+    field lock as a ReentrantLock
+    note GAP: stored callbacks - timefunc and delayfunc are functions kept in fields and called later; the doc has no type for an operation held as a value, so `an Operation ...` is invented
+    field timefunc as an Operation producing a Number
+    field delayfunc as an Operation taking a Number
+    note WORKAROUND: itertools.count() is a lazy generator; Scribe has no generators, so a plain counter of the next sequence number stands in for it, and every later use must read and then increase it by hand
+    field next_sequence as a Nat
+
+to new_scheduler with timefunc and delayfunc using memory
+    note GAP: default arguments - the original defaults timefunc to time.monotonic and delayfunc to time.sleep; the doc has no default or optional arguments, so both must be passed by every caller
+    note GAP: ambient authority in defaults - the defaults reach the wall clock and the sleeper with no capability passed in; in Scribe those need a Clock passed explicitly, so a default could only exist if it captured a capability the caller never handed over, which example 22 forbids
+    given timefunc is an Operation producing a Number
+    given delayfunc is an Operation taking a Number
+    given memory is an Allocator
+    produces a Scheduler
+    fails with OutOfMemory
+    uses memory
+
+    note UNCLEAR: the doc shows record construction only as `an Order from cart and receipt with status Paid` (example 29); it does not say how to build a record field by field, so the form below follows that phrase with one `with` per field
+    note UNCLEAR: creating an empty list and a lock both allocate in Python; the doc does not say how `[]` or a new lock name the allocator they use
+    let new_lock be try new_reentrant_lock using memory
+    give back a Scheduler with queue [] and lock new_lock and timefunc timefunc and delayfunc delayfunc and next_sequence 0
+
+to new_reentrant_lock using memory
+    note GAP: there is no lock type or lock operation in the doc; declared only so the translation is self-contained
+    given memory is an Allocator
+    produces a ReentrantLock
+    fails with OutOfMemory
+    uses memory

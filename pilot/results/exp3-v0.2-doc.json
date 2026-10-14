@@ -1,0 +1,413 @@
+[
+ {
+  "file": "corpus/doc/00_notation-aliases-and-renderers.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": [],
+  "resolved": {}
+ },
+ {
+  "file": "corpus/doc/01_1-a-pure-function-with-a-refined-input.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": [
+   {
+    "line": 5,
+    "text": "name",
+    "status": "ok"
+   }
+  ],
+  "resolved": {}
+ },
+ {
+  "file": "corpus/doc/02_2-a-loop-with-its-reasoning-attached.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": [],
+  "resolved": {}
+ },
+ {
+  "file": "corpus/doc/03_3-ranges-that-cannot-be-misread.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": [],
+  "resolved": {}
+ },
+ {
+  "file": "corpus/doc/04_4-optional-results.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": [
+   {
+    "line": 21,
+    "text": "p",
+    "status": "ok"
+   }
+  ],
+  "resolved": {}
+ },
+ {
+  "file": "corpus/doc/05_5-choices-with-exhaustive-matching-and-u.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": [],
+  "resolved": {}
+ },
+ {
+  "file": "corpus/doc/06_6-failure-is-visible-propagated-or-handl.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": [],
+  "resolved": {}
+ },
+ {
+  "file": "corpus/doc/07_7-binding-versus-mutation.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": [],
+  "resolved": {}
+ },
+ {
+  "file": "corpus/doc/08_8-a-full-contract-with-success-and-failu.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": [],
+  "resolved": {}
+ },
+ {
+  "file": "corpus/doc/09_9-a-type-with-an-invariant-and-a-model.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": [],
+  "resolved": {}
+ },
+ {
+  "file": "corpus/doc/10_10-a-repeat-while-loop-with-a-variant.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": [],
+  "resolved": {}
+ },
+ {
+  "file": "corpus/doc/11_11-named-predicates-keep-specs-readable.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": [],
+  "resolved": {}
+ },
+ {
+  "file": "corpus/doc/12_12-refinement-types.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": [],
+  "resolved": {}
+ },
+ {
+  "file": "corpus/doc/13_13-proof-hints-are-separate-foldable-and.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": [],
+  "resolved": {}
+ },
+ {
+  "file": "corpus/doc/14_14-tiers-and-escape-hatches-are-explicit.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": [],
+  "resolved": {}
+ },
+ {
+  "file": "corpus/doc/15_15-examples-and-properties-run-as-tests.scribe",
+  "status": "fail",
+  "ambiguities": [],
+  "error": {
+   "line": 4,
+   "column": 39,
+   "token": "-",
+   "source": "property for every items that is a non-empty List of Int, largest items is in items"
+  },
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/16_16-records-and-choices.scribe",
+  "status": "fail",
+  "ambiguities": [],
+  "error": {
+   "line": 11,
+   "column": 30,
+   "token": "Int",
+   "source": "field quantity as a Positive Int"
+  },
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/17_17-units-and-time-are-types.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": [],
+  "resolved": {}
+ },
+ {
+  "file": "corpus/doc/18_18-collections-in-words.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": [],
+  "resolved": {
+   "D1": 1
+  }
+ },
+ {
+  "file": "corpus/doc/19_19-a-resource-that-must-be-released.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": [],
+  "resolved": {}
+ },
+ {
+  "file": "corpus/doc/20_20-a-protocol-the-compiler-enforces.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": [],
+  "resolved": {}
+ },
+ {
+  "file": "corpus/doc/21_21-allocation-is-visible.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": [],
+  "resolved": {}
+ },
+ {
+  "file": "corpus/doc/22_22-authority-enters-at-one-place-and-is-.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": [],
+  "resolved": {}
+ },
+ {
+  "file": "corpus/doc/24_24-untrusted-data-cannot-reach-a-sink.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": [
+   {
+    "line": 8,
+    "text": "name",
+    "status": "ok"
+   }
+  ],
+  "resolved": {}
+ },
+ {
+  "file": "corpus/doc/25_24-untrusted-data-cannot-reach-a-sink.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": [],
+  "resolved": {
+   "D1": 1
+  }
+ },
+ {
+  "file": "corpus/doc/26_25-declassification-is-named-justified-a.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": [
+   {
+    "line": 6,
+    "text": "last 4 digits of card",
+    "status": "ok"
+   }
+  ],
+  "resolved": {}
+ },
+ {
+  "file": "corpus/doc/27_26-pure-means-pure.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": [],
+  "resolved": {}
+ },
+ {
+  "file": "corpus/doc/28_27-a-protocol-declared-once-checked-on-b.scribe",
+  "status": "fail",
+  "ambiguities": [],
+  "error": {
+   "line": 12,
+   "column": 49,
+   "token": "every",
+   "source": "ensure if it succeeds, checksum sent is hash of every Chunk data received"
+  },
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/29_28-the-manifest.scribe",
+  "status": "fail",
+  "ambiguities": [],
+  "error": {
+   "line": 18,
+   "column": 51,
+   "token": "of",
+   "source": "payments answers within 2 seconds for 99 percent of calls    assumed owner payments_team monitor sampling 1 percent"
+  },
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/30_29-the-implementation-below-it.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": [],
+  "resolved": {}
+ },
+ {
+  "file": "corpus/doc/31_30-a-versioned-schema-and-a-checked-migr.scribe",
+  "status": "fail",
+  "ambiguities": [],
+  "error": {
+   "line": 11,
+   "column": 18,
+   "token": "field",
+   "source": "ensure for every field other than note, that field of new is that field of old"
+  },
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/33_32-the-system-file.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": [],
+  "resolved": {}
+ },
+ {
+  "file": "corpus/doc/35_34-a-rule-that-catches-a-quiet-mistake.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": [],
+  "resolved": {}
+ },
+ {
+  "file": "corpus/doc/38_36-the-fix-and-the-order-to-deploy-in.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": [
+   {
+    "line": 17,
+    "text": "id of order",
+    "status": "ok"
+   },
+   {
+    "line": 27,
+    "text": "request_id",
+    "status": "ok"
+   }
+  ],
+  "resolved": {}
+ },
+ {
+  "file": "corpus/doc/40_37-doing-several-things-at-once.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": [],
+  "resolved": {}
+ },
+ {
+  "file": "corpus/doc/41_38-the-race-that-cannot-be-written.scribe",
+  "status": "fail",
+  "ambiguities": [],
+  "error": {
+   "line": 3,
+   "column": 11,
+   "token": "a",
+   "source": "for each a in first_half"
+  },
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/42_38-the-race-that-cannot-be-written.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": [],
+  "resolved": {}
+ },
+ {
+  "file": "corpus/doc/43_39-a-pipeline-with-a-bounded-queue.scribe",
+  "status": "fail",
+  "ambiguities": [],
+  "error": {
+   "line": 7,
+   "column": 8,
+   "token": "every",
+   "source": "ensure every row read is either saved or listed in rejects of result"
+  },
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/44_40-work-that-survives-a-restart.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": [],
+  "resolved": {}
+ },
+ {
+  "file": "corpus/doc/46_41-time-and-ordering-are-written-down.scribe",
+  "status": "fail",
+  "ambiguities": [],
+  "error": {
+   "line": 7,
+   "column": 8,
+   "token": "every",
+   "source": "remove every s from sessions where expires_at of s is not after now using clock"
+  },
+  "interpolations": []
+ },
+ {
+  "file": "corpus/doc/47_review-view-canonical.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": [],
+  "resolved": {}
+ },
+ {
+  "file": "corpus/doc/48_compact-view.scribe",
+  "status": "fail",
+  "ambiguities": [],
+  "error": {
+   "line": 5,
+   "column": 15,
+   "token": "in",
+   "source": "ensure result in items"
+  },
+  "interpolations": []
+ }
+]

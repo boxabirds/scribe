@@ -1,0 +1,39 @@
+{
+  "id": "F35",
+  "behaviour_preserved": "not possible",
+  "gaps": [
+    {"category": "closures and stored callbacks",
+     "construct": "self.timefunc = timefunc; self.delayfunc = delayfunc (caller-supplied functions stored in fields and called later)",
+     "description": "The doc has no function type, no operation values and no way to call a stored one; `TimeFunction` and `DelayFunction` are placeholders whose call syntax is undefined. Event actions (stored callables with arguments) hit the same gap.",
+     "kind": "gap"},
+    {"category": "concurrency, threads and locks",
+     "construct": "self._lock = threading.RLock() so one scheduler can be used from several threads",
+     "description": "Scribe's only concurrency is structured `together` blocks with no shared mutable state, and example 38 says there is nothing for a lock to protect. A long-lived object shared across threads, guarded by a re-entrant lock, has no form; `ReentrantLock` is a placeholder.",
+     "kind": "gap"},
+    {"category": "closures and stored callbacks",
+     "construct": "self._sequence_generator = count() (a stateful iterator stored in a field)",
+     "description": "No generators or iterator objects; replaced with a Nat counter field, which changes the design from a shared generator to a value advanced through an editable Scheduler.",
+     "kind": "workaround"},
+    {"category": "objects, methods and self",
+     "construct": "__init__ initialising fields through self",
+     "description": "No constructors; written as an operation that returns a record.",
+     "kind": "workaround"},
+    {"category": "default, optional and keyword arguments",
+     "construct": "timefunc=_time, delayfunc=time.sleep defaults",
+     "description": "No default arguments; both are required parameters. The defaults are also ambient-authority functions, which Scribe deliberately forbids.",
+     "kind": "workaround"},
+    {"category": "time and clocks",
+     "construct": "timefunc returning a float of seconds and delayfunc sleeping for a float of seconds",
+     "description": "The doc has a Clock capability and `now using clock`, but no sleep/delay operation and no way to let the caller substitute a different time source except passing a different Clock value.",
+     "kind": "unclear"},
+    {"category": "objects, methods and self",
+     "construct": "record construction with every field named",
+     "description": "Only `an Order from cart and receipt with status Paid` is shown; there is no general record-literal form. `a Scheduler with queue as [] and lock as lock and ...` is a guess.",
+     "kind": "unclear"}
+  ],
+  "doc_rules_contradicted": [
+    "Because values are never shared mutably between tasks, there is nothing for a lock to protect, and no way to forget one."
+  ],
+  "invented_syntax": ["TimeFunction", "DelayFunction", "Action", "ReentrantLock", "a Scheduler with queue as [] and lock as lock and ...", "new_reentrant_lock"],
+  "notes": "The function is 6 assignments, but every interesting field is a capability the doc lacks: stored callbacks, a lock for a thread-shared object, and a generator. A Scribe-native scheduler would likely take a Clock capability instead of timefunc/delayfunc and a choice of actions instead of callables, but that is a redesign, not a translation. A designer should decide whether long-lived objects shared across tasks (schedulers, caches, pools) are a non-goal and state the alternative."
+}

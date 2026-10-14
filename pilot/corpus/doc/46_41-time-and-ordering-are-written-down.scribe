@@ -1,0 +1,7 @@
+to expire_sessions sessions using clock
+    given sessions is an editable List of Session
+    given clock is a Clock
+    ensure for every s in sessions, expires_at of s is after now using clock
+    uses clock
+
+    remove every s from sessions where expires_at of s is not after now using clock

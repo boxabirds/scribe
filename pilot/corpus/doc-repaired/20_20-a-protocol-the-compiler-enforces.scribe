@@ -1,0 +1,19 @@
+type Connection in state Closed or Open
+
+to open_connection address using network
+    given address is an Address
+    given network is a Network limited to host "api.example.com"
+    produces a Connection in state Open
+    fails with NetworkError
+    uses network
+
+to send data over connection
+    given data is Bytes
+    given connection is an editable Connection in state Open
+    fails with NetworkError
+    uses connection
+
+to close connection
+    given connection is a consumed Connection in state Open
+    produces a Connection in state Closed
+    uses connection

@@ -1,0 +1,29 @@
+{
+  "id": "F44",
+  "behaviour_preserved": "not possible",
+  "gaps": [
+    {"category": "pointers and shared mutable references",
+     "construct": "p *int64 kept by the flag package and written later during Parse, while the caller reads the same variable",
+     "description": "editable lends exclusive access for the length of one call; there is no long-lived shared reference, so 'shared Reference to an Int64' is invented. The whole flag package design (flag.Int64Var(&cfg.port, ...)) depends on this aliasing.",
+     "kind": "gap"},
+    {"category": "pointers and shared mutable references",
+     "construct": "*p = val (write through a pointer)",
+     "description": "No dereference; 'set target of p to val' is invented.",
+     "kind": "gap"},
+    {"category": "unsafe and raw memory",
+     "construct": "(*int64Value)(p): reinterpret a pointer to int64 as a pointer to the named type int64Value",
+     "description": "No newtype, type alias or pointer conversion; written as a constructor wrapping the reference, which only works because Int64Value was declared as that wrapper.",
+     "kind": "gap"},
+    {"category": "interfaces and dynamic dispatch",
+     "construct": "int64Value exists so the same memory satisfies the flag.Value interface (Set, String)",
+     "description": "The point of the conversion is to attach methods to an existing int64; without interfaces or methods the purpose of the function cannot be expressed, only its two statements.",
+     "kind": "gap"},
+    {"category": "numeric types and conversions",
+     "construct": "int64",
+     "description": "The doc names Int and Nat but no fixed-width types; Int64 is assumed as a refinement of Int.",
+     "kind": "unclear"}
+  ],
+  "doc_rules_contradicted": ["Changing an `editable` argument is not an effect, because ownership already says who can see it. (here the caller and the flag set both see p, so the write is a real shared-state effect with no uses line)"],
+  "invented_syntax": ["type Int64Value is a reference to an Int64", "given p is a shared Reference to an Int64", "set target of p to val", "an Int64Value from p"],
+  "notes": "A four-line function, but it is the core of Go's 'bind a flag to my variable' idiom, which is aliasing by design. Scribe's ownership model (read, editable, consumed) has no way to say 'this operation keeps a reference you passed and will write it later'; a translation that returns the parsed value instead would be idiomatic Scribe but a different API. Configuration libraries in most languages use this pattern, so the gap will recur."
+}

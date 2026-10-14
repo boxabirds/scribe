@@ -1,0 +1,50 @@
+FAIL       F01.scribe: {'line': 6, 'column': 22, 'token': 'a', 'source': 'to bisect_right x in a from lo to hi by key'}
+FAIL       F02.scribe: {'line': 3, 'column': 13, 'token': 'f', 'source': 'to search n f'}
+FAIL       F03.scribe: {'line': 7, 'column': 10, 'token': 'minus', 'source': 'define x minus y stays in range'}
+FAIL       F04.scribe: {'line': 43, 'column': 29, 'token': 'until', 'source': 'let t1 be part of l1 from 1 until count of l1'}
+FAIL       F05.scribe: {'line': 30, 'column': 23, 'token': 'against', 'source': 'to match_chunk chunk against s using memory'}
+FAIL       F06.scribe: {'line': 8, 'column': 18, 'token': 'against', 'source': 'to ufmerge2_1 l1 against h2 by fun then t2 onto m after h2m using memory'}
+FAIL       F07.scribe: {'line': 6, 'column': 34, 'token': 'to', 'source': 'field prev as a maybe reference to Adlist_node'}
+FAIL       F08.scribe: {'line': 5, 'column': 18, 'token': 'startpos', 'source': 'to siftdown heap startpos pos'}
+FAIL       F09.scribe: {'line': 6, 'column': 27, 'token': 'order', 'source': 'define items is sorted_by order'}
+FAIL       F10.scribe: {'line': 45, 'column': 36, 'token': 'until', 'source': 'set digits to part of text from 1 until count of text'}
+FAIL       F11.scribe: {'line': 76, 'column': 63, 'token': 'from', 'source': 'let ordered be item (count of ext - 1 - k) of ext for each k from 0 until count of ext'}
+FAIL       F12.scribe: {'line': 60, 'column': 28, 'token': 'with', 'source': 'fail with JSONDecodeError with msg "Extra data" and doc s and pos end'}
+FAIL       F13.scribe: {'line': 29, 'column': 32, 'token': 'with', 'source': 'give back a Prefix_and_suffix with prefix as slice of pattern from 0 until pos and suffix as slice of pattern from pos + 1 until count of pattern_bytes'}
+FAIL       F14.scribe: {'line': 32, 'column': 28, 'token': 'suffix', 'source': 'to sanitize_params prefix suffix dir using files'}
+ok         F15.scribe
+FAIL       F16.scribe: {'line': 21, 'column': 17, 'token': 'on', 'source': 'to set_err err on scanner'}
+FAIL       F17.scribe: {'line': 22, 'column': 30, 'token': 'and', 'source': 'to ignore_patterns_for path and names with patterns using memory'}
+FAIL       F18.scribe: {'line': 7, 'column': 30, 'token': 'from', 'source': 'field events as a maybe Map from EventKey to Listeners'}
+ok         F19.scribe
+FAIL       F20.scribe: {'line': 44, 'column': 27, 'token': 'until', 'source': 'set name to characters 1 until (length of name - 1) of name'}
+FAIL       F21.scribe: {'line': 97, 'column': 23, 'token': 'because', 'source': 'fail with BadQuoting because "closing quote must be followed by a space or nothing at all"'}
+FAIL       F22.scribe: {'line': 53, 'column': 18, 'token': 'and', 'source': 'to coerce first and second'}
+FAIL       F23.scribe: {'line': 21, 'column': 29, 'token': 'and', 'source': 'to sqlite3_strnicmp z_left and z_right up_to n'}
+FAIL       F24.scribe: {'line': 20, 'column': 46, 'token': 'bitand', 'source': 'let swapped_bytes be ((x shifted right by 8) bitand m3) bitor ((x bitand m3) shifted left by 8 wrapping)'}
+FAIL       F25.scribe: {'line': 24, 'column': 36, 'token': 'until', 'source': 'let rest be slice of value from 1 until count of value'}
+FAIL       F26.scribe: {'line': 21, 'column': 24, 'token': 'month', 'source': 'to make_datetime year month day hour minute second microsecond tzinfo fold'}
+FAIL       F27.scribe: {'line': 13, 'column': 35, 'token': 'and', 'source': 'to offset_string_adjustment time and unit for tz'}
+FAIL       F28.scribe: {'line': 17, 'column': 33, 'token': 'within', 'source': 'to read_line_slice from reader within lim'}
+ok         F29.scribe
+FAIL       F30.scribe: {'line': 17, 'column': 27, 'token': 'GetKeysResult', 'source': 'produces a maybe borrowed GetKeysResult from pcmd'}
+FAIL       F31.scribe: {'line': 5, 'column': 13, 'token': 'of', 'source': 'choice Tree of T'}
+FAIL       F32.scribe: {'line': 10, 'column': 1, 'token': '⇥', 'source': 'to get i from captures'}
+FAIL       F33.scribe: {'line': 11, 'column': 34, 'token': 'from', 'source': 'type EncoderFunc is an Operation from an editable EncodeState and a ReflectedValue and an EncodeOptions to nothing'}
+FAIL       F34.scribe: {'line': 25, 'column': 43, 'token': 'to', 'source': 'field events as a maybe Map of EventName to EventSlot'}
+FAIL       F35.scribe: {'line': 26, 'column': 33, 'token': 'and', 'source': 'to new_scheduler with timefunc and delayfunc using memory'}
+FAIL       F36.scribe: {'line': 30, 'column': 7, 'token': 'stop', 'source': 'field stop as an Int'}
+FAIL       F37.scribe: {'line': 5, 'column': 26, 'token': 'Bool', 'source': 'field done as an Atomic Bool'}
+FAIL       F38.scribe: {'line': 16, 'column': 7, 'token': 'result', 'source': 'field result as a maybe T'}
+FAIL       F39.scribe: {'line': 101, 'column': 1, 'token': '⇤', 'source': 'var coop starts at nothing'}
+FAIL       F40.scribe: {'line': 9, 'column': 36, 'token': 'to', 'source': 'field index as a maybe Map of Key to Position'}
+FAIL       F41.scribe: {'line': 85, 'column': 27, 'token': 'bytes', 'source': 'to allocate_logged size bytes using memory and log'}
+FAIL       F42.scribe: {'line': 43, 'column': 27, 'token': 'a', 'source': 'give back x bitor ((b as a UInt64) shifted left by s)'}
+FAIL       F43.scribe: {'line': 65, 'column': 38, 'token': 'with', 'source': 'fail with MissingSectionHeaderError with file as fpname and lineno as lineno of st and line as line'}
+FAIL       F44.scribe: {'line': 4, 'column': 32, 'token': 'to', 'source': 'type Int64Value is a reference to an Int64'}
+FAIL       F45.scribe: {'line': 34, 'column': 60, 'token': 'forced', 'source': 'to rewrite_config_rewrite_line state for option with line forced'}
+FAIL       F46.scribe: {'line': 12, 'column': 12, 'token': 'a', 'source': 'to byte_eq a and b'}
+ok         F47.scribe
+FAIL       F48.scribe: {'line': 9, 'column': 30, 'token': 'and', 'source': 'to range_end_overflows start and size against max'}
+
+{'fail': 44, 'ok': 4} of 48

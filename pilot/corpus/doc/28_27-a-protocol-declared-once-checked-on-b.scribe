@@ -1,0 +1,13 @@
+protocol Upload
+    client sends Begin with size as Bytes at most 1 GiB
+    repeat
+        client sends Chunk with data as Bytes
+        server sends Ack with offset as Bytes
+    until client sends Commit
+    server sends one of Done with checksum as a Hash, or Failed with reason as Text
+
+to serve_upload connection
+    given connection is an editable Upload as server
+    fails with ProtocolError
+    ensure if it succeeds, checksum sent is hash of every Chunk data received
+    uses connection

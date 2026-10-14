@@ -1,0 +1,2 @@
+    let valid_name be try check name as UserName
+    give back try fetch User from database where name is valid_name

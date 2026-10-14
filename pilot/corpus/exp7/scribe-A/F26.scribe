@@ -1,0 +1,108 @@
+note Translated from CPython Lib/_pydatetime.py datetime.replace (lines 2091 to 2114).
+note Return a new datetime with new values for the specified fields.
+
+type DateTime
+    field year as an Int
+    field month as an Int
+    field day as an Int
+    field hour as an Int
+    field minute as an Int
+    field second as an Int
+    field microsecond as an Int
+    field tzinfo as a maybe TimeZoneInfo
+    field fold as an Int
+
+note GAP: three-state argument - Python's tzinfo=True means "keep", None means "remove the zone", and a value means "set it"; maybe has only two states, so a choice is declared
+choice TzinfoChange
+    Keep
+    Clear
+    Set_to with zone as a TimeZoneInfo
+
+to make_datetime year month day hour minute second microsecond tzinfo fold
+    given year is an Int
+    given month is an Int
+    given day is an Int
+    given hour is an Int
+    given minute is an Int
+    given second is an Int
+    given microsecond is an Int
+    given tzinfo is a maybe TimeZoneInfo
+    given fold is an Int
+    produces a DateTime
+    fails with ValueError
+
+note GAP: default and keyword arguments - every parameter defaults to None (or True for tzinfo) and fold is keyword-only, so callers write d.replace(day=1); the doc has neither defaults nor keywords, so every caller must pass nine values
+note GAP: objects, methods and self - replace is a method; `type(self)(...)` builds an instance of the caller's subclass, and the doc has no self, no subclasses and no way to construct "the same type as this value"
+to replace self year month day hour minute second microsecond tzinfo fold
+    given self is a DateTime
+    given year is a maybe Int
+    given month is a maybe Int
+    given day is a maybe Int
+    given hour is a maybe Int
+    given minute is a maybe Int
+    given second is a maybe Int
+    given microsecond is a maybe Int
+    given tzinfo is a TzinfoChange
+    given fold is a maybe Int
+    produces a DateTime
+    fails with ValueError
+
+    note WORKAROUND: "if x is None, x = self.x" needs a choose per field, nine times; the doc has no "or else" default for a maybe outside a together block
+    var new_year starts at year of self
+    choose year
+        when some y
+            set new_year to y
+        when nothing
+            note keep year of self
+    var new_month starts at month of self
+    choose month
+        when some m
+            set new_month to m
+        when nothing
+            note keep month of self
+    var new_day starts at day of self
+    choose day
+        when some d
+            set new_day to d
+        when nothing
+            note keep day of self
+    var new_hour starts at hour of self
+    choose hour
+        when some h
+            set new_hour to h
+        when nothing
+            note keep hour of self
+    var new_minute starts at minute of self
+    choose minute
+        when some m
+            set new_minute to m
+        when nothing
+            note keep minute of self
+    var new_second starts at second of self
+    choose second
+        when some s
+            set new_second to s
+        when nothing
+            note keep second of self
+    var new_microsecond starts at microsecond of self
+    choose microsecond
+        when some u
+            set new_microsecond to u
+        when nothing
+            note keep microsecond of self
+    var new_tzinfo starts at tzinfo of self
+    choose tzinfo
+        when Keep
+            note keep tzinfo of self
+        when Clear
+            set new_tzinfo to nothing
+        when Set_to with zone
+            set new_tzinfo to some zone
+    var new_fold starts at fold of self
+    choose fold
+        when some f
+            set new_fold to f
+        when nothing
+            note keep fold of self
+    note UNCLEAR: whether a when branch may hold only a note is not stated; the doc forbids an empty on failure line but says nothing about when
+    give back try make_datetime new_year new_month new_day new_hour new_minute new_second new_microsecond new_tzinfo new_fold

@@ -1,0 +1,34 @@
+{
+  "id": "F25",
+  "behaviour_preserved": "approximate",
+  "gaps": [
+    {"category": "characters, bytes and strings",
+     "construct": "value[0] (byte at index) and value[1:] (substring)",
+     "description": "No indexing or slicing form for Text; `byte 0 of value` and `slice of value from 1 until count of value` are invented.",
+     "kind": "gap"},
+    {"category": "characters, bytes and strings",
+     "construct": "byte literals '-' and '+' compared with a byte",
+     "description": "No character or byte literal; writing \"-\" compares a Byte with Text, which breaks the stated rule that `is` compares like with like only.",
+     "kind": "unclear"},
+    {"category": "error types and exceptions",
+     "construct": "panic on value[0] when value is empty",
+     "description": "There is no panic or out-of-range rule for indexing, and the original has no stated precondition, so the empty-string behaviour is undefined in the translation.",
+     "kind": "unclear"},
+    {"category": "error types and exceptions",
+     "construct": "x, rem, err := leadingInt(...) then `if err != nil || value[1:] == rem`",
+     "description": "Go combines the error test and a value test in one condition; Scribe must split them into a handle block plus an on failure line that repeats `give back 0`, and the three results need a helper record.",
+     "kind": "workaround"},
+    {"category": "characters, bytes and strings",
+     "construct": "len(value) - len(rem) as byte counts",
+     "description": "`count of` a Text is not defined as bytes or characters.",
+     "kind": "unclear"}
+  ],
+  "doc_rules_contradicted": [
+    "No implicit conversions. `is` compares like with like only (comparing a Byte with the Text \"-\")"
+  ],
+  "invented_syntax": [
+    "byte 0 of value",
+    "slice of value from 1 until count of value"
+  ],
+  "notes": "The function uses 0 as a sentinel for 'not an offset', which in Scribe would naturally be a maybe Int, but changing that would change behaviour, so the sentinel is kept. Go's leadingInt reports only overflow as an error, so the Scribe failure name LeadingIntOverflow was chosen to match; a reviewer reading the header cannot tell the function swallows that failure because handled failures leave no trace in the header, which is by design but hides a semantic choice."
+}

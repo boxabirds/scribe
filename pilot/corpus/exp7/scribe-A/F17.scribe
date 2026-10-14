@@ -1,0 +1,37 @@
+note Translation of the inner function _ignore_patterns from CPython's shutil.ignore_patterns (Lib/shutil.py).
+note In Python it is a closure: ignore_patterns(*patterns) returns _ignore_patterns, which captures patterns and is later called by copytree as ignore(path, names).
+note GAP: closure capturing an outer variable - the doc has no nested operations, no operation values and no capture, so `patterns` becomes an explicit parameter. copytree can then no longer accept an arbitrary ignore callable, and nothing here says how one is stored or passed.
+
+note fnmatch.filter: the names that match pattern.
+to fnmatch_filter names by pattern using memory
+    given names is a List of Text
+    given pattern is Text
+    given memory is an Allocator
+    produces a List of Text
+    fails with OutOfMemory
+    uses memory
+
+note GAP: Python's set type - the doc has no Set collection. `Set of Text` and `set_of` are guessed.
+to set_of items using memory
+    given items is a List of Text
+    given memory is an Allocator
+    produces a Set of Text
+    fails with OutOfMemory
+    uses memory
+
+to ignore_patterns_for path and names with patterns using memory
+    given path is Text
+    given names is a List of Text
+    given patterns is a List of Text
+    given memory is an Allocator
+    produces a Set of Text
+    fails with OutOfMemory
+    uses memory
+    note path is unused, as in the original. copytree's callback protocol passes it.
+
+    var ignored_names starts at []
+    for each pattern in patterns
+        let matched be try fnmatch_filter names by pattern using memory
+        note GAP: list.extend has no form in the doc. Only `append value to list` (example 9) and `followed by` (in specs) exist, so `followed by` is used in code here.
+        set ignored_names to ignored_names followed by matched
+    give back try set_of ignored_names using memory
