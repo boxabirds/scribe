@@ -13,11 +13,13 @@ Code examples are shown in the **review view**, the default way people read Scri
 
 ## 1. Purpose and principles
 
-Scribe is a language for a world where most code is written by machines and read, reviewed and owned by people. It has three aims, in order:
+Scribe is a language written by agents and read by humans. No person is expected to write it: AI agents write it, with endless patience for complexity and rigour, and people read and review what they wrote. That division decides almost everything else.
 
-1. **Rapid impact assessment.** Every operation and component states what it promises, needs and may do, in a form a tool can compare between two versions. The impact of a proposed change is computed from those statements before it is merged, in time that grows with the change and the components that depend on it, not with the size of the codebase.
-2. **Human readability.** Every token a reviewer sees is understood at reading speed. Every line has exactly one reading, and a reader who knows what the words mean sees it without knowing any rule of precedence beyond school arithmetic: text that can be read two ways is not readable, and needing a manual to read an expression is a failure of design. This holds for the stored text and for every view. When readability and impact assessment conflict, Scribe looks for a spelling that serves both; only when there is none does impact assessment win, and the cost to readability is recorded as a decision. Against every other aim, readability wins.
-3. **Correctness by construction.** No undefined behaviour, no missing-value errors, no data races, no leaked resources, no unhandled failures. Beyond that, contracts are proven wherever the compiler can, and checked at run time where it cannot.
+It has three aims, in order:
+
+1. **Quick, reliable impact assessment.** Most languages cannot say reliably what a proposed change affects, because so much is decided only at run time. Scribe removes that uncertainty: everything that links one piece of code to another (ownership, effects, capabilities, failures, states, contracts) is stated in the source, so standard static analysis finds every linkage, and the impact of a change is computed before it is merged, in time that grows with the change and what depends on it, not with the size of the codebase.
+2. **As easy to read as possible.** The approach is plain English plus basic maths operators, drawing on similar languages and, above all, on what did and did not work across them over the decades. Every line has exactly one reading, and a reader who knows what the words mean sees it without knowing any rule of precedence beyond school arithmetic: text that can be read two ways is not readable, and needing a manual to read an expression is a failure of design. This holds for the stored text and for every view. When readability and impact assessment conflict, Scribe looks for a spelling that serves both; only when there is none does impact assessment win, and the cost to readability is recorded as a decision. Against every other aim, readability wins.
+3. **Almost provably correct.** Because agents write the code, the language can demand validation no person would put up with writing: Rust-style ownership, states tracked in types, contracts on every operation. No undefined behaviour, no missing-value errors, no data races, no leaked resources, no unhandled failures; beyond that, contracts are proven wherever the compiler can, and checked at run time where it cannot. The writer's effort is free; the reader's is not, so every check must still read plainly.
 
 And two constraints:
 
@@ -30,6 +32,7 @@ Principles that follow from these and decide individual rules:
 
 | Principle | Consequence |
 | --- | --- |
+| Rigour costs the writer nothing, reading costs the reader | Validation can be as demanding as correctness needs, because agents write it; every construct is judged by how it reads, not by how hard it is to write |
 | What a reviewer must judge is visible before the body | Failures, capabilities, effects and contracts sit in each operation's header |
 | One stored form, many readings | The source has exactly one canonical text; people see it through views, and the formatter chooses the clearest phrasing |
 | Words where words are clearer, symbols where symbols are | School-level maths symbols for arithmetic and comparison; words for logic and structure |
