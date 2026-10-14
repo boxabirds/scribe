@@ -1,0 +1,8 @@
+module Proxy
+    requires
+        Urls as urls
+            uses parse
+    exports
+        function target(text: Text) -> Url
+            can fail with MissingScheme, BadEscape
+            return try urls.parse(text)

@@ -1,0 +1,9 @@
+type Keeper
+    kept: List[Byte]
+
+note Section 7.1: values, not references. This line stores a copy of the
+note bytes, so a buffer the caller reuses can never be seen through `kept`.
+note The cost is the copy; avoiding it is the compiler's job, not the writer's.
+function write(keeper: editable Keeper, data: List[Byte])
+    changes only keeper
+    keeper.kept = data

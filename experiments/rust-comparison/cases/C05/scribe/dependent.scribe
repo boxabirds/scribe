@@ -1,0 +1,11 @@
+module Login
+    requires
+        Users as users
+            uses current_user
+    exports
+        function greeting(session: Session) -> Text
+            handle
+                let user = try users.current_user(session)
+                return "Hello {user.name}"
+            on failure NotFound
+                return "Hello"

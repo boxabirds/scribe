@@ -1,0 +1,10 @@
+module Pool
+    requires
+        Net as net
+            uses dial
+    exports
+        function open(socket: editable Socket, address: Address)
+            can fail with Canceled, Refused
+            ensure on failure Canceled, socket.is_closed
+            changes only socket
+            try net.dial(socket, address)

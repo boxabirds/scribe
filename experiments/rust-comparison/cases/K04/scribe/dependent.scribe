@@ -1,0 +1,9 @@
+module Index
+    requires
+        SuffixArray as suffix_array
+            uses reset
+    exports
+        function rebuild(counts: editable List[Nat])
+            changes only counts
+            suffix_array.reset(counts)
+            assert for all c in counts, c == 0

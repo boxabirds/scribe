@@ -1,0 +1,5 @@
+module Urls
+    exports
+        function join_path(base: Text, part: Text) -> Text
+            ensure if base == "", result == "/" + part
+            return join_rooted(base, part)

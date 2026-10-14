@@ -1,0 +1,6 @@
+module Net
+    exports
+        function dial(socket: editable Socket, address: Address)
+            can fail with Canceled, Refused
+            changes only socket
+            try connect_watching_cancel(socket, address)

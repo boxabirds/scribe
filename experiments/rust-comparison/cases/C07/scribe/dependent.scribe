@@ -1,0 +1,8 @@
+module Client
+    requires
+        Urls as urls
+            uses join_path
+    exports
+        function relative(part: Text) -> Text
+            ensure result == part
+            return urls.join_path("", part)

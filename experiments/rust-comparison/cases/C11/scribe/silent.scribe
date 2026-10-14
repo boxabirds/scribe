@@ -1,0 +1,6 @@
+module Urls
+    exports
+        function parse(text: Text) -> Url
+            can fail with MissingScheme, BadEscape
+            note the new body can now fail with InvalidHost; the contract was not updated
+            return try sys_parse_v2(text)

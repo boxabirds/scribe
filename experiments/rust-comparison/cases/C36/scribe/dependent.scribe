@@ -1,0 +1,8 @@
+module Files
+    requires
+        Poll as poll
+            uses copy_file_range
+    exports
+        function copy(source: editable File, target: editable File) -> Nat
+            can fail with Io
+            return try poll.copy_file_range(source, target)

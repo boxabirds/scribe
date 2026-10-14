@@ -1,0 +1,16 @@
+scribe impact Net: old.scribe → new.scribe
+
+Breaking (1)
+    dial
+        guarantee weakened or removed: ensure on failure Canceled, socket.is_closed; breaking for Pool, which relies on it
+        used by Pool
+
+Authority change (0)
+
+Needs review (0)
+
+Unchanged, unchecked (0)
+
+Compatible (0)
+
+Suggested version change: major (a breaking change)

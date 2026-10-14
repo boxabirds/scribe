@@ -1,0 +1,5 @@
+module Users
+    exports
+        function current_user(session: Session) -> User
+            can fail with NotFound
+            return try sys_current_user(session)

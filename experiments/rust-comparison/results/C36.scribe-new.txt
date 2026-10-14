@@ -1,0 +1,16 @@
+scribe impact Poll: old.scribe → new.scribe
+
+Breaking (0)
+
+Authority change (0)
+
+Needs review (1)
+    copy_file_range
+        new way to fail, NotImplemented: breaking for callers that handle every failure by name
+        used by Files
+
+Unchanged, unchecked (0)
+
+Compatible (0)
+
+Suggested version change: patch

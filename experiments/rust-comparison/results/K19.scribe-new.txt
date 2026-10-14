@@ -1,0 +1,16 @@
+scribe impact Profiles: old.scribe → new.scribe
+
+Breaking (0)
+
+Authority change (0)
+
+Needs review (1)
+    write_profile
+        new way to fail, Compression: breaking for callers that handle every failure by name
+        used by Pprof
+
+Unchanged, unchecked (0)
+
+Compatible (0)
+
+Suggested version change: patch

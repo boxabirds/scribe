@@ -1,0 +1,8 @@
+module Pprof
+    requires
+        Profiles as profiles
+            uses write_profile
+    exports
+        function save(profile: Profile, out: editable Writer) -> Nat
+            can fail with Io
+            return try profiles.write_profile(profile, out)

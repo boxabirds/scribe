@@ -1,0 +1,23 @@
+    Building case_r1 v1.0.1 (current)
+       Built [   0.444s] (current)
+     Parsing case_r1 v1.0.1 (current)
+      Parsed [   0.002s] (current)
+    Building case_r1 v1.0.0 (baseline)
+       Built [   0.428s] (baseline)
+     Parsing case_r1 v1.0.0 (baseline)
+      Parsed [   0.001s] (baseline)
+    Checking case_r1 v1.0.0 -> v1.0.1 (patch change)
+     Checked [   0.012s] 229 checks: 228 pass, 1 fail, 0 warn, 31 skip
+
+--- failure function_parameter_count_changed: pub fn parameter count changed ---
+
+Description:
+A publicly-visible function now takes a different number of parameters.
+        ref: https://doc.rust-lang.org/cargo/reference/semver.html#fn-change-arity
+       impl: https://github.com/obi1kenobi/cargo-semver-checks/tree/v0.51.0/src/lints/function_parameter_count_changed.ron
+
+Failed in:
+  case_r1::get_item now takes 3 parameters instead of 2, in cases/R1/rust/new/src/lib.rs:4
+
+     Summary semver requires new major version: 1 major and 0 minor checks failed
+    Finished [   1.087s] case_r1

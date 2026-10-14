@@ -1,0 +1,5 @@
+module Http
+    exports
+        function redirect_body(target: Text) -> Text
+            ensure count(result) == count(target) + 30
+            return "<a href=\"" + target + "\">Found</a>.\n\n"

@@ -1,0 +1,7 @@
+module Tar
+    exports
+        function entry_name(entry: Entry) -> Text
+            ensure if entry.is_directory, result == entry.path + "/"
+            if entry.is_directory
+                return entry.path + "/"
+            return entry.path

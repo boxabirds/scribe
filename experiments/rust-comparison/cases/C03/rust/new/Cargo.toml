@@ -1,0 +1,9 @@
+[package]
+name = "case_c03"
+version = "1.0.1"
+edition = "2021"
+
+[lib]
+path = "src/lib.rs"
+
+[workspace]

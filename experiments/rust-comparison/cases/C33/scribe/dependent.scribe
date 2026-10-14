@@ -1,0 +1,8 @@
+module Feeds
+    requires
+        Xml as xml
+            uses next_token
+    exports
+        function first_token(decoder: editable Decoder) -> Token
+            can fail with Syntax, EndOfInput
+            return try xml.next_token(decoder)

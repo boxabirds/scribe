@@ -1,0 +1,12 @@
+error: postcondition not satisfied
+  --> C06/verus/silent.rs:8:13
+   |
+ 8 |     ensures u.host_empty ==> r@ == u.path@,
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+...
+13 |     r
+   |     - at the end of the function body
+
+verification results:: 2 verified, 1 errors
+error: aborting due to 1 previous error
+

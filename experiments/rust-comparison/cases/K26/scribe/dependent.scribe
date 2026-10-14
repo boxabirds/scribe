@@ -1,0 +1,7 @@
+module Importer
+    requires
+        PkgBits as pkgbits
+            uses version
+    exports
+        function supported(reader: Reader) -> Bool
+            return pkgbits.version(reader) < 3

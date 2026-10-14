@@ -1,0 +1,8 @@
+module Unpack
+    requires
+        Tar as tar
+            uses entry_name
+    exports
+        function count_entries(entries: List[Entry]) -> Nat
+            ensure result == count(entries)
+            return count(entries)

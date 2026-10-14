@@ -1,0 +1,16 @@
+scribe impact Xml: old.scribe → new.scribe
+
+Breaking (0)
+
+Authority change (0)
+
+Needs review (1)
+    next_token
+        new way to fail, LateDeclaration: breaking for callers that handle every failure by name
+        used by Feeds
+
+Unchanged, unchecked (0)
+
+Compatible (0)
+
+Suggested version change: patch

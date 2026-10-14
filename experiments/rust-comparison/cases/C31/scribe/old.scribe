@@ -1,0 +1,5 @@
+module Poll
+    exports
+        function accept(listener: editable Listener) -> Socket
+            can fail with Closed, TooManyFiles
+            return try sys_accept(listener)

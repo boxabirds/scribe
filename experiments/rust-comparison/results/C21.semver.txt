@@ -1,0 +1,23 @@
+    Building case_c21 v1.0.1 (current)
+       Built [   0.435s] (current)
+     Parsing case_c21 v1.0.1 (current)
+      Parsed [   0.002s] (current)
+    Building case_c21 v1.0.0 (baseline)
+       Built [   0.433s] (baseline)
+     Parsing case_c21 v1.0.0 (baseline)
+      Parsed [   0.001s] (baseline)
+    Checking case_c21 v1.0.0 -> v1.0.1 (patch change)
+     Checked [   0.013s] 229 checks: 228 pass, 1 fail, 0 warn, 31 skip
+
+--- failure enum_variant_added: enum variant added on exhaustive enum ---
+
+Description:
+A publicly-visible enum without #[non_exhaustive] has a new variant.
+        ref: https://doc.rust-lang.org/cargo/reference/semver.html#enum-variant-new
+       impl: https://github.com/obi1kenobi/cargo-semver-checks/tree/v0.51.0/src/lints/enum_variant_added.ron
+
+Failed in:
+  variant Error:ShortBuffer in cases/C21/rust/new/src/lib.rs:2
+
+     Summary semver requires new major version: 1 major and 0 minor checks failed
+    Finished [   1.116s] case_c21

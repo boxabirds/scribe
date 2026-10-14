@@ -1,0 +1,12 @@
+error: postcondition not satisfied
+  --> C16/verus/new.rs:19:13
+   |
+19 |     ensures r is Joined,
+   |             ^^^^^^^^^^^ failed this postcondition
+20 | {
+21 |     join(problems)
+   |     -------------- at the end of the function body
+
+verification results:: 2 verified, 1 errors
+error: aborting due to 1 previous error
+

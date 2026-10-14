@@ -1,0 +1,16 @@
+scribe impact Tar: old.scribe → new.scribe
+
+Breaking (1)
+    entry_name
+        guarantee weakened or removed: ensure if entry.is_directory, result == entry.path; breaking for Unpack, which relies on it
+        used by Unpack
+
+Authority change (0)
+
+Needs review (0)
+
+Unchanged, unchecked (0)
+
+Compatible (0)
+
+Suggested version change: major (a breaking change)

@@ -1,0 +1,8 @@
+module Extension
+    requires
+        Objects as objects
+            uses get_item
+    exports
+        function first(object: Object, key: Object) -> Object
+            can fail with Python
+            return try objects.get_item(object, key)

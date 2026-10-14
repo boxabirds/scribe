@@ -1,0 +1,7 @@
+module Hex
+    exports
+        function decode(target: editable List[Byte], source: List[Byte]) -> Nat
+            can fail with InvalidByte, OddLength
+            expect count(target) >= count(source) / 2
+            changes only target
+            return try decode_checked(target, source)

@@ -1,0 +1,16 @@
+scribe impact Objects: old.scribe → new.scribe
+
+Breaking (1)
+    get_item
+        signature changed: get_item(object: Object, key: Object) -> Object became get_item(object: Object, key: Object, interpreter: Interpreter) -> Object
+        used by Extension
+
+Authority change (0)
+
+Needs review (0)
+
+Unchanged, unchecked (0)
+
+Compatible (0)
+
+Suggested version change: major (a breaking change)

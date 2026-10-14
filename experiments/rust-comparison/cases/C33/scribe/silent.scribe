@@ -1,0 +1,6 @@
+module Xml
+    exports
+        function next_token(decoder: editable Decoder) -> Token
+            can fail with Syntax, EndOfInput
+            note the new body can now fail with LateDeclaration; the contract was not updated
+            return try sys_next_token_v2(decoder)

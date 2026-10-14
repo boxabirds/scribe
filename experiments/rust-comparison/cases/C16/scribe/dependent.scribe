@@ -1,0 +1,9 @@
+module Report
+    requires
+        Errors as errors
+            uses join
+    exports
+        function combine(problems: List[Error]) -> Error
+            expect count(problems) > 0
+            ensure result is Joined
+            return errors.join(problems)

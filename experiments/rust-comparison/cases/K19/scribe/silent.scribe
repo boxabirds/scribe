@@ -1,0 +1,6 @@
+module Profiles
+    exports
+        function write_profile(profile: Profile, out: editable Writer) -> Nat
+            can fail with Io
+            note the new body can now fail with Compression; the contract was not updated
+            return try sys_write_profile_v2(profile)

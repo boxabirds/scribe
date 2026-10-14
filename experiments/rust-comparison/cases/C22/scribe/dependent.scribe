@@ -1,0 +1,8 @@
+module Proxy
+    requires
+        Http as http
+            uses redirect_body
+    exports
+        function content_length(target: Text) -> Nat
+            ensure result == count(target) + 30
+            return count(http.redirect_body(target))

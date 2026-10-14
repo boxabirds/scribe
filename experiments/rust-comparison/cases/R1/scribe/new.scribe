@@ -1,0 +1,5 @@
+module Objects
+    exports
+        function get_item(object: Object, key: Object, interpreter: Interpreter) -> Object
+            can fail with Python
+            return try lookup_holding(object, key, interpreter)

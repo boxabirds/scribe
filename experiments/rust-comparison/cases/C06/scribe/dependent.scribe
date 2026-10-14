@@ -1,0 +1,9 @@
+module Router
+    requires
+        Urls as urls
+            uses to_text
+    exports
+        function route_key(url: Url) -> Text
+            expect url.host == ""
+            ensure result == url.path
+            return urls.to_text(url)

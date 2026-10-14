@@ -1,0 +1,8 @@
+module Errors
+    exports
+        function join(errors: List[Error]) -> Error
+            expect count(errors) > 0
+            ensure result is Joined
+            if count(errors) == 1
+                return errors[0]
+            return Joined(errors: errors)

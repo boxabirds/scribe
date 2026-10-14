@@ -1,0 +1,11 @@
+module Server
+    requires
+        Http as http
+            uses close_body
+    exports
+        function finish_request(body: editable RequestBody, connection: editable Connection)
+            ensure connection.reusable
+            changes only body, connection
+            http.close_body(body)
+            assert body.remaining == 0
+            connection.reusable = true

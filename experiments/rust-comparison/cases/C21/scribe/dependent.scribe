@@ -1,0 +1,10 @@
+module Keys
+    requires
+        Hex as hex
+            uses decode
+    exports
+        function read_key(target: editable List[Byte], source: List[Byte]) -> Nat
+            can fail with InvalidByte, OddLength
+            expect count(target) >= count(source) / 2
+            changes only target
+            return try hex.decode(target, source)

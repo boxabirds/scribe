@@ -1,0 +1,5 @@
+module Xml
+    exports
+        function next_token(decoder: editable Decoder) -> Token
+            can fail with Syntax, EndOfInput
+            return try sys_next_token(decoder)

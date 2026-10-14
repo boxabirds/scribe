@@ -1,0 +1,16 @@
+scribe impact Http: old.scribe → new.scribe
+
+Breaking (1)
+    redirect_body
+        guarantee weakened or removed: ensure count(result) == count(target) + 30; breaking for Proxy, which relies on it
+        used by Proxy
+
+Authority change (0)
+
+Needs review (0)
+
+Unchanged, unchecked (0)
+
+Compatible (0)
+
+Suggested version change: major (a breaking change)

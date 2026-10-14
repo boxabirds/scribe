@@ -1,0 +1,12 @@
+error: postcondition not satisfied
+  --> C07/verus/new.rs:16:13
+   |
+16 |     ensures r@ == part@,
+   |             ^^^^^^^^^^^ failed this postcondition
+...
+19 |     join_path(&empty, part)
+   |     ----------------------- at the end of the function body
+
+verification results:: 2 verified, 1 errors
+error: aborting due to 1 previous error
+

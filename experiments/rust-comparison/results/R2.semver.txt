@@ -1,0 +1,24 @@
+    Building case_r2 v1.0.1 (current)
+       Built [   0.434s] (current)
+     Parsing case_r2 v1.0.1 (current)
+      Parsed [   0.002s] (current)
+    Building case_r2 v1.0.0 (baseline)
+       Built [   0.453s] (baseline)
+     Parsing case_r2 v1.0.0 (baseline)
+      Parsed [   0.002s] (baseline)
+    Checking case_r2 v1.0.0 -> v1.0.1 (patch change)
+     Checked [   0.014s] 229 checks: 228 pass, 1 fail, 0 warn, 31 skip
+
+--- failure auto_trait_impl_removed: auto trait no longer implemented ---
+
+Description:
+A public type has stopped implementing one or more auto traits. This can break downstream code that depends on the traits being implemented.
+        ref: https://doc.rust-lang.org/reference/special-types-and-traits.html#auto-traits
+       impl: https://github.com/obi1kenobi/cargo-semver-checks/tree/v0.51.0/src/lints/auto_trait_impl_removed.ron
+
+Failed in:
+  type Command is no longer Send, in cases/R2/rust/new/src/lib.rs:2
+  type Command is no longer Sync, in cases/R2/rust/new/src/lib.rs:2
+
+     Summary semver requires new major version: 1 major and 0 minor checks failed
+    Finished [   1.151s] case_r2

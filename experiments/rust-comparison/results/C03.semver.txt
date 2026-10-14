@@ -1,0 +1,12 @@
+    Building case_c03 v1.0.1 (current)
+       Built [   0.396s] (current)
+     Parsing case_c03 v1.0.1 (current)
+      Parsed [   0.001s] (current)
+    Building case_c03 v1.0.0 (baseline)
+       Built [   0.450s] (baseline)
+     Parsing case_c03 v1.0.0 (baseline)
+      Parsed [   0.002s] (baseline)
+    Checking case_c03 v1.0.0 -> v1.0.1 (patch change)
+     Checked [   0.015s] 229 checks: 229 pass, 31 skip
+     Summary no semver update required
+    Finished [   1.072s] case_c03

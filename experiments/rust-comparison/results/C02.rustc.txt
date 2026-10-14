@@ -1,0 +1,12 @@
+error: lifetime may not live long enough
+  --> C02/keep_buffer.rs:13:9
+   |
+11 | impl<'a> Writer for Keeper<'a> {
+   |      -- lifetime `'a` defined here
+12 |     fn write(&mut self, data: &[u8]) {
+   |                               - let's call the lifetime of this reference `'1`
+13 |         self.kept = Some(data);
+   |         ^^^^^^^^^^^^^^^^^^^^^^ assignment requires that `'1` must outlive `'a`
+
+error: aborting due to 1 previous error
+

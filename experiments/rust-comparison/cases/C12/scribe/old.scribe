@@ -1,0 +1,7 @@
+module Net
+    exports
+        function dial(socket: editable Socket, address: Address)
+            can fail with Canceled, Refused
+            ensure on failure Canceled, socket.is_closed
+            changes only socket
+            try connect_or_close(socket, address)

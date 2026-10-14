@@ -1,0 +1,16 @@
+scribe impact Users: old.scribe → silent.scribe
+
+Breaking (0)
+
+Authority change (0)
+
+Needs review (0)
+
+Unchanged, unchecked (1)
+    current_user
+        the body changed and the contract did not; nothing checks the new body against the contract yet
+        used by Login
+
+Compatible (0)
+
+Suggested version change: patch

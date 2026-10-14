@@ -1,0 +1,5 @@
+module Urls
+    exports
+        function parse(text: Text) -> Url
+            can fail with MissingScheme, BadEscape, InvalidHost
+            return try sys_parse_v2(text)

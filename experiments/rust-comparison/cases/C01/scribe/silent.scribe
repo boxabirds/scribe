@@ -1,0 +1,7 @@
+module Http
+    exports
+        function close_body(body: editable RequestBody)
+            ensure body.remaining == 0
+            ensure body.is_closed
+            changes only body
+            body.is_closed = true

@@ -1,0 +1,6 @@
+module Users
+    exports
+        function current_user(session: Session) -> User
+            can fail with NotFound
+            note the new body can now fail with NoMapping; the contract was not updated
+            return try sys_current_user_v2(session)

@@ -1,0 +1,16 @@
+scribe impact Urls: old.scribe → new.scribe
+
+Breaking (1)
+    join_path
+        guarantee weakened or removed: ensure if base == "", result == part; breaking for Client, which relies on it
+        used by Client
+
+Authority change (0)
+
+Needs review (0)
+
+Unchanged, unchecked (0)
+
+Compatible (0)
+
+Suggested version change: major (a breaking change)

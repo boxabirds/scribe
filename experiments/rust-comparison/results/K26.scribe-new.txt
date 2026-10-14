@@ -1,0 +1,16 @@
+scribe impact PkgBits: old.scribe → new.scribe
+
+Breaking (0)
+
+Authority change (0)
+
+Needs review (0)
+
+Unchanged, unchecked (0)
+
+Compatible (0)
+
+Identical (1)
+    version
+
+Suggested version change: patch

@@ -1,0 +1,5 @@
+module Objects
+    exports
+        function get_item(object: Object, key: Object) -> Object
+            can fail with Python
+            return try lookup(object, key)

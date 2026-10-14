@@ -1,0 +1,12 @@
+error: postcondition not satisfied
+  --> C07/verus/silent.rs:6:13
+   |
+ 6 |     ensures base.len() == 0 ==> r@ == part@,
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+...
+12 |     r
+   |     - at the end of the function body
+
+verification results:: 2 verified, 1 errors
+error: aborting due to 1 previous error
+

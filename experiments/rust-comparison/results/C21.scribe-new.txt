@@ -1,0 +1,17 @@
+scribe impact Hex: old.scribe → new.scribe
+
+Breaking (0)
+
+Authority change (0)
+
+Needs review (1)
+    decode
+        new way to fail, ShortBuffer: breaking for callers that handle every failure by name
+        weaker precondition: dropped expect count(target) >= count(source) / 2
+        used by Keys
+
+Unchanged, unchecked (0)
+
+Compatible (0)
+
+Suggested version change: patch

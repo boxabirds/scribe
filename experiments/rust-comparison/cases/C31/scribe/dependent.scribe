@@ -1,0 +1,8 @@
+module Serve
+    requires
+        Poll as poll
+            uses accept
+    exports
+        function next_connection(listener: editable Listener) -> Socket
+            can fail with Closed, TooManyFiles
+            return try poll.accept(listener)

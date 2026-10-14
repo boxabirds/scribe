@@ -1,0 +1,12 @@
+error: postcondition not satisfied
+  --> C12/verus/silent.rs:9:13
+   |
+ 9 |     ensures r matches Err(Error::Canceled) ==> final(s).closed,
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+...
+12 |         return Err(Error::Canceled);
+   |         --------------------------- at this exit
+
+verification results:: 2 verified, 1 errors
+error: aborting due to 1 previous error
+

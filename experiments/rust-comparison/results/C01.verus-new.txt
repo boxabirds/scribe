@@ -1,0 +1,9 @@
+error: assertion failed
+  --> C01/verus/new.rs:18:12
+   |
+18 |     assert(b.remaining == 0);
+   |            ^^^^^^^^^^^^^^^^ assertion failed
+
+verification results:: 2 verified, 1 errors
+error: aborting due to 1 previous error
+

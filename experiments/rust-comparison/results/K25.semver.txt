@@ -1,0 +1,12 @@
+    Building case_k25 v1.0.1 (current)
+       Built [   0.433s] (current)
+     Parsing case_k25 v1.0.1 (current)
+      Parsed [   0.002s] (current)
+    Building case_k25 v1.0.0 (baseline)
+       Built [   0.402s] (baseline)
+     Parsing case_k25 v1.0.0 (baseline)
+      Parsed [   0.002s] (baseline)
+    Checking case_k25 v1.0.0 -> v1.0.1 (patch change)
+     Checked [   0.013s] 229 checks: 229 pass, 31 skip
+     Summary no semver update required
+    Finished [   1.064s] case_k25

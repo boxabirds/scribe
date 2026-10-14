@@ -1,0 +1,12 @@
+error: postcondition not satisfied
+  --> C06/verus/new.rs:18:13
+   |
+18 |     ensures r@ == u.path@,
+   |             ^^^^^^^^^^^^^ failed this postcondition
+19 | {
+20 |     to_text(u)
+   |     ---------- at the end of the function body
+
+verification results:: 2 verified, 1 errors
+error: aborting due to 1 previous error
+

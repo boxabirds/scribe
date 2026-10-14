@@ -1,0 +1,5 @@
+module Profiles
+    exports
+        function write_profile(profile: Profile, out: editable Writer) -> Nat
+            can fail with Io
+            return try sys_write_profile(profile)

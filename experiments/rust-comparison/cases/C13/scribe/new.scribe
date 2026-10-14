@@ -1,0 +1,6 @@
+module Http
+    exports
+        function serve_content(response: editable Response, content: editable File) -> Nat
+            can fail with Io
+            ensure on success, result == old(content.remaining)
+            return try copy_generic(response, content)

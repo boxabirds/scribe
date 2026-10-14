@@ -1,0 +1,16 @@
+scribe impact Errors: old.scribe → new.scribe
+
+Breaking (1)
+    join
+        guarantee weakened or removed: ensure result is Joined; breaking for Report, which relies on it
+        used by Report
+
+Authority change (0)
+
+Needs review (0)
+
+Unchanged, unchecked (0)
+
+Compatible (0)
+
+Suggested version change: major (a breaking change)

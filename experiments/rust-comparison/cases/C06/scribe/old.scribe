@@ -1,0 +1,5 @@
+module Urls
+    exports
+        function to_text(url: Url) -> Text
+            ensure if url.host == "", result == url.path
+            return render(url)

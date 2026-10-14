@@ -1,0 +1,11 @@
+error: postcondition not satisfied
+ --> C01/verus/silent.rs:9:13
+  |
+8 | pub fn close_body(b: &mut RequestBody)
+  | -------------------------------------- at the end of the function body
+9 |     ensures final(b).remaining == 0, final(b).closed,
+  |             ^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+
+verification results:: 2 verified, 1 errors
+error: aborting due to 1 previous error
+

@@ -1,0 +1,4 @@
+module PkgBits
+    exports
+        function version(reader: Reader) -> Nat
+            return reader.version

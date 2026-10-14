@@ -1,0 +1,13 @@
+error: postcondition not satisfied
+  --> C22/verus/new.rs:23:13
+   |
+23 |       ensures n == target.len() + 30,
+   |               ^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition
+24 | / {
+25 | |     redirect_body(target).len()
+26 | | }
+   | |_- at the end of the function body
+
+verification results:: 3 verified, 1 errors
+error: aborting due to 1 previous error
+

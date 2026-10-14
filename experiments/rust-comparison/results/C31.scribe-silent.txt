@@ -1,0 +1,16 @@
+scribe impact Poll: old.scribe → silent.scribe
+
+Breaking (0)
+
+Authority change (0)
+
+Needs review (0)
+
+Unchanged, unchecked (1)
+    accept
+        the body changed and the contract did not; nothing checks the new body against the contract yet
+        used by Serve
+
+Compatible (0)
+
+Suggested version change: patch

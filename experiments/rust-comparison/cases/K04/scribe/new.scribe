@@ -1,0 +1,7 @@
+module SuffixArray
+    exports
+        function reset(counts: editable List[Nat])
+            ensure for all c in counts, c == 0
+            ensure count(counts) == old(count(counts))
+            changes only counts
+            clear(counts)

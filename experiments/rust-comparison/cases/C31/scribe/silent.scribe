@@ -1,0 +1,6 @@
+module Poll
+    exports
+        function accept(listener: editable Listener) -> Socket
+            can fail with Closed, TooManyFiles
+            note the new body can now fail with NotSupported; the contract was not updated
+            return try sys_accept_v2(listener)

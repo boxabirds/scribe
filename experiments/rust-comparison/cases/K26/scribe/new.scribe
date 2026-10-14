@@ -1,0 +1,5 @@
+module PkgBits
+    exports
+        note the version of the export data format, read from its header
+        function version(reader: Reader) -> Nat
+            return reader.version
