@@ -42,19 +42,23 @@ Version 1 compiles to WebAssembly. The specification is
 
 ## The compiler
 
-The compiler is written in Rust (`crates/`). It is at the start of roadmap
-phase 2: the lexer is done, the parser is next.
+The compiler is written in Rust (`crates/`). The lexer and the parser are
+done; the parser is hand-written, by recursive descent.
 
     cargo test --workspace
     cargo run -q -p scribe-cli -- lex FILE...
+    cargo run -q -p scribe-cli -- parse FILE...
     python3 tools/compare_lexers.py
+    python3 tools/compare_parsers.py
 
 `compare_lexers.py` lexes every test file and every code block in the
 specification with both the compiler and the
 reference grammar, and fails on any difference in any token. The keyword list
 is generated once, by the grammar build, into `grammar/keywords.txt`, and the
 compiler embeds that file, so the two cannot disagree about which words are
-reserved. CI runs all of this on every push.
+reserved. `compare_parsers.py` does the same for parsing: both parsers must
+give the same tree for every test, corpus file and spec block, or both reject
+it. CI runs all of this on every push.
 
 ## Reference grammar
 

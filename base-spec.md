@@ -862,7 +862,7 @@ These are the decisions this draft does not settle. Each names what blocks it. A
 | 4 | ~~A rule language for system files~~ | Removed | System files are removed; `scribe query` answers reach and flow questions from the code (8.1) |
 | 5 | Possessive paths: `account's balance` | Settled | Allowed, never mixed with `of` in one path (5.1) |
 | 6 | Reduce the keyword set (now 58 keywords and 3 positional ones) | Open | Experiment 1, the comprehension test, extended to compare candidate words for the same idea, for example `hold` against `using` |
-| 7 | Parser strategy: the grammar is LALR(1) with no conflicts (Appendix A); whether the compiler's parser is generated from it or written by hand | Open | Comparing the error messages each gives on the pilot's real mistakes |
+| 7 | Parser strategy | Settled | Written by hand, by recursive descent, as Rust, Go, Swift and TypeScript are, for error messages in the reader's terms; checked tree for tree against the reference grammar on every build |
 | 8 | Code generator for WebAssembly, the version 1 target: a back end of our own, or one built on LLVM or Cranelift | Open | A compile-time benchmark on the pilot corpus |
 | 9 | Solver for proving contracts | Open | Choosing a solver that is fast and gives stable results across versions |
 | 10 | Localized views beyond English | Open | Round-trip proof for at least one other language |

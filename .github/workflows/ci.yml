@@ -27,5 +27,7 @@ jobs:
         run: python3 tools/check_grammar.py
       - name: Lexer against the reference grammar
         run: python3 tools/compare_lexers.py
+      - name: Parser against the reference grammar, tree for tree
+        run: python3 tools/compare_parsers.py
       - name: Grammar has no LALR(1) conflicts
         run: python3 tools/check_lalr.py

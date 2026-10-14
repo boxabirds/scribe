@@ -35,8 +35,8 @@ with one reading, and the negative cases fail. (Draft 0.5 replaced the pilot's s
 | --- | --- |
 | Choose the implementation language for the compiler (Rust) and set up the workspace and CI | done |
 | Lexer with the layout rules of Section 2.6 and the hard and soft keywords; agrees with the reference grammar's lexer token for token on every test and spec block | done |
-| Decide between a parser generated from the grammar and a hand-written one, by comparing their error messages on realistic mistakes | now |
-| The parser, producing a syntax tree, tested against the Earley grammar on every build: same accept or reject, same tree | |
+| Decide between a parser generated from the grammar and a hand-written one: hand-written, as Rust, Go, Swift and TypeScript chose, for error messages in the reader's terms | done |
+| The parser, producing a syntax tree, tested against the Earley grammar on every build: same accept or reject, same tree (`tools/compare_parsers.py`) | done |
 | Formatter that writes the stored form; formatting twice changes nothing, and every view round-trips | |
 | Diagnostics as Section 13.2 describes, and `scribe check --explain` | |
 
