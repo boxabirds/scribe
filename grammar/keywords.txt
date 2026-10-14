@@ -12,7 +12,6 @@ hard at
 hard be
 hard by
 hard changes
-hard choice
 hard choose
 hard component
 hard decreases
@@ -20,6 +19,7 @@ hard decrement
 hard do
 hard each
 hard ensure
+hard enum
 hard every
 hard example
 hard expect

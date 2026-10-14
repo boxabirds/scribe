@@ -87,3 +87,4 @@ Decisions from the review of readability and unambiguous presentation
 | 26 | Record members lose the word `field` | Approved; done |
 | 27 | A quantifier over a type is `for every x as T` | Approved; done |
 | 28 | `schema` and `migration` removed: a stored format is a type, and an upgrade is an operation | Approved; done |
+| 29 | `enum` replaces `choice` (Rust, Swift, Scala 3) | Approved; done |

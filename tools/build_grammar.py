@@ -27,7 +27,7 @@ all any none then
 matching only
 from until through repeat while invariant decreases stop skip choose when hold
 together trust assert
-type choice component example
+type enum component example
 property model interface
 is not and or mod of every there where result it some nothing at
 less more than most least followed

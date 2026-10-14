@@ -163,17 +163,17 @@ type Queue of T
     invariant count of contents ≤ capacity
 ```
 
-### 3.3 Choices
+### 3.3 Enums
 
 ```
-choice OrderStatus
+enum OrderStatus
     Draft
     Paid with paid_at as an Instant
     Shipped with tracking as Text
     Cancelled with reason as Text
 ```
 
-A choice is used through `choose`, which must handle every variant. Adding a variant makes every `choose` that does not handle it fail to compile.
+An enum's variants may carry data, as in Rust and Swift. An enum is used through `choose`, which must handle every variant. Adding a variant makes every `choose` that does not handle it fail to compile.
 
 ### 3.4 Missing values
 
@@ -403,7 +403,7 @@ Rules:
 - `on failure A or B as problem` binds the failure so it can be passed on: `fail with problem`.
 - Adding a way to fail is a change to the contract (Section 12).
 
-A failure is a value. Failures are declared as variants of a `choice`, so a failure can carry fields and two failures with the same name can be told apart, and `fail with` takes any expression whose value is a failure: `fail with an OutOfRange with value as clamped`. Failures that carried no data were the most common gap in translated real code. **Open:** the type rules for failure values (Section 14).
+A failure is a value. Failures are declared as variants of an `enum`, so a failure can carry fields and two failures with the same name can be told apart, and `fail with` takes any expression whose value is a failure: `fail with an OutOfRange with value as clamped`. Failures that carried no data were the most common gap in translated real code. **Open:** the type rules for failure values (Section 14).
 
 **Open:** whether panics exist at all. The current rule is that an operation cannot panic, and the compiler proves it; what a bounds check it cannot prove does is undecided.
 
@@ -850,7 +850,7 @@ These are the decisions this draft does not settle. Each names what blocks it. A
 | 9 | Solver for proving contracts | Open | Choosing a solver that is fast and gives stable results across versions |
 | 10 | Localized views beyond English | Open | Round-trip proof for at least one other language |
 | 11 | Which host bindings impact analysis compares by default (10.3) | Open | Re-expressing the replay's platform-specific breakages with it |
-| 12 | Type rules for failures as values: how a failure `choice` relates to `fails with`, and how impact analysis compares a failure's fields | Open | Roadmap phase 5, with the translation wave that needs them |
+| 12 | Type rules for failures as values: how a failure `enum` relates to `fails with`, and how impact analysis compares a failure's fields | Open | Roadmap phase 5, with the translation wave that needs them |
 | 13 | ~~Cost bounds (`cost at most`)~~ | Removed | A cost bound is not an instruction the program carries out; speed is measured by tools outside the language |
 | 14 | A condition group as the condition of an `if` or `repeat while` | Settled | `then` or `do` on its own line between the two blocks (5.2) |
 
@@ -939,6 +939,7 @@ What the replay changed in this specification:
 - Every contract feature must be enforceable, and the language has no concept of time. Removed for that reason: `idempotent by`, which nothing can enforce; `deadline`, time comparisons (`is after`, `is before`), date literals and built-in time types, which are standard-library operations on a clock capability; `may block`, which repeated what `uses` shows; `varies by host`, since a host-dependent fact is an ordinary operation of a capability's interface; and system files, whose questions `scribe query` answers from the code (3.6, 9.1, 10.1, 10.3, 11.5).
 - If in doubt, make it a library, as Rust does. Moved out of the language for that reason: capability narrowing (`attenuated`, and the `files`, `network`, `host`, `port`, `under`, `read only` descriptions) is standard-library operations; labels and `declassifies` became distinct types and named conversions; `define` predicates became operations that produce a `Bool`; `implies` went, since aligned `if` / `then` lines say it; pipelines, protocols and schemas with migrations became library code; clauses scoped `in build` went; a component's `may` section went, since all authority starts at the entry point; record members lost the word `field`; and a quantifier over a type is written `for every x as T` (1, 3.2, 5.2, 8, 9.3, 10, 11).
 - A condition group may be the condition of an `if` or `repeat while`, with `then` or `do` on its own line between the two blocks (5.2).
+- `enum` replaces `choice`, following Rust, Swift and Scala 3; no popular language uses `choice` (3.3).
 - Scribe is not described as a systems language. Having no garbage collector is a choice about memory management, managed at compile time as in Rust, not about the kind of software Scribe is for (1, 7).
 
 ### B.4 Earlier documents

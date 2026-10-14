@@ -113,7 +113,6 @@ make this easier than the list suggests:
 | `example` | An exact example in a contract | Samples, fixtures | `sample`, `specimen`, `fixture` |
 | `assert` | A condition the compiler proves at that point | Test assertions | `check`, `verify` |
 | `trust` | A block the checker does not verify | Trust levels, scores | `trust_level`, `confidence` |
-| `choice` | Declares a choice type | User selections | `selection`, `option`, `pick` |
 | `repeat` | `repeat while` loops | Repetition counts | `repeat_count`, `count` |
 | `when` | A branch of `choose` | Times and moments | `moment`, `at_time`, `occurred_at` |
 | `where` | Filters in comprehensions and quantifiers | Locations | `place`, `location`, `site` |
@@ -144,7 +143,8 @@ These are rarely names in other languages, so they seldom need renaming.
 | `given`, `produces` | Parameters and results in a contract |
 | `ensure` | A guarantee |
 | `invariant`, `decreases` | Loop and type reasoning |
-| `choose` | Matches every variant of a choice |
+| `choose` | Matches every variant of an enum |
+| `enum` | Declares an enum: variants that may carry data, as in Rust |
 | `together` | Runs lines at once |
 | `followed` | `followed by`, joining sequences |
 | `do` | `do nothing`, for a branch with nothing to do |

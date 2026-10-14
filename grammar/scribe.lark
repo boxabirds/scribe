@@ -18,7 +18,7 @@
 
 start: (item)*
 
-?item: operation | typedecl | choice | component | example | property
+?item: operation | typedecl | enum | component | example | property
      | interface
      | stmt
 
@@ -66,7 +66,7 @@ typedecl: "type" name ["of" name] ["in" "state" name ("or" name)*] ["is" typeexp
 ?member: name "as" typeexpr _NL                       -> field
        | "model" name "as" expr _NL                   -> model
        | "invariant" line_condition                   -> type_invariant
-choice: "choice" name _NL _INDENT variant+ _DEDENT
+enum: "enum" name _NL _INDENT variant+ _DEDENT                            // SPEC 3.3: as in Rust and Swift
 variant: name ["with" field_decl ("," field_decl)*] _NL                       // SPEC 3.3: parts take commas
 field_decl: name "as" typeexpr
 
@@ -322,7 +322,7 @@ name: NAME
     | "provides"
     | "state"
     | "succeeds"
-QUANTITY.4: /\d+(\.\d+)?[ ]+(?!(component|decreases|decrement|increment|interface|invariant|non_empty|otherwise|anything|consumed|editable|followed|matching|positive|produces|property|provides|subtract|succeeds|together|changes|example|failure|nothing|through|assert|choice|choose|ensure|expect|handle|repeat|result|return|starts|entry|every|fails|given|least|maybe|model|needs|state|there|trust|until|using|where|while|each|else|fail|from|hold|into|less|more|most|none|only|onto|over|skip|some|stop|than|then|type|uses|when|with|add|all|and|any|but|for|let|mod|not|set|the|try|var|an|as|at|be|by|do|if|in|is|it|of|on|or|to|a)(?![A-Za-z0-9_]))[A-Za-z][A-Za-z0-9_]*/
+QUANTITY.4: /\d+(\.\d+)?[ ]+(?!(component|decreases|decrement|increment|interface|invariant|non_empty|otherwise|anything|consumed|editable|followed|matching|positive|produces|property|provides|subtract|succeeds|together|changes|example|failure|nothing|through|assert|choose|ensure|expect|handle|repeat|result|return|starts|entry|every|fails|given|least|maybe|model|needs|state|there|trust|until|using|where|while|each|else|enum|fail|from|hold|into|less|more|most|none|only|onto|over|skip|some|stop|than|then|type|uses|when|with|add|all|and|any|but|for|let|mod|not|set|the|try|var|an|as|at|be|by|do|if|in|is|it|of|on|or|to|a)(?![A-Za-z0-9_]))[A-Za-z][A-Za-z0-9_]*/
 OR_ELSE.9: /,[ ]*or[ ]+else(?![A-Za-z0-9_])/
 FOR_EACH.8: /for[ ]+each(?![A-Za-z0-9_])/
 AT_ENTRY.7: /at[ ]+entry(?![A-Za-z0-9_])/

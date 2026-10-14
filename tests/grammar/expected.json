@@ -135,9 +135,9 @@
   "F47.scribe": "ok"
  },
  "spec": {
-  "choice OrderStatus": "ok",
   "component Checkout": "ok",
   "ensure": "fail",
+  "enum OrderStatus": "ok",
   "for every x in items, x ≤ result": "fail",
   "hold input as open path for reading using files": "ok",
   "if all of": "ok",
