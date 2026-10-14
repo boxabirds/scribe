@@ -108,6 +108,7 @@ Done when: wave 2 translates most functions without a gap.
 | HTTP client on `wasi:http`; TLS from the host | |
 | HTTP server written in Scribe, with its protocol declared (Section 11.4) | |
 | Interop with other components through WIT; hand-written manifests for foreign code, marked trusted | |
+| A retry operation in the standard library, whose contract says how many times it may call the operation it retries | |
 | Every standard library release checked with `scribe impact` against the last | |
 
 ## Phase 8. Toolchain and 1.0

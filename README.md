@@ -83,10 +83,10 @@ one reading on its own (spec Section 1).
 | Check | Result |
 | --- | --- |
 | Conformance tests, one per construct (`tests/grammar/accept`) | 49 of 49 parse with one reading |
-| Forbidden forms (`tests/grammar/reject`) | 34 of 34 rejected |
+| Forbidden forms (`tests/grammar/reject`) | 36 of 36 rejected |
 | Spec code blocks | 24 of 28; the other 4 are fragments of clauses, not whole programs |
-| Pilot doc examples, repaired | 35 of 42; the 7 others use forms the language has since changed: fields joined by `and` (05), owners on escape hatches and assumptions (14, 29), a field without `as` (30), `none` as a value (40), `workflow` (44), a list comprehension in round brackets (46) |
-| Pilot doc examples, as written | 27 of 42; examples 22 and 30 were two of the pilot's silent misreadings, and are now errors |
+| Pilot doc examples, repaired | 34 of 42; the 8 others use forms the language has since changed: fields joined by `and` (05), owners on escape hatches and assumptions (14, 29), a field without `as` (30), failure domains (33), `none` as a value (40), `workflow` (44), a list comprehension in round brackets (46) |
+| Pilot doc examples, as written | 26 of 42; examples 22 and 30 were two of the pilot's silent misreadings, and are now errors |
 | Pilot translations | 7 of 43; two parse as a logical `and` the checker must reject (`tests/checker`) |
 | Bison | **No LALR(1) conflicts** (v0.2: 172 shift/reduce and 20 reduce/reduce), so no text has two readings; `tools/check_lalr.py` keeps it that way |
 

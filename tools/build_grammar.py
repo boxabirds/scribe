@@ -25,7 +25,7 @@ deadline holds because assumes may
 let be var starts set return fail try handle on failure if otherwise for each
 increment decrement add subtract do
 all any none then
-labelled matching limited added corrects times only
+labelled matching limited added corrects only
 from until through repeat while invariant decreases stop skip choose when hold
 together pipeline trust proof
 type choice define component system protocol schema migration example

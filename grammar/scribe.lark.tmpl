@@ -56,7 +56,7 @@ deadline: "deadline" expr _NL                                                // 
 holds: "holds" "when" line_condition
 because: "because" STRING
 cost: "cost" "at" "most" expr _NL                                             // SPEC 10.1
-assumes_clause: "assumes" STRING ["monitor" monitor_policy] _NL               // SPEC 10.1
+assumes_clause: "assumes" STRING _NL                                           // SPEC 10.1
 may_block: "may" "block" STRING _NL                                           // SPEC 8.2
 // SPEC 12.3: a clause that was never true
 corrects_clause: "corrects" ("ensure" | "expect") STRING [because] _NL
@@ -127,28 +127,21 @@ component: "component" name "version" version _NL _INDENT comp_section+ _DEDENT
              | "may" _NL _INDENT may_line+ _DEDENT                -> may
              | "assumes" _NL _INDENT assumption+ _DEDENT          -> assumes
              | "provides" _NL _INDENT operation+ _DEDENT          -> provides
-             | "failure" _NL _INDENT failure_line+ _DEDENT        -> failure_section
              | tier
 need: name "from" version "as" name _NL [_INDENT "uses" name_list _NL _DEDENT]
 ?may_line: "nothing" "of" "its" "own" _NL                         -> no_authority   // SPECIAL EX 28
          | cap_spec _NL
 // an assumption is a quoted sentence, as in an operation's `assumes` clause (SPEC 10.1)
-assumption: STRING "monitor" monitor_policy _NL
-monitor_policy: "checking" | "sampling" expr
-?failure_line: "domain" name _NL                                                    -> domain
-             | "retry" name "at" "most" expr "times" "with" "backoff" expr because _NL -> retry   // SPECIAL EX 28
+assumption: STRING _NL
 
 system: "system" name "version" version _NL _INDENT sys_section+ _DEDENT
 ?sys_section: "components" _NL _INDENT (name version _NL)+ _DEDENT                  -> components
             | "authority" _NL _INDENT authority_line+ _DEDENT                   -> authority
             | "wiring" _NL _INDENT wiring_line+ _DEDENT                         -> wiring
-            | "failure" "domains" _NL _INDENT domain_line+ _DEDENT              -> failure_domains
             | "rules" _NL _INDENT rule_line+ _DEDENT                            -> rules
 ?authority_line: "root" "gives" name cap_spec _NL                               -> grant
                | "nothing" "else" "holds" "authority" _NL                       -> no_other_authority   // SPECIAL
 wiring_line: name "needs" name_list ["(" "read" "operations" "only" ")"] _NL   // SPECIAL parenthesised qualifier
-?domain_line: name "contains" name_list _NL                                     -> domain_members
-            | "a" "failure" "in" name "must" "not" "stop" name _NL              -> isolation   // SPECIAL
 ?rule_line: "only" name "can" "reach" cap_spec _NL                              -> reach_rule   // SPECIAL
           | "no" "value" "labelled" name "leaves" name _NL                      -> flow_rule    // SPECIAL
           | name "cannot" "write" "to" cap_spec _NL                             -> write_rule   // SPECIAL

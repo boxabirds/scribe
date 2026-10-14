@@ -56,7 +56,7 @@ deadline: "deadline" expr _NL                                                // 
 holds: "holds" "when" line_condition
 because: "because" STRING
 cost: "cost" "at" "most" expr _NL                                             // SPEC 10.1
-assumes_clause: "assumes" STRING ["monitor" monitor_policy] _NL               // SPEC 10.1
+assumes_clause: "assumes" STRING _NL                                           // SPEC 10.1
 may_block: "may" "block" STRING _NL                                           // SPEC 8.2
 // SPEC 12.3: a clause that was never true
 corrects_clause: "corrects" ("ensure" | "expect") STRING [because] _NL
@@ -127,28 +127,21 @@ component: "component" name "version" version _NL _INDENT comp_section+ _DEDENT
              | "may" _NL _INDENT may_line+ _DEDENT                -> may
              | "assumes" _NL _INDENT assumption+ _DEDENT          -> assumes
              | "provides" _NL _INDENT operation+ _DEDENT          -> provides
-             | "failure" _NL _INDENT failure_line+ _DEDENT        -> failure_section
              | tier
 need: name "from" version "as" name _NL [_INDENT "uses" name_list _NL _DEDENT]
 ?may_line: "nothing" "of" "its" "own" _NL                         -> no_authority   // SPECIAL EX 28
          | cap_spec _NL
 // an assumption is a quoted sentence, as in an operation's `assumes` clause (SPEC 10.1)
-assumption: STRING "monitor" monitor_policy _NL
-monitor_policy: "checking" | "sampling" expr
-?failure_line: "domain" name _NL                                                    -> domain
-             | "retry" name "at" "most" expr "times" "with" "backoff" expr because _NL -> retry   // SPECIAL EX 28
+assumption: STRING _NL
 
 system: "system" name "version" version _NL _INDENT sys_section+ _DEDENT
 ?sys_section: "components" _NL _INDENT (name version _NL)+ _DEDENT                  -> components
             | "authority" _NL _INDENT authority_line+ _DEDENT                   -> authority
             | "wiring" _NL _INDENT wiring_line+ _DEDENT                         -> wiring
-            | "failure" "domains" _NL _INDENT domain_line+ _DEDENT              -> failure_domains
             | "rules" _NL _INDENT rule_line+ _DEDENT                            -> rules
 ?authority_line: "root" "gives" name cap_spec _NL                               -> grant
                | "nothing" "else" "holds" "authority" _NL                       -> no_other_authority   // SPECIAL
 wiring_line: name "needs" name_list ["(" "read" "operations" "only" ")"] _NL   // SPECIAL parenthesised qualifier
-?domain_line: name "contains" name_list _NL                                     -> domain_members
-            | "a" "failure" "in" name "must" "not" "stop" name _NL              -> isolation   // SPECIAL
 ?rule_line: "only" name "can" "reach" cap_spec _NL                              -> reach_rule   // SPECIAL
           | "no" "value" "labelled" name "leaves" name _NL                      -> flow_rule    // SPECIAL
           | name "cannot" "write" "to" cap_spec _NL                             -> write_rule   // SPECIAL
@@ -398,21 +391,16 @@ name: NAME
     | "anything"
     | "assert"
     | "authority"
-    | "backoff"
     | "block"
     | "build"
     | "but"
     | "can"
     | "cannot"
-    | "checking"
     | "compatibility"
     | "components"
     | "consumed"
-    | "contains"
     | "cost"
     | "database"
-    | "domain"
-    | "domains"
     | "editable"
     | "else"
     | "entry"
@@ -424,8 +412,6 @@ name: NAME
     | "leaves"
     | "lemma"
     | "maybe"
-    | "monitor"
-    | "must"
     | "needs"
     | "network"
     | "no"
@@ -441,10 +427,8 @@ name: NAME
     | "read"
     | "removed"
     | "reserved"
-    | "retry"
     | "root"
     | "rules"
-    | "sampling"
     | "sends"
     | "stage"
     | "stages"
@@ -460,7 +444,7 @@ name: NAME
     | "version"
     | "wiring"
     | "write"
-QUANTITY.4: /\d+(\.\d+)?[ ]+(?!(compatibility|declassifies|attenuated|components|everything|idempotent|operations|authority|component|decreases|decrement|increment|interface|invariant|migration|non_empty|otherwise|anything|checking|consumed|contains|corrects|database|deadline|editable|followed|labelled|matching|pipeline|positive|produces|property|protocol|provides|reserved|sampling|subtract|succeeds|together|assumes|backoff|because|changes|domains|example|failure|implies|limited|monitor|network|nothing|removed|through|turning|version|assert|before|cannot|choice|choose|define|domain|ensure|expect|handle|leaves|repeat|result|return|schema|stages|starts|system|varies|wiring|about|added|after|block|build|entry|every|fails|field|files|given|gives|holds|least|lemma|maybe|model|needs|proof|queue|reach|retry|rules|sends|stage|state|there|times|trust|under|until|using|value|where|while|write|cost|each|else|fail|from|hold|host|into|less|more|most|must|none|only|onto|over|port|read|root|skip|some|stop|than|that|then|tier|time|type|uses|when|with|add|all|and|any|but|can|for|its|let|may|mod|not|one|own|set|the|try|use|var|an|as|at|be|by|do|if|in|is|it|no|of|on|or|to|a)(?![A-Za-z0-9_]))[A-Za-z][A-Za-z0-9_]*/
+QUANTITY.4: /\d+(\.\d+)?[ ]+(?!(compatibility|declassifies|attenuated|components|everything|idempotent|operations|authority|component|decreases|decrement|increment|interface|invariant|migration|non_empty|otherwise|anything|consumed|corrects|database|deadline|editable|followed|labelled|matching|pipeline|positive|produces|property|protocol|provides|reserved|subtract|succeeds|together|assumes|because|changes|example|failure|implies|limited|network|nothing|removed|through|turning|version|assert|before|cannot|choice|choose|define|ensure|expect|handle|leaves|repeat|result|return|schema|stages|starts|system|varies|wiring|about|added|after|block|build|entry|every|fails|field|files|given|gives|holds|least|lemma|maybe|model|needs|proof|queue|reach|rules|sends|stage|state|there|trust|under|until|using|value|where|while|write|cost|each|else|fail|from|hold|host|into|less|more|most|none|only|onto|over|port|read|root|skip|some|stop|than|that|then|tier|time|type|uses|when|with|add|all|and|any|but|can|for|its|let|may|mod|not|one|own|set|the|try|use|var|an|as|at|be|by|do|if|in|is|it|no|of|on|or|to|a)(?![A-Za-z0-9_]))[A-Za-z][A-Za-z0-9_]*/
 OR_ELSE.9: /,[ ]*or[ ]+else(?![A-Za-z0-9_])/
 COMMA_OR.8: /,[ ]*or(?![A-Za-z0-9_])/
 FOR_EACH.7: /for[ ]+each(?![A-Za-z0-9_])/

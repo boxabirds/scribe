@@ -61,5 +61,5 @@ Decisions from the review of readability and unambiguous presentation
 | --- | --- | --- |
 | 1 | Owners and teams are not part of the language. `trust`, `assume` and `assumes` say what is unchecked and why; the repository's own ownership rules say who reviews it | Approved; done |
 | 2 | `workflow` (durable execution) is removed; it is a platform service. `idempotent by` stays | Approved; done |
-| 3 | Audit the specification for other operational concepts, and bring each back as a decision | Approved; list presented |
+| 3 | Audit the specification for other operational concepts, and bring each back as a decision | Approved; list presented || 4 | Only what the running program does, and what is checked about it, is language. Removed: monitoring policies on assumptions, a manifest's `failure` section (retries are written in code), a system's `failure domains`, and `scribe deploy plan` | Approved; done |
 
