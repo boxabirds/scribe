@@ -1,0 +1,936 @@
+[
+ {
+  "file": "00_notation-aliases-and-renderers.scribe",
+  "code_lines": 1,
+  "failed": [],
+  "skipped": [],
+  "ambiguous": [],
+  "parsed": true
+ },
+ {
+  "file": "01_1-a-pure-function-with-a-refined-input.scribe",
+  "code_lines": 4,
+  "failed": [],
+  "skipped": [],
+  "ambiguous": [],
+  "parsed": true
+ },
+ {
+  "file": "02_2-a-loop-with-its-reasoning-attached.scribe",
+  "code_lines": 13,
+  "failed": [],
+  "skipped": [],
+  "ambiguous": [],
+  "parsed": true
+ },
+ {
+  "file": "03_3-ranges-that-cannot-be-misread.scribe",
+  "code_lines": 9,
+  "failed": [],
+  "skipped": [],
+  "ambiguous": [],
+  "parsed": true
+ },
+ {
+  "file": "04_4-optional-results.scribe",
+  "code_lines": 20,
+  "failed": [],
+  "skipped": [],
+  "ambiguous": [],
+  "parsed": true
+ },
+ {
+  "file": "05_5-choices-with-exhaustive-matching-and-u.scribe",
+  "code_lines": 11,
+  "failed": [],
+  "skipped": [],
+  "ambiguous": [],
+  "parsed": true
+ },
+ {
+  "file": "06_6-failure-is-visible-propagated-or-handl.scribe",
+  "code_lines": 15,
+  "failed": [],
+  "skipped": [],
+  "ambiguous": [],
+  "parsed": true
+ },
+ {
+  "file": "07_7-binding-versus-mutation.scribe",
+  "code_lines": 4,
+  "failed": [],
+  "skipped": [],
+  "ambiguous": [],
+  "parsed": true
+ },
+ {
+  "file": "08_8-a-full-contract-with-success-and-failu.scribe",
+  "code_lines": 13,
+  "failed": [],
+  "skipped": [],
+  "ambiguous": [],
+  "parsed": true
+ },
+ {
+  "file": "09_9-a-type-with-an-invariant-and-a-model.scribe",
+  "code_lines": 14,
+  "failed": [],
+  "skipped": [],
+  "ambiguous": [],
+  "parsed": true
+ },
+ {
+  "file": "10_10-a-repeat-while-loop-with-a-variant.scribe",
+  "code_lines": 22,
+  "failed": [],
+  "skipped": [],
+  "ambiguous": [],
+  "parsed": true
+ },
+ {
+  "file": "11_11-named-predicates-keep-specs-readable.scribe",
+  "code_lines": 7,
+  "failed": [],
+  "skipped": [],
+  "ambiguous": [],
+  "parsed": true
+ },
+ {
+  "file": "12_12-refinement-types.scribe",
+  "code_lines": 3,
+  "failed": [],
+  "skipped": [],
+  "ambiguous": [],
+  "parsed": true
+ },
+ {
+  "file": "13_13-proof-hints-are-separate-foldable-and.scribe",
+  "code_lines": 10,
+  "failed": [],
+  "skipped": [],
+  "ambiguous": [
+   {
+    "line": null,
+    "source": ""
+   }
+  ],
+  "parsed": true
+ },
+ {
+  "file": "14_14-tiers-and-escape-hatches-are-explicit.scribe",
+  "code_lines": 7,
+  "failed": [],
+  "skipped": [],
+  "ambiguous": [],
+  "parsed": true
+ },
+ {
+  "file": "15_15-examples-and-properties-run-as-tests.scribe",
+  "code_lines": 4,
+  "failed": [
+   {
+    "line": 4,
+    "source": "property for every items that is a non-empty List of Int, largest items is in items",
+    "reason": "unexpected -",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 3,
+    "source": "example find 7 in [1, 7, 7] is some 1",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 2,
+    "source": "example largest [5] is 5",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 1,
+    "source": "example largest [3, 9, 2] is 9",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   }
+  ],
+  "skipped": [],
+  "ambiguous": [],
+  "parsed": false
+ },
+ {
+  "file": "16_16-records-and-choices.scribe",
+  "code_lines": 16,
+  "failed": [
+   {
+    "line": 11,
+    "source": "field quantity as a Positive Int",
+    "reason": "unexpected Int",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 10,
+    "source": "field product as a ProductId",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 9,
+    "source": "type OrderLine",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 7,
+    "source": "invariant lines is not empty or status is Draft because \"only drafts may be empty\"",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 6,
+    "source": "field status as an OrderStatus",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 5,
+    "source": "field placed_at as an Instant",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 4,
+    "source": "field lines as a List of OrderLine",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 3,
+    "source": "field customer as a CustomerId",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 2,
+    "source": "field id as an OrderId",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 1,
+    "source": "type Order",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   }
+  ],
+  "skipped": [
+   {
+    "line": 12,
+    "source": "field unit_price as Money"
+   }
+  ],
+  "ambiguous": [],
+  "parsed": false
+ },
+ {
+  "file": "17_17-units-and-time-are-types.scribe",
+  "code_lines": 7,
+  "failed": [],
+  "skipped": [],
+  "ambiguous": [],
+  "parsed": true
+ },
+ {
+  "file": "18_18-collections-in-words.scribe",
+  "code_lines": 9,
+  "failed": [],
+  "skipped": [],
+  "ambiguous": [],
+  "parsed": true
+ },
+ {
+  "file": "19_19-a-resource-that-must-be-released.scribe",
+  "code_lines": 8,
+  "failed": [],
+  "skipped": [],
+  "ambiguous": [],
+  "parsed": true
+ },
+ {
+  "file": "20_20-a-protocol-the-compiler-enforces.scribe",
+  "code_lines": 16,
+  "failed": [],
+  "skipped": [],
+  "ambiguous": [],
+  "parsed": true
+ },
+ {
+  "file": "21_21-allocation-is-visible.scribe",
+  "code_lines": 7,
+  "failed": [],
+  "skipped": [],
+  "ambiguous": [],
+  "parsed": true
+ },
+ {
+  "file": "22_22-authority-enters-at-one-place-and-is-.scribe",
+  "code_lines": 6,
+  "failed": [],
+  "skipped": [],
+  "ambiguous": [],
+  "parsed": true
+ },
+ {
+  "file": "24_24-untrusted-data-cannot-reach-a-sink.scribe",
+  "code_lines": 8,
+  "failed": [],
+  "skipped": [],
+  "ambiguous": [],
+  "parsed": true
+ },
+ {
+  "file": "25_24-untrusted-data-cannot-reach-a-sink.scribe",
+  "code_lines": 2,
+  "failed": [],
+  "skipped": [],
+  "ambiguous": [],
+  "parsed": true
+ },
+ {
+  "file": "26_25-declassification-is-named-justified-a.scribe",
+  "code_lines": 5,
+  "failed": [],
+  "skipped": [],
+  "ambiguous": [],
+  "parsed": true
+ },
+ {
+  "file": "27_26-pure-means-pure.scribe",
+  "code_lines": 5,
+  "failed": [],
+  "skipped": [],
+  "ambiguous": [],
+  "parsed": true
+ },
+ {
+  "file": "28_27-a-protocol-declared-once-checked-on-b.scribe",
+  "code_lines": 12,
+  "failed": [
+   {
+    "line": 12,
+    "source": "ensure if it succeeds, checksum sent is hash of every Chunk data received",
+    "reason": "unexpected every",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 11,
+    "source": "fails with ProtocolError",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 10,
+    "source": "given connection is an editable Upload as server",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 9,
+    "source": "to serve_upload connection",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 7,
+    "source": "server sends one of Done with checksum as a Hash, or Failed with reason as Text",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 6,
+    "source": "until client sends Commit",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 5,
+    "source": "server sends Ack with offset as Bytes",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 4,
+    "source": "client sends Chunk with data as Bytes",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 3,
+    "source": "repeat",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 2,
+    "source": "client sends Begin with size as Bytes at most 1 GiB",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 1,
+    "source": "protocol Upload",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   }
+  ],
+  "skipped": [
+   {
+    "line": 13,
+    "source": "uses connection"
+   }
+  ],
+  "ambiguous": [],
+  "parsed": false
+ },
+ {
+  "file": "29_28-the-manifest.scribe",
+  "code_lines": 32,
+  "failed": [
+   {
+    "line": 18,
+    "source": "payments answers within 2 seconds for 99 percent of calls    assumed owner payments_team monitor sampling 1 percent",
+    "reason": "unexpected of",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 17,
+    "source": "assumes",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 15,
+    "source": "nothing of its own",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 14,
+    "source": "may",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 12,
+    "source": "uses save",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 11,
+    "source": "Orders_store from 1.2 as store",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 10,
+    "source": "uses reserve, release",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 9,
+    "source": "Inventory from 2.0 as inventory",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 8,
+    "source": "uses charge, refund, total_charged_to",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 7,
+    "source": "Payments from 3.1 as payments",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 6,
+    "source": "needs",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 4,
+    "source": "Turns a cart into a paid order. Charges a customer at most once per request.",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 3,
+    "source": "about",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 1,
+    "source": "component Checkout version 3.0.0",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   }
+  ],
+  "skipped": [
+   {
+    "line": 19,
+    "source": "charging with the same key twice charges once               assumed owner payments_team monitor checking"
+   },
+   {
+    "line": 21,
+    "source": "provides"
+   },
+   {
+    "line": 22,
+    "source": "to place_order cart for customer with request_id"
+   },
+   {
+    "line": 23,
+    "source": "given cart is a Cart"
+   },
+   {
+    "line": 24,
+    "source": "given customer is a CustomerId"
+   },
+   {
+    "line": 25,
+    "source": "given request_id is a RequestId"
+   },
+   {
+    "line": 26,
+    "source": "produces an Order"
+   },
+   {
+    "line": 27,
+    "source": "fails with EmptyCart, OutOfStock, PaymentDeclined, StoreUnavailable, RefundFailed"
+   },
+   {
+    "line": 28,
+    "source": "expect cart is not empty because \"an order needs at least one line\""
+   },
+   {
+    "line": 29,
+    "source": "ensure if it succeeds, status of result is Paid"
+   },
+   {
+    "line": 30,
+    "source": "ensure if it succeeds, total of result is total of cart"
+   },
+   {
+    "line": 31,
+    "source": "ensure if it fails with anything but RefundFailed, total_charged_to customer is total_charged_to customer at entry"
+   },
+   {
+    "line": 32,
+    "source": "idempotent by request_id"
+   },
+   {
+    "line": 33,
+    "source": "uses payments, inventory, store"
+   },
+   {
+    "line": 35,
+    "source": "failure"
+   },
+   {
+    "line": 36,
+    "source": "domain checkout"
+   },
+   {
+    "line": 37,
+    "source": "retry charge at most 3 times with backoff 1 second because \"charge is idempotent by key\""
+   },
+   {
+    "line": 39,
+    "source": "tier proven for contracts, checked for everything else"
+   }
+  ],
+  "ambiguous": [],
+  "parsed": false
+ },
+ {
+  "file": "30_29-the-implementation-below-it.scribe",
+  "code_lines": 16,
+  "failed": [],
+  "skipped": [],
+  "ambiguous": [],
+  "parsed": true
+ },
+ {
+  "file": "31_30-a-versioned-schema-and-a-checked-migr.scribe",
+  "code_lines": 9,
+  "failed": [
+   {
+    "line": 11,
+    "source": "ensure for every field other than note, that field of new is that field of old",
+    "reason": "unexpected field",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 10,
+    "source": "ensure note of new is nothing",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 9,
+    "source": "migration Order from version 3 to version 4 turning old into new",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 7,
+    "source": "discount     reserved            removed in version 3",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 5,
+    "source": "status       as an OrderStatus",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 4,
+    "source": "lines        as a List of OrderLine",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 3,
+    "source": "customer     as a CustomerId",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 2,
+    "source": "id           as an OrderId",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 1,
+    "source": "schema Order version 4 compatibility backward_transitive",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   }
+  ],
+  "skipped": [],
+  "ambiguous": [],
+  "parsed": false
+ },
+ {
+  "file": "33_32-the-system-file.scribe",
+  "code_lines": 31,
+  "failed": [],
+  "skipped": [],
+  "ambiguous": [],
+  "parsed": true
+ },
+ {
+  "file": "35_34-a-rule-that-catches-a-quiet-mistake.scribe",
+  "code_lines": 4,
+  "failed": [],
+  "skipped": [],
+  "ambiguous": [],
+  "parsed": true
+ },
+ {
+  "file": "38_36-the-fix-and-the-order-to-deploy-in.scribe",
+  "code_lines": 26,
+  "failed": [],
+  "skipped": [],
+  "ambiguous": [],
+  "parsed": true
+ },
+ {
+  "file": "40_37-doing-several-things-at-once.scribe",
+  "code_lines": 12,
+  "failed": [],
+  "skipped": [],
+  "ambiguous": [],
+  "parsed": true
+ },
+ {
+  "file": "41_38-the-race-that-cannot-be-written.scribe",
+  "code_lines": 6,
+  "failed": [
+   {
+    "line": 3,
+    "source": "for each a in first_half",
+    "reason": "unexpected a",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 2,
+    "source": "together",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 1,
+    "source": "var total starts at 0",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   }
+  ],
+  "skipped": [
+   {
+    "line": 4,
+    "source": "set total to total + a"
+   },
+   {
+    "line": 5,
+    "source": "for each b in second_half"
+   },
+   {
+    "line": 6,
+    "source": "set total to total + b"
+   }
+  ],
+  "ambiguous": [],
+  "parsed": false
+ },
+ {
+  "file": "42_38-the-race-that-cannot-be-written.scribe",
+  "code_lines": 4,
+  "failed": [],
+  "skipped": [],
+  "ambiguous": [],
+  "parsed": true
+ },
+ {
+  "file": "43_39-a-pipeline-with-a-bounded-queue.scribe",
+  "code_lines": 17,
+  "failed": [
+   {
+    "line": 7,
+    "source": "ensure every row read is either saved or listed in rejects of result",
+    "reason": "unexpected every",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 6,
+    "source": "fails with ImportFailed",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 5,
+    "source": "produces an ImportSummary",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 4,
+    "source": "given memory is an Allocator",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 3,
+    "source": "given store is an Orders_store",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 2,
+    "source": "given source is a File of Rows",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 1,
+    "source": "to import_orders source into store using memory",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   }
+  ],
+  "skipped": [
+   {
+    "line": 8,
+    "source": "uses source, store, memory"
+   },
+   {
+    "line": 10,
+    "source": "pipeline"
+   },
+   {
+    "line": 11,
+    "source": "stage read_rows from source"
+   },
+   {
+    "line": 12,
+    "source": "queue of at most 100 rows"
+   },
+   {
+    "line": 13,
+    "source": "stage parse_row, 4 at a time"
+   },
+   {
+    "line": 14,
+    "source": "queue of at most 100 orders"
+   },
+   {
+    "line": 15,
+    "source": "stage save_order into store, 2 at a time"
+   },
+   {
+    "line": 16,
+    "source": "on failure in any stage"
+   },
+   {
+    "line": 17,
+    "source": "stop all stages"
+   },
+   {
+    "line": 18,
+    "source": "fail with ImportFailed"
+   }
+  ],
+  "ambiguous": [],
+  "parsed": false
+ },
+ {
+  "file": "44_40-work-that-survives-a-restart.scribe",
+  "code_lines": 11,
+  "failed": [],
+  "skipped": [],
+  "ambiguous": [],
+  "parsed": true
+ },
+ {
+  "file": "46_41-time-and-ordering-are-written-down.scribe",
+  "code_lines": 6,
+  "failed": [
+   {
+    "line": 7,
+    "source": "remove every s from sessions where expires_at of s is not after now using clock",
+    "reason": "unexpected every",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 5,
+    "source": "uses clock",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 4,
+    "source": "ensure for every s in sessions, expires_at of s is after now using clock",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 3,
+    "source": "given clock is a Clock",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 2,
+    "source": "given sessions is an editable List of Session",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 1,
+    "source": "to expire_sessions sessions using clock",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   }
+  ],
+  "skipped": [],
+  "ambiguous": [],
+  "parsed": false
+ },
+ {
+  "file": "47_review-view-canonical.scribe",
+  "code_lines": 13,
+  "failed": [],
+  "skipped": [],
+  "ambiguous": [],
+  "parsed": true
+ },
+ {
+  "file": "48_compact-view.scribe",
+  "code_lines": 13,
+  "failed": [
+   {
+    "line": 5,
+    "source": "ensure result in items",
+    "reason": "unexpected in",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 4,
+    "source": "produces an Int",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 3,
+    "source": "expect count of items >= 1",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 2,
+    "source": "given items is a List of Int",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   },
+   {
+    "line": 1,
+    "source": "to largest items",
+    "reason": "unexpected ",
+    "flagged_by_translator": false
+   }
+  ],
+  "skipped": [
+   {
+    "line": 6,
+    "source": "ensure for every x in items, x <= result"
+   },
+   {
+    "line": 8,
+    "source": "var best starts at item 0 of items"
+   },
+   {
+    "line": 9,
+    "source": "for each i from 1 until count of items"
+   },
+   {
+    "line": 10,
+    "source": "invariant best in items"
+   },
+   {
+    "line": 11,
+    "source": "invariant for every j from 0 through i - 1, item j of items <= best"
+   },
+   {
+    "line": 12,
+    "source": "if item i of items > best"
+   },
+   {
+    "line": 13,
+    "source": "set best to item i of items"
+   },
+   {
+    "line": 14,
+    "source": "give back best"
+   }
+  ],
+  "ambiguous": [],
+  "parsed": false
+ }
+]

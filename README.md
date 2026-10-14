@@ -1,13 +1,15 @@
 # Scribe
 
 A systems language for code written by machines and reviewed by people. The
-specification is [docs/spec.md](docs/spec.md) (draft 0.3).
+specification is [base-spec.md](base-spec.md) (draft 0.3).
 
-| Folder | What it is |
+| Path | What it is |
 | --- | --- |
-| `docs/` | The specification |
-| `grammar/`, `tools/` | The reference grammar and its tools. These change as the language does |
-| `pilot/` | The record of the pilot (experiments 3 and 7, spec Appendix B.1), kept as it ran. Do not edit |
+| `base-spec.md` | The specification |
+| `scribe-grammar-v0.2.lark` | The grammar as the specification cites it (Appendix A) |
+| `grammar/`, `tools/` | The working copy of the grammar and its tools. These change as the language does |
+| `research/` | The record of the pilot (experiments 3 and 7, spec Appendix B.1), kept as it ran. Do not edit |
+| `docs/` | Earlier documents: the syntax philosophy and worked examples, and the change replay (Appendix B.2, B.4) |
 
 ## Reference grammar
 
@@ -23,13 +25,14 @@ a production parser will be tested against; it is not a production parser.
 dedent, `⟪…⟫` prose) and `tools/run3.py` parses with every reading kept, then
 applies rules D1 and D2. To parse the code in the specification:
 
-    python3 tools/spec_blocks.py docs/spec.md /tmp/spec
+    python3 tools/spec_blocks.py base-spec.md /tmp/spec
     python3 tools/run3.py grammar/scribe.lark /tmp/spec
 
 These started as copies of the pilot's tools. One change since: the pilot's
 `build_grammar.py` ordered keywords of equal length by Python's set order, so
 the built grammar's bytes changed from run to run (the language it accepts did
-not). Ties are now broken by spelling.
+not). Ties are now broken by spelling, so `grammar/scribe.lark` differs from
+`scribe-grammar-v0.2.lark` in the order of that one list and nowhere else.
 
 ### The grammar against spec 0.3
 
@@ -46,8 +49,8 @@ after the v0.2 grammar:
 
 ## The pilot
 
-`pilot/` is `scribe-pilot-wave1.zip`; its README lists the commands to repeat
-it. Its grammar and tools match `results/checksums-final.txt`, and re-running
-experiment 3 reproduces the recorded output byte for byte (33 of 42 doc
-examples as written, 42 of 42 repaired). [pilot/ARCHIVE.md](pilot/ARCHIVE.md)
-lists what differs from the zip.
+`research/` is `scribe-pilot-wave1.zip`; its README lists the commands to
+repeat it, run from that folder. Its grammar and tools match
+`results/checksums-final.txt`, and re-running experiment 3 reproduces the
+recorded output byte for byte (33 of 42 doc examples as written, 42 of 42
+repaired).
