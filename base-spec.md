@@ -560,7 +560,6 @@ A **contract** is what an operation requires and promises. It is the lines betwe
 | `ensure condition` | What it guarantees. Forms: `ensure if it succeeds, ...`, `ensure if it fails, ...`, `ensure if result is some p, ...` | Proof, or run-time check, by tier |
 | `changes only x` | Everything else is untouched | Compiler |
 | `example call is value` | An exact result for an exact input | Run on every build |
-| `cost at most ...` | A cost bound: an amount (`cost at most 50 milliseconds`), or how cost grows with an input | Benchmarks for amounts, at the `tested` tier; impact analysis compares growth (12.3) |
 | `idempotent by keys` | Repeating it with the same keys has no further effect | Tests; proof at higher tiers |
 | `assumes "..."` | A fact about the outside world it relies on | Not proven. Listed in every report that depends on it |
 | `"a quoted sentence"` in place of a condition | An informal clause | Not checked. Labelled informal everywhere it appears |
@@ -629,21 +628,15 @@ Each clause has an assurance tier, and every report states the weakest tier it r
 | Tier | Meaning |
 | --- | --- |
 | `informal` | Quoted text. Shown, never trusted |
-| `tested` | Checked by examples, properties and benchmarks |
+| `tested` | Checked by examples and properties |
 | `checked` | The default. No undefined behaviour, no unhandled failure, no run-time error is proven; types, effects, capabilities, units and states are checked |
 | `proven` | Every `ensure` and invariant is proven |
 
 Proof hints go in a `proof` block at the end of the operation, folded by default in the review view. Escape hatches, `trust "..."` and `assume`, state what is taken on trust and why; they are counted per package, and appear in every review and report that depends on them, with their file and line. Who reviews them is a matter for the repository's own ownership rules, not the language.
 
-### 10.6 Corrections
+### 10.6 Corrections (removed)
 
-When a change fixes a bug that callers may have relied on, the new clause can say so:
-
-```
-ensure "every write failure is reported, including the failure to finish compression" corrects "only the first write failure was reported" because "the old behaviour lost errors"
-```
-
-A `corrects` line makes the change a review item rather than a breaking change (Section 12). It is removed at the next release.
+Removed from the language. A `corrects` line described an earlier version of the program, not this one. Whether a changed clause fixes a false promise is said in the change's review, where impact analysis lists the dependents that relied on it (12.3).
 
 ### 10.7 Writing complete contracts
 
@@ -661,9 +654,6 @@ A **component** is the unit of review, versioning and deployment. Its **manifest
 
 ```
 component Checkout version 3.0.0
-
-    about
-        Turns a cart into a paid order. Charges a customer at most once per request.
 
     needs
         Payments from 3.1 as payments
@@ -690,7 +680,6 @@ component Checkout version 3.0.0
 
 | Section | Says |
 | --- | --- |
-| `about` | What the component is for, in prose |
 | `needs` | Each component it depends on, from which version, and which of its operations it uses. Impact is judged against exactly these |
 | `may` | Authority it holds of its own (usually none: it acts through what it needs) |
 | `assumes` | Facts about the world outside that it relies on |
@@ -814,20 +803,13 @@ Each provided operation, each dependent and each system rule gets exactly one ve
 | Changed informal clause | Needs review |
 | New capability or effect for the component | Authority change |
 | Removed or renamed operation | Breaking for every caller the same change leaves untouched; compatible for callers the change updates |
-| Changed `cost` | Needs review if it grows in the order of growth; compatible if it shrinks |
 | Changed schema | As its compatibility mode says; a change that does not meet the mode is breaking |
 | Changed protocol | Compatible if the new protocol refines the old; breaking otherwise |
 
 Three points of detail:
 
 - **Effects are compared per component.** Moving an existing effect from one operation to another inside the same component is not an authority change. It is reported against the operations concerned under the rules above.
-- **A correction is not a breakage of the false promise.** A change may declare that an old clause was never true:
-
-```
-corrects ensure "names are returned in sorted order" because "the order was never sorted on Plan 9; see issue 4417"
-```
-
-The report shows corrected clauses separately. Dependents that relied on the clause are still listed with needs review, because their code may have depended on the false promise in practice.
+- **A removed guarantee is reported, even when it was never true.** A change that drops a clause the old code did not meet is still a weaker guarantee: dependents that relied on it are listed, because their code may have depended on the false promise in practice. Saying that the old clause was false belongs in the change's review, not in the source.
 
 - **Informal clauses must describe behaviour, not implementation.** A lint rejects informal clauses that name internal variables, algorithms or data structures, because a clause like `"uses a hash map"` changes with every refactor and turns impact reports into noise.
 
@@ -918,27 +900,27 @@ These are the decisions this draft does not settle. Each names what blocks it. A
 | 3 | `allocates` as a contract clause, with the allocator passed as context | Proposed | Measuring how many contracts it adds lines to |
 | 4 | A small rule language for system files in place of fixed English templates | Proposed | Keyword count (Appendix A) |
 | 5 | Possessive paths: `account's balance` | Settled | Allowed, never mixed with `of` in one path (5.1) |
-| 6 | Reduce the keyword set (now 115 hard, 70 soft) | Open | Experiment 1, the comprehension test, extended to compare candidate words for the same idea: for example `hold` against `with`, `using` and `lease` |
+| 6 | Reduce the keyword set (now 109 hard, 55 soft) | Open | Experiment 1, the comprehension test, extended to compare candidate words for the same idea: for example `hold` against `with`, `using` and `lease` |
 | 7 | Parser strategy: the grammar is LALR(1) with no conflicts (Appendix A); whether the compiler's parser is generated from it or written by hand | Open | Comparing the error messages each gives on the pilot's real mistakes |
 | 8 | Code generator for WebAssembly, the version 1 target: a back end of our own, or one built on LLVM or Cranelift | Open | A compile-time benchmark on the pilot corpus |
 | 9 | Solver and proof format for `proven` clauses | Open | Choosing a solver that is fast and gives stable results across versions |
 | 10 | Localized views beyond English | Open | Round-trip proof for at least one other language |
 | 11 | How host-dependent facts are declared (10.3), and which host bindings impact analysis compares by default | Proposed | Re-expressing the replay's platform-specific breakages with it |
 | 12 | Type rules for failures as values: how a failure `choice` relates to `fails with`, and how impact analysis compares a failure's fields | Open | Roadmap phase 5, with the translation wave that needs them |
-| 13 | How a cost that grows with an input is written (`cost at most`, 10.1), so impact analysis can compare orders of growth (12.3) | Open | A vocabulary of growth (constant, logarithmic, linear, `n log n`, quadratic) in terms of a named input; if it is not ready, version 1 has amounts only |
+| 13 | ~~Cost bounds (`cost at most`)~~ | Removed | A cost bound is not an instruction the program carries out; speed is measured by tools outside the language |
 | 14 | A condition group, or an `if` / `then` pair, as the condition of an `if` or `repeat while` statement whose own block follows | Open | A layout that keeps the condition's block and the statement's block apart at a glance; until then, name the condition with `let` |
 
 ## Appendix A: grammar notes
 
 The reference grammar is `grammar/scribe.lark` (version 0.3) in this project; `scribe-grammar-v0.2.lark` is the version the pilot measured. It is an Earley grammar: it states the language precisely but is not yet a production parser. `tools/check_grammar.py` tests it against a file per construct in this specification, a file per forbidden form, this specification's code blocks and the pilot corpora.
 
-**Vocabulary.** 185 reserved words: 115 hard keywords, which can never be names, and 70 soft keywords, which are names everywhere except in the position that gives them meaning. The articles `a`, `an` and `the` are hard. A few two-word phrases are read by the lexer as one token, so a parser looking one token ahead sees both words: `for each`, `at entry`, `, or else` and `, or`; a comma that ends a line is read with the line's end. None of this changes the text.
+**Vocabulary.** 164 reserved words: 109 hard keywords, which can never be names, and 55 soft keywords, which are names everywhere except in the position that gives them meaning. The articles `a`, `an` and `the` are hard. A few two-word phrases are read by the lexer as one token, so a parser looking one token ahead sees both words: `for each`, `at entry`, `, or else` and `, or`; a comma that ends a line is read with the line's end. None of this changes the text.
 
 **No special rules.** The grammar is unambiguous by construction. Converted to Bison it has no LALR(1) conflicts, which proves that no text has two readings, and `tools/check_lalr.py` fails the build if one appears. `tools/check_grammar.py` also parses every test, every code block in this specification and the pilot corpora with no disambiguation applied. The pilot's rules D1 and D2 are now the grammar's own structure (Section 5.5), mixing `and` with `or` is a condition group (Section 5.2), and a label word belongs to the outermost call on its line because an argument is one term: a labelled call inside an argument is in brackets.
 
 Constructions list their parts with commas, never `and`, so `and` is always logical.
 
-**Parser class.** LALR(1), with no conflicts (version 0.2 had 172 shift/reduce and 20 reduce/reduce). Reaching zero changed what can be written in a few places, all recorded in Appendix B.3: phrase words such as `labelled`, `times` and `only` became hard keywords; records built with fields, and comparisons that end in `where` or a comprehension, became whole values; and a value followed by a phrase word (`add … to`, a limit in a type) became one term.
+**Parser class.** LALR(1), with no conflicts (version 0.2 had 172 shift/reduce and 20 reduce/reduce). Reaching zero changed what can be written in a few places, all recorded in Appendix B.3: phrase words such as `labelled`, `matching` and `only` became hard keywords; records built with fields, and comparisons that end in `where` or a comprehension, became whole values; and a value followed by a phrase word (`add … to`, a limit in a type) became one term.
 
 ## Appendix B: evidence and history
 
@@ -970,7 +952,7 @@ What the replay changed in this specification:
 | Green results were given for code the contract did not speak to | "Unchanged, checked" and "Unchanged, unchecked" replace "no impact"; contract coverage (12.2, 12.4) |
 | Platform-specific breakages were averaged away | Host-dependent facts stated on capabilities, and contracts compared once per host binding (10.3, 12.1) |
 | Interfaces had no contract, so implementations drifted | Interfaces carry contracts that bind every implementation (11.2) |
-| Fixing a false promise was reported as breaking it | `corrects` (12.3) |
+| Fixing a false promise was reported as breaking it | `corrects` (12.3); later removed, because it described an old version of the program (10.6) |
 | False alarms on controls | Removal breaking only for callers left untouched; effects compared per component; lint on implementation-detail informal clauses (12.3) |
 | Contracts were costly to write | `scribe draft` (13.1) |
 
@@ -991,7 +973,7 @@ What the replay changed in this specification:
 - An operation may take several unlabelled parameters (4.1); a call with several unlabelled arguments stands bare only as a whole statement or value (5.1).
 - Possessive paths are allowed and never mixed with `of` in one path, the same rule that keeps `and` and `or` apart (5.1).
 - Records can be built with fields by name: `a Point with x as 1, y as 2` (5.3). One element can be set: `set item i of heap to x`. `do nothing` fills a branch with nothing to do (4.2).
-- Every statement and every clause is one line; no clause continues onto the next (2.6, 10.6, 12.3).
+- Every statement and every clause is one line; no clause continues onto the next (2.6).
 - A line that can be read two ways is not readable. Where a reading would otherwise depend on a rule, the language makes the structure visible instead (1):
     - conditions that mix `and` and `or` are condition groups, `all of`, `any of` and `none of`, one condition per line, nesting like statement blocks; commas at the ends of their lines are optional, checked if present, and drawn by the review view (2.6, 5.2);
     - a word that opens a scope covers the rest of its line, replacing the pilot's rules D1 and D2 (5.5);
@@ -1002,13 +984,14 @@ What the replay changed in this specification:
 - Any expression goes wherever a value goes. A grammar rule that takes only a name or a literal needs a stated reason; otherwise types decide what fits, and mistakes the grammar no longer catches are the checker's to report (1).
 - A failure is a value, and `fail with` takes any expression (6).
 - The grammar has no LALR(1) conflicts, so it is proven that no text has two readings; the build fails if one appears (Appendix A). Reaching zero meant:
-    - `labelled`, `matching`, `limited`, `added`, `assumed`, `corrects`, `times` and `only` are hard keywords, because each follows a value and could otherwise be read as part of it;
+    - `labelled`, `matching`, `limited`, `added` and `only` are hard keywords, because each follows a value and could otherwise be read as part of it;
     - a record built with fields is a whole value or in brackets (5.3), and so is a comparison that ends in `where` or a comprehension (5.2); this turned another of the pilot's silent misreadings, `an Order from cart and receipt with status Paid`, into an error;
     - the amount in `add` and `subtract`, and a limit in a type, is one term (3.5, 4.2);
     - an item of a one-line condition group holds no word that covers the rest of the line (5.2), and a pipeline stage is a call (9.3).
 - The language holds only what the running program does and what is checked about it. How a program is monitored, retried by configuration, grouped into failure domains or rolled out belongs to operations tooling: assumption monitors, a manifest's `failure` section, a system's `failure domains` and `scribe deploy plan` are removed (11.1, 11.5, 12.6). A retry is written in code, where it can be seen.
 - The language describes programs, not organisations. Owners and teams are not part of it: `trust`, `assume` and `assumes` say what is unchecked and why, and the repository's own ownership rules say who reviews it (10.5). Durable execution (`workflow`, `runs at most once per`, `survives restarts`) is a platform service, not language (9.4).
 - Source never names an operating system. A difference between hosts is a fact about a capability, declared in its interface; this replaces clauses scoped `on <platform>` (10.3).
+- Source text describes only the program's instructions and what is checked about them. A cost bound (`cost at most`), a component's `about` prose and a `corrects` line describing an earlier version are removed (10.1, 10.6, 11.1).
 - Scribe is not described as a systems language. Having no garbage collector is a choice about memory management, managed at compile time as in Rust, not about the kind of software Scribe is for (1, 7).
 
 ### B.4 Earlier documents

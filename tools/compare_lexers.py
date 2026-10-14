@@ -56,8 +56,6 @@ def oracle_tokens(parser, text, hard, soft):
             out += ["symbol\t,", "newline\t"]
         elif t.type in JOINED:
             out.append(f"hard\t{v}")
-        elif v.startswith("⟪"):
-            out.append(f"prose\t{v[1:-1]}")
         elif v[0].isdigit():
             out.append(f"{t.type.lower()}\t{v}")
         elif v.startswith('"'):

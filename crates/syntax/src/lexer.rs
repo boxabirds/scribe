@@ -3,8 +3,7 @@
 //! Layout is part of the token stream: each line ends with a `Newline`, a
 //! deeper indent opens an `Indent`, and a shallower one closes a `Dedent` for
 //! each level it leaves. Blocks are four spaces deep; a tab is an error. Blank
-//! lines and `note` lines are dropped, and the lines under an `about` header
-//! become one `Prose` token.
+//! lines and `note` lines are dropped.
 //!
 //! The rules match the reference grammar's (`grammar/scribe.lark` with
 //! `tools/pre.py`), and `tools/compare_lexers.py` checks the two agree.
@@ -29,8 +28,6 @@ pub enum TokenKind {
     /// A number followed directly by a word that is not a keyword: `30 seconds`.
     Quantity,
     Str,
-    /// The free text under an `about` header.
-    Prose,
     Symbol,
     Newline,
     Indent,
@@ -54,7 +51,6 @@ impl TokenKind {
             TokenKind::Binary => "binary",
             TokenKind::Quantity => "quantity",
             TokenKind::Str => "string",
-            TokenKind::Prose => "prose",
             TokenKind::Symbol => "symbol",
             TokenKind::Newline => "newline",
             TokenKind::Indent => "indent",
@@ -148,33 +144,6 @@ pub fn lex(source: &str, options: LexOptions) -> Result<Vec<Token>, LexError> {
                 spaces + 1,
                 "this line does not line up with any block it could close",
             ));
-        }
-
-        if content == "about" {
-            out.push(word_token("about", number, spaces + 1));
-            let mut prose = Vec::new();
-            let mut j = i + 1;
-            while j < lines.len() {
-                let next = lines[j].trim_end();
-                if next.trim().is_empty() {
-                    j += 1;
-                    continue;
-                }
-                if indent_of(next, j + 1)?.saturating_sub(base_indent) <= col {
-                    break;
-                }
-                prose.push(next.trim());
-                j += 1;
-            }
-            out.push(Token {
-                kind: TokenKind::Prose,
-                text: prose.join(" "),
-                line: number,
-                column: spaces + 1,
-            });
-            out.push(layout(TokenKind::Newline, number, raw.chars().count() + 1));
-            i = j;
-            continue;
         }
 
         if options.elision && is_elision(content) {
@@ -569,14 +538,6 @@ mod tests {
     #[test]
     fn possessives() {
         assert_eq!(texts("return user's manager's name\n")[1..6], ["user", "'s", "manager", "'s", "name"]);
-    }
-
-    #[test]
-    fn prose_under_about() {
-        let k = kinds(
-            "component C version 1.0.0\n    about\n        Turns a cart\n        into an order.\n    needs\n",
-        );
-        assert!(k.contains(&(TokenKind::Prose, "Turns a cart into an order.".into())));
     }
 
     #[test]

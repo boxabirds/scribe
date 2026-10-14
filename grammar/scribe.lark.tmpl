@@ -33,14 +33,14 @@ signature: name [name ("," name)*] ((label | "of") name)*              // DOC; F
 
 ?clause: given | produces | fails | expect | ensure | changes | uses_clause
        | tier | idempotent | declassifies | deadline | holds
-       | example | property | cost | assumes_clause | may_block | corrects_clause
+       | example | property | assumes_clause | may_block
        | scoped
 
 given: "given" name "is" typeexpr _NL
 produces: "produces" typeexpr _NL
 fails: "fails" "with" name_list _NL
 expect: "expect" line_condition
-ensure: "ensure" ensure_body ["corrects" STRING] [because] _NL              // SPEC 10.6: one line
+ensure: "ensure" ensure_body [because] _NL
        | "ensure" group                                                    -> ensure_group
        | "ensure" [because] if_then                                        -> ensure_if_then
 ensure_body: expr
@@ -55,11 +55,8 @@ declassifies: "declassifies" name "to" name because _NL
 deadline: "deadline" expr _NL                                                // SPEC 1: any expression
 holds: "holds" "when" line_condition
 because: "because" STRING
-cost: "cost" "at" "most" expr _NL                                             // SPEC 10.1
 assumes_clause: "assumes" STRING _NL                                           // SPEC 10.1
 may_block: "may" "block" STRING _NL                                           // SPEC 8.2
-// SPEC 12.3: a clause that was never true
-corrects_clause: "corrects" ("ensure" | "expect") STRING [because] _NL
 // SPEC 10.3: clauses that hold in one build mode only. Source never names a
 // platform: host differences are facts declared on capability interfaces
 scoped: "in" "build" name _NL _INDENT clause+ _DEDENT
@@ -122,8 +119,7 @@ message_spec: name ["with" field_decl ("," field_decl)*]
 
 // ---------------------------------------------------------------- components and systems
 component: "component" name "version" version _NL _INDENT comp_section+ _DEDENT
-?comp_section: "about" PROSE _NL                                  -> about
-             | "needs" _NL _INDENT need+ _DEDENT                  -> needs
+?comp_section: "needs" _NL _INDENT need+ _DEDENT                  -> needs
              | "may" _NL _INDENT may_line+ _DEDENT                -> may
              | "assumes" _NL _INDENT assumption+ _DEDENT          -> assumes
              | "provides" _NL _INDENT operation+ _DEDENT          -> provides
@@ -373,7 +369,6 @@ LINE_COMMA.9: /,[ ]*⏎/
 _INDENT: "⇥"
 _DEDENT: "⇤"
 ELIDED: "⋯"
-PROSE: /⟪[^⟫]*⟫/
 STRING: /"([^"\\]|\\.)*"/
 DATE.3: /\d{4}-\d{2}-\d{2}/
 // SPEC 13: hex and binary literals, with `_` allowed between digits

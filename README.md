@@ -67,7 +67,7 @@ To work on the grammar:
     python3 tools/run3.py grammar/scribe.lark FILE_OR_DIR...
 
 `tools/pre.py` turns layout into tokens (`⏎` end of line, `⇥` indent, `⇤`
-dedent, `⟪…⟫` prose) and `tools/run3.py` parses with every reading kept, then
+dedent) and `tools/run3.py` parses with every reading kept, then
 applies rules D1 and D2. `tools/to_bison.py` converts the grammar for Bison's
 conflict and counterexample reports.
 
@@ -82,7 +82,7 @@ one reading on its own (spec Section 1).
 
 | Check | Result |
 | --- | --- |
-| Conformance tests, one per construct (`tests/grammar/accept`) | 49 of 49 parse with one reading |
+| Conformance tests, one per construct (`tests/grammar/accept`) | 47 of 47 parse with one reading |
 | Forbidden forms (`tests/grammar/reject`) | 36 of 36 rejected |
 | Spec code blocks | 24 of 28; the other 4 are fragments of clauses, not whole programs |
 | Pilot doc examples, repaired | 34 of 42; the 8 others use forms the language has since changed: fields joined by `and` (05), owners on escape hatches and assumptions (14, 29), a field without `as` (30), failure domains (33), `none` as a value (40), `workflow` (44), a list comprehension in round brackets (46) |

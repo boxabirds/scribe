@@ -138,7 +138,7 @@ make this easier than the list suggests:
 | `all`, `any`, `none` | Condition groups: `all of`, `any of`, `none of` | Collection helpers, flags | `everything`, `any_found`, `none_found`, `empty` |
 | `only` | `changes only`, `read only` | Filters and flags | `sole`, `exclusive`, `just_one` |
 | `labelled`, `matching`, `limited` | Type limits: `Text labelled untrusted`, `Text matching email_format` | Flags and filters | `has_label`, `is_match`, `capped` |
-| `added`, `corrects` | Schema history, corrections | Change records | `added_at`, `correction` |
+| `added` | Schema history | Change records | `added_at` |
 
 ### Other hard keywords
 
@@ -148,7 +148,7 @@ These are rarely names in other languages, so they seldom need renaming.
 | --- | --- |
 | `and`, `or`, `not`, `implies` | Logic |
 | `is` | Tests: equality with words, variants, predicates, membership |
-| `at`, `less`, `more`, `than`, `most`, `least` | Comparison phrases: `is at most`, `cost at most` |
+| `at`, `less`, `more`, `than`, `most`, `least` | Comparison phrases: `is at most`, `less than` |
 | `each`, `every`, `there` | `for each`, `for every`, `there is` |
 | `if`, `otherwise`, `on` | Branches, `on failure` |
 | `be`, `starts` | `let x be`, `var x starts at` |

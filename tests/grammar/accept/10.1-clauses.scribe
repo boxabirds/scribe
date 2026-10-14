@@ -10,6 +10,5 @@ to charge customer for amount
     ensure "the customer is charged at most once" because "payments are idempotent"
     changes only balance of customer
     example charge alice for 10 is receipt_for 10
-    cost at most 50 milliseconds
     idempotent by customer, amount
     assumes "the card network answers within 30 seconds"

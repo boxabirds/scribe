@@ -137,8 +137,6 @@
  "spec": {
   "choice OrderStatus": "ok",
   "component Checkout version 3.0.0": "ok",
-  "corrects ensure \"names are returned in sorted order\" because \"the order was never sorted on Plan 9; see issue 4417\"": "fail",
-  "ensure \"every write failure is reported, including the failure to finish compression\" corrects \"only the first write failure was reported\" because \"the old behaviour lost errors\"": "fail",
   "ensure for every x in items, x > 0 implies x < limit": "fail",
   "for every x in items, x ≤ result": "fail",
   "hold input as open path for reading using files": "ok",

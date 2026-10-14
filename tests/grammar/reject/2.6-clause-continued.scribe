@@ -1,4 +1,4 @@
 to names_in directory
     given directory is a Directory
-    corrects ensure "names are returned in sorted order"
+    ensure "names are returned in sorted order"
         because "the order was never sorted"

@@ -10,8 +10,8 @@ until the specification says so.
 | 1 | ~~How are the update forms (`increment count`, `add price to total`, `subtract`, `decrement`) recognised?~~ Settled: the four words are hard keywords, because a reserved word costs readers nothing and Scribe's authors are machines | 2.1 | Update statements; the words cannot be names | Done; listed in the porting guide |
 | 2 | ~~Several unlabelled parameters~~ Settled: `to gcd first, second`, called `gcd 12, 18`; such a call stands bare only as a whole statement or value, and takes parentheses elsewhere | 4.1, 5.1 | Accepted | Done |
 | 3 | ~~`some` with a call~~ Settled: `some` takes the whole arithmetic expression after it, under the rule that any expression goes wherever a value goes | 3.4 | `some item 0 of items` accepted | Done |
-| 4 | ~~What follows `cost at most`~~ Settled: any expression; the checker accepts an amount or a growth. How growth is written is spec open decision 13 | 10.1 | Any expression | Growth vocabulary in phase 5 |
-| 5 | ~~`corrects` across two lines~~ Settled: every statement and clause is one line; both `corrects` shapes are written on one line | 2.6, 10.6, 12.3 | One line only | Done |
+| 4 | ~~What follows `cost at most`~~ Moot: cost bounds are removed, because they are not instructions | 10.1 | Removed | Done |
+| 5 | ~~`corrects` across two lines~~ Moot: `corrects` is removed, because it describes an earlier program. Every statement and clause is one line | 2.6, 10.6 | Removed | Done |
 | 6 | `assume`, the escape hatch, has no syntax | 10.5 | Not accepted | `assume condition because "..." owner team`, mirroring `trust` |
 | 7 | ~~Keyword count~~ Settled: not a concern. Scribe is written by machines, so a large keyword set costs readers nothing | 2.5 | 102 hard, 80 soft | Done |
 | 8 | ~~Possessive paths~~ Settled: `account's balance` is allowed and chains; a path never mixes possessives with `of` | 5.1 | Accepted; mixed paths rejected | Done |
@@ -47,7 +47,7 @@ Decisions from the review of readability and unambiguous presentation
 
 | Change | Why | Effect on what is written |
 | --- | --- | --- |
-| `labelled`, `matching`, `limited`, `added`, `assumed`, `corrects`, `times`, `only` are hard keywords | Each follows a value and could be read as part of it | They cannot be names |
+| `labelled`, `matching`, `limited`, `added`, `only` are hard keywords | Each follows a value and could be read as part of it | They cannot be names |
 | A record built with fields is a whole value or in brackets | Its last field ran into what followed: `a Point with x as 1 + 2` | `let p be a Point with …` is unchanged; inside a larger expression it is bracketed. Turned the pilot's misreading `an Order from cart and receipt` into an error |
 | A comparison ending in `where` or a comprehension is a whole condition | The `where` covers the rest of the line, so nothing can follow it | Not usable as one link of an `and` chain; use a group |
 | The amount in `add`/`subtract`, and a limit in a type, is one term | `add price of item to total`: the `to` must belong to `add` | A labelled call or arithmetic there is bracketed |
@@ -61,5 +61,6 @@ Decisions from the review of readability and unambiguous presentation
 | --- | --- | --- |
 | 1 | Owners and teams are not part of the language. `trust`, `assume` and `assumes` say what is unchecked and why; the repository's own ownership rules say who reviews it | Approved; done |
 | 2 | `workflow` (durable execution) is removed; it is a platform service. `idempotent by` stays | Approved; done |
-| 3 | Audit the specification for other operational concepts, and bring each back as a decision | Approved; list presented || 4 | Only what the running program does, and what is checked about it, is language. Removed: monitoring policies on assumptions, a manifest's `failure` section (retries are written in code), a system's `failure domains`, and `scribe deploy plan` | Approved; done |
-
+| 3 | Audit the specification for other operational concepts, and bring each back as a decision | Approved; list presented |
+| 4 | Only what the running program does, and what is checked about it, is language. Removed: monitoring policies on assumptions, a manifest's `failure` section (retries are written in code), a system's `failure domains`, and `scribe deploy plan` | Approved; done |
+| 5 | Only what describes the program's instructions is language. Removed: `cost at most`, a component's `about` prose, and `corrects` (which described an earlier version of the program) | Approved; done |
