@@ -14,7 +14,7 @@
   "11_11-named-predicates-keep-specs-readable.scribe": "ok",
   "12_12-refinement-types.scribe": "ok",
   "13_13-proof-hints-are-separate-foldable-and.scribe": "ok",
-  "14_14-tiers-and-escape-hatches-are-explicit.scribe": "ok",
+  "14_14-tiers-and-escape-hatches-are-explicit.scribe": "fail",
   "15_15-examples-and-properties-run-as-tests.scribe": "fail",
   "16_16-records-and-choices.scribe": "fail",
   "17_17-units-and-time-are-types.scribe": "ok",
@@ -38,7 +38,7 @@
   "41_38-the-race-that-cannot-be-written.scribe": "fail",
   "42_38-the-race-that-cannot-be-written.scribe": "ok",
   "43_39-a-pipeline-with-a-bounded-queue.scribe": "fail",
-  "44_40-work-that-survives-a-restart.scribe": "ok",
+  "44_40-work-that-survives-a-restart.scribe": "fail",
   "46_41-time-and-ordering-are-written-down.scribe": "fail",
   "47_review-view-canonical.scribe": "ok",
   "48_compact-view.scribe": "fail"
@@ -58,7 +58,7 @@
   "11_11-named-predicates-keep-specs-readable.scribe": "ok",
   "12_12-refinement-types.scribe": "ok",
   "13_13-proof-hints-are-separate-foldable-and.scribe": "ok",
-  "14_14-tiers-and-escape-hatches-are-explicit.scribe": "ok",
+  "14_14-tiers-and-escape-hatches-are-explicit.scribe": "fail",
   "15_15-examples-and-properties-run-as-tests.scribe": "ok",
   "16_16-records-and-choices.scribe": "ok",
   "17_17-units-and-time-are-types.scribe": "ok",
@@ -72,7 +72,7 @@
   "26_25-declassification-is-named-justified-a.scribe": "ok",
   "27_26-pure-means-pure.scribe": "ok",
   "28_27-a-protocol-declared-once-checked-on-b.scribe": "ok",
-  "29_28-the-manifest.scribe": "ok",
+  "29_28-the-manifest.scribe": "fail",
   "30_29-the-implementation-below-it.scribe": "fail",
   "31_30-a-versioned-schema-and-a-checked-migr.scribe": "ok",
   "33_32-the-system-file.scribe": "ok",
@@ -82,7 +82,7 @@
   "41_38-the-race-that-cannot-be-written.scribe": "ok",
   "42_38-the-race-that-cannot-be-written.scribe": "ok",
   "43_39-a-pipeline-with-a-bounded-queue.scribe": "ok",
-  "44_40-work-that-survives-a-restart.scribe": "ok",
+  "44_40-work-that-survives-a-restart.scribe": "fail",
   "46_41-time-and-ordering-are-written-down.scribe": "fail",
   "47_review-view-canonical.scribe": "ok",
   "48_compact-view.scribe": "ok"
@@ -162,7 +162,6 @@
   "type Order": "ok",
   "type OrderLine": "ok",
   "type Percent is an Int with value 0 through 100": "ok",
-  "type Queue of T": "ok",
-  "workflow nightly_billing for date": "ok"
+  "type Queue of T": "ok"
  }
 }

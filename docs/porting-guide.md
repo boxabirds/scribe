@@ -66,8 +66,8 @@ fixed-width unsigned types, so they need no precedence:
 
 ## Reserved words
 
-Scribe reserves more words than most languages: 115 hard keywords, which can
-never be names, and 70 soft keywords, which are keywords only inside their own
+Scribe reserves more words than most languages: 111 hard keywords, which can
+never be names, and 66 soft keywords, which are keywords only inside their own
 phrase and ordinary names everywhere else. Scribe is written by machines and
 read by people, so a word reserved to make a line unambiguous costs readers
 nothing (specification, Section 2.5).
@@ -106,7 +106,6 @@ make this easier than the list suggests:
 | `holds` | Gives a predicate's condition | Holdings, positions | `holdings`, `positions` |
 | `changes` | Says what an operation may change | Diffs, change lists | `edits`, `deltas`, `change_list` |
 | `uses` | Says which capabilities an operation uses | Usage counts | `usage_count`, `usages` |
-| `runs` | `runs at most once per date` | Run counts, executions | `run_count`, `executions` |
 | `expect` | A precondition | Test assertions (JavaScript) | `expected`, `require` |
 | `model` | The abstract state of a type | Data models, ML models | `data_model`, `entity`, `predictor` |
 | `field` | A field of a record | Form fields, columns | `field_name`, `column`, `entry` |
@@ -123,7 +122,6 @@ make this easier than the list suggests:
 | `tier` | A clause's assurance tier | Pricing or service tiers | `level`, `plan_tier`, `grade` |
 | `deadline` | A time limit monitored at run time | Due dates | `due`, `due_at`, `cutoff` |
 | `choice` | Declares a choice type | User selections | `selection`, `option`, `pick` |
-| `workflow` | Work that survives a restart | Jobs, processes | `job`, `process`, `flow` |
 | `pipeline` | Stages joined by bounded queues | Build or data pipelines | `stages`, `chain`, `flow` |
 | `repeat` | `repeat while` loops | Repetition counts | `repeat_count`, `count` |
 | `when` | A branch of `choose` | Times and moments | `moment`, `at_time`, `occurred_at` |
@@ -141,7 +139,7 @@ make this easier than the list suggests:
 | `only` | `changes only`, `read only` | Filters and flags | `sole`, `exclusive`, `just_one` |
 | `times` | `retry … at most 3 times` | Counts and timestamps | `count`, `occurrences`, `timestamps` |
 | `labelled`, `matching`, `limited` | Type limits: `Text labelled untrusted`, `Text matching email_format` | Flags and filters | `has_label`, `is_match`, `capped` |
-| `added`, `assumed`, `corrects` | Schema history, assumptions, corrections | Change records | `added_at`, `assumption`, `correction` |
+| `added`, `corrects` | Schema history, corrections | Change records | `added_at`, `correction` |
 
 ### Other hard keywords
 
@@ -160,7 +158,7 @@ These are rarely names in other languages, so they seldom need renaming.
 | `given`, `produces` | Parameters and results in a contract |
 | `ensure` | A guarantee |
 | `assumes` | A fact about the outside world |
-| `idempotent`, `declassifies`, `survives` | Contract clauses |
+| `idempotent`, `declassifies` | Contract clauses |
 | `invariant`, `decreases` | Loop and type reasoning |
 | `define` | Names a predicate |
 | `choose` | Matches every variant of a choice |

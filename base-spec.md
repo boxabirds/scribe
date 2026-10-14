@@ -536,19 +536,7 @@ Every queue is bounded, so a full queue makes the stage before it wait. A stage 
 
 ### 9.4 Work that survives a restart
 
-```
-workflow nightly_billing for date
-    given date is a CalendarDate
-    runs at most once per date
-    survives restarts
-    uses billing
-
-    for each account in list_billable_accounts for date in billing
-        remember progress by account
-        try bill account for date in billing
-```
-
-A workflow resumes after the last completed step. The compiler rejects it unless every effect in a repeatable step is declared `idempotent by` the keys that identify the step.
+Removed from the language. Resuming work after a restart, running it at most once per key and remembering its progress are services of the platform a program runs on, not part of what the program means. Where a program needs them, they come from a library or a capability, used through ordinary operations. The `idempotent by` clause stays (Section 10.1): it is a contract that impact analysis compares, wherever it is used.
 
 ### 9.5 Waiting without `async`
 
@@ -574,7 +562,7 @@ A **contract** is what an operation requires and promises. It is the lines betwe
 | `example call is value` | An exact result for an exact input | Run on every build |
 | `cost at most ...` | A cost bound: an amount (`cost at most 50 milliseconds`), or how cost grows with an input | Benchmarks for amounts, at the `tested` tier; impact analysis compares growth (12.3) |
 | `idempotent by keys` | Repeating it with the same keys has no further effect | Tests; proof at higher tiers |
-| `assumes "..." assumed owner team` | A fact about the outside world it relies on | Not proven. Listed in every report that depends on it; may carry a run-time monitor |
+| `assumes "..."` | A fact about the outside world it relies on | Not proven. Listed in every report that depends on it; may carry a run-time monitor |
 | `"a quoted sentence"` in place of a condition | An informal clause | Not checked. Labelled informal everywhere it appears |
 
 Any clause may end with `because "..."`. The sentence becomes the diagnostic text, the documentation and the label in reports. Inside an `ensure`, `x at entry` is the value of `x` when the operation began.
@@ -645,7 +633,7 @@ Each clause has an assurance tier, and every report states the weakest tier it r
 | `checked` | The default. No undefined behaviour, no unhandled failure, no run-time error is proven; types, effects, capabilities, units and states are checked |
 | `proven` | Every `ensure` and invariant is proven |
 
-Proof hints go in a `proof` block at the end of the operation, folded by default in the review view. Escape hatches, `trust "..." owner team` and `assume`, name a reason and an owner, are counted per package, and appear in every review and report that depends on them.
+Proof hints go in a `proof` block at the end of the operation, folded by default in the review view. Escape hatches, `trust "..."` and `assume`, state what is taken on trust and why; they are counted per package, and appear in every review and report that depends on them, with their file and line. Who reviews them is a matter for the repository's own ownership rules, not the language.
 
 ### 10.6 Corrections
 
@@ -684,7 +672,7 @@ component Checkout version 3.0.0
             uses reserve, release
 
     assumes
-        "charging with the same key twice charges once"    assumed owner payments_team monitor checking
+        "charging with the same key twice charges once"    monitor checking
 
     provides
         to place_order cart for customer with request_id
@@ -707,7 +695,7 @@ component Checkout version 3.0.0
 | `about` | What the component is for, in prose |
 | `needs` | Each component it depends on, from which version, and which of its operations it uses. Impact is judged against exactly these |
 | `may` | Authority it holds of its own (usually none: it acts through what it needs) |
-| `assumes` | Facts about the world outside, each with an owner and a monitor |
+| `assumes` | Facts about the world outside, each with a monitor |
 | `provides` | The operations other components may call, with their contracts |
 | `failure` | Its failure domain and retry rules |
 
@@ -829,7 +817,7 @@ Each provided operation, each dependent and each system rule gets exactly one ve
 | Stronger precondition | Breaking for any caller that may not meet it, with that caller's input as witness |
 | Weaker or removed guarantee | Breaking for dependents that rely on it; needs review for unknown callers |
 | New way to fail | Breaking for callers that handle every failure by name; needs review otherwise |
-| New or changed `assumes` | Needs review, addressed to the assumption's owner |
+| New or changed `assumes` | Needs review |
 | Changed informal clause | Needs review |
 | New capability or effect for the component | Authority change |
 | Removed or renamed operation | Breaking for every caller the same change leaves untouched; compatible for callers the change updates |
@@ -870,7 +858,7 @@ Breaking (1)
 
 Needs review (1)
     assumes "the card network answers within 30 seconds"
-        changed to 10 seconds; owner payments_team
+        changed to 10 seconds
 
 Authority change (0)
 
@@ -1026,6 +1014,7 @@ What the replay changed in this specification:
     - a record built with fields is a whole value or in brackets (5.3), and so is a comparison that ends in `where` or a comprehension (5.2); this turned another of the pilot's silent misreadings, `an Order from cart and receipt with status Paid`, into an error;
     - the amount in `add` and `subtract`, and a limit in a type, is one term (3.5, 4.2);
     - an item of a one-line condition group holds no word that covers the rest of the line (5.2), and a pipeline stage is a call (9.3).
+- The language describes programs, not organisations. Owners and teams are not part of it: `trust`, `assume` and `assumes` say what is unchecked and why, and the repository's own ownership rules say who reviews it (10.5). Durable execution (`workflow`, `runs at most once per`, `survives restarts`) is a platform service, not language (9.4).
 - Source never names an operating system. A difference between hosts is a fact about a capability, declared in its interface; this replaces clauses scoped `on <platform>` (10.3).
 - Scribe is not described as a systems language. Having no garbage collector is a choice about memory management, managed at compile time as in Rust, not about the kind of software Scribe is for (1, 7).
 

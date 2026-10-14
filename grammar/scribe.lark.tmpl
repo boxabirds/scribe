@@ -18,7 +18,7 @@
 
 start: (item)*
 
-?item: operation | workflow | define | typedecl | choice | protocol
+?item: operation | define | typedecl | choice | protocol
      | schema | migration | component | system | example | property
      | interface
      | stmt
@@ -29,11 +29,10 @@ block: _NL _INDENT stmt+ _DEDENT
 
 // ---------------------------------------------------------------- operations
 operation: "to" signature _NL [_INDENT clause* stmt* proof? _DEDENT]        // DOC
-workflow: "workflow" signature _NL _INDENT clause* stmt* _DEDENT           // EX 40
 signature: name [name ("," name)*] ((label | "of") name)*              // DOC; FIX-3; SPEC 4.1 several unlabelled parameters
 
 ?clause: given | produces | fails | expect | ensure | changes | uses_clause
-       | tier | idempotent | declassifies | deadline | runs | survives | holds
+       | tier | idempotent | declassifies | deadline | holds
        | example | property | cost | assumes_clause | may_block | corrects_clause
        | scoped
 
@@ -54,12 +53,10 @@ tier: "tier" name ["for" name ("," name "for" "everything" "else")?] _NL
 idempotent: "idempotent" "by" name_list _NL
 declassifies: "declassifies" name "to" name because _NL
 deadline: "deadline" expr _NL                                                // SPEC 1: any expression
-runs: "runs" "at" "most" "once" "per" name _NL                                // SPECIAL EX 40
-survives: "survives" "restarts" _NL                                          // SPECIAL EX 40
 holds: "holds" "when" line_condition
 because: "because" STRING
 cost: "cost" "at" "most" expr _NL                                             // SPEC 10.1
-assumes_clause: "assumes" STRING "assumed" "owner" name ["monitor" monitor_policy] _NL   // SPEC 10.1
+assumes_clause: "assumes" STRING ["monitor" monitor_policy] _NL               // SPEC 10.1
 may_block: "may" "block" STRING _NL                                           // SPEC 8.2
 // SPEC 12.3: a clause that was never true
 corrects_clause: "corrects" ("ensure" | "expect") STRING [because] _NL
@@ -135,7 +132,8 @@ component: "component" name "version" version _NL _INDENT comp_section+ _DEDENT
 need: name "from" version "as" name _NL [_INDENT "uses" name_list _NL _DEDENT]
 ?may_line: "nothing" "of" "its" "own" _NL                         -> no_authority   // SPECIAL EX 28
          | cap_spec _NL
-assumption: expr "assumed" "owner" name "monitor" monitor_policy _NL
+// an assumption is a quoted sentence, as in an operation's `assumes` clause (SPEC 10.1)
+assumption: STRING "monitor" monitor_policy _NL
 monitor_policy: "checking" | "sampling" expr
 ?failure_line: "domain" name _NL                                                    -> domain
              | "retry" name "at" "most" expr "times" "with" "backoff" expr because _NL -> retry   // SPECIAL EX 28
@@ -215,7 +213,7 @@ pipeline: "pipeline" _NL _INDENT pipe_item+ _DEDENT [on_failure]
           | "queue" "of" "at" "most" expr _NL                                   -> queue
 stop: "stop" ["all" "stages"] _NL                                               // "all stages" SPECIAL EX 39
 skip: "skip" _NL
-trust: "trust" STRING "owner" name _NL
+trust: "trust" STRING _NL
 proof: "proof" _NL _INDENT proof_stmt+ _DEDENT
 ?proof_stmt: "use" "lemma" name _NL                              -> use_lemma
            | "assert" expr _NL                                   -> assert_stmt

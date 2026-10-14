@@ -7,7 +7,7 @@ HARD  reserved everywhere. A HARD word can never be a name. These are the words
       argument labels, and the articles. Each one must be HARD because, if it
       were allowed as a name, a line could be read both as a statement and as a
       call (measured in experiment 3, see results/).
-SOFT  every other word that appears in a fixed phrase ("survives", "network",
+SOFT  every other word that appears in a fixed phrase ("restarts", "network",
       "queue", "version" ...). A SOFT word is a keyword only inside its own
       phrase and an ordinary name everywhere else, like Python's `match`.
 
@@ -21,14 +21,14 @@ import sys
 
 HARD = set("""
 to given produces fails expect ensure changes uses tier idempotent declassifies
-deadline runs survives holds because assumes may
+deadline holds because assumes may
 let be var starts set return fail try handle on failure if otherwise for each
 increment decrement add subtract do
 all any none then
-labelled matching limited added assumed corrects times only
+labelled matching limited added corrects times only
 from until through repeat while invariant decreases stop skip choose when hold
 together pipeline trust proof
-type choice define component system protocol schema migration workflow example
+type choice define component system protocol schema migration example
 property field model interface
 is not and or implies mod of every there where result it some nothing at
 less more than most least after before followed attenuated

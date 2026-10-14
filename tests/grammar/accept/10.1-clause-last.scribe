@@ -4,4 +4,4 @@ to wait_for_lock of file
 
 to charge customer
     given customer is a CustomerId
-    assumes "the card network answers within 30 seconds" assumed owner payments_team
+    assumes "the card network answers within 30 seconds"

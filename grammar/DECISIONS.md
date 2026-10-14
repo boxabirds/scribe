@@ -54,3 +54,12 @@ Decisions from the review of readability and unambiguous presentation
 | An item of a one-line group holds no scope word | `any of x where c, y`: the `where` would take in `y` | Such an item goes on its own line |
 | A pipeline stage is a call; the condition before the comma in `ensure if …,` is a plain condition | A record's commas ran into the phrase's comma | None in practice |
 | `for each`, `at entry`, `, or else`, `, or`, and a comma ending a line, are read as one token by the lexer | Lets a one-token parser see both words | None: the text is unchanged |
+
+## Language, not organisation
+
+| # | Decision | Status |
+| --- | --- | --- |
+| 1 | Owners and teams are not part of the language. `trust`, `assume` and `assumes` say what is unchecked and why; the repository's own ownership rules say who reviews it | Approved; done |
+| 2 | `workflow` (durable execution) is removed; it is a platform service. `idempotent by` stays | Approved; done |
+| 3 | Audit the specification for other operational concepts, and bring each back as a decision | Approved; list presented |
+

@@ -12,4 +12,4 @@ to charge customer for amount
     example charge alice for 10 is receipt_for 10
     cost at most 50 milliseconds
     idempotent by customer, amount
-    assumes "the card network answers within 30 seconds" assumed owner payments_team
+    assumes "the card network answers within 30 seconds"

@@ -18,7 +18,7 @@
 
 start: (item)*
 
-?item: operation | workflow | define | typedecl | choice | protocol
+?item: operation | define | typedecl | choice | protocol
      | schema | migration | component | system | example | property
      | interface
      | stmt
@@ -29,11 +29,10 @@ block: _NL _INDENT stmt+ _DEDENT
 
 // ---------------------------------------------------------------- operations
 operation: "to" signature _NL [_INDENT clause* stmt* proof? _DEDENT]        // DOC
-workflow: "workflow" signature _NL _INDENT clause* stmt* _DEDENT           // EX 40
 signature: name [name ("," name)*] ((label | "of") name)*              // DOC; FIX-3; SPEC 4.1 several unlabelled parameters
 
 ?clause: given | produces | fails | expect | ensure | changes | uses_clause
-       | tier | idempotent | declassifies | deadline | runs | survives | holds
+       | tier | idempotent | declassifies | deadline | holds
        | example | property | cost | assumes_clause | may_block | corrects_clause
        | scoped
 
@@ -54,12 +53,10 @@ tier: "tier" name ["for" name ("," name "for" "everything" "else")?] _NL
 idempotent: "idempotent" "by" name_list _NL
 declassifies: "declassifies" name "to" name because _NL
 deadline: "deadline" expr _NL                                                // SPEC 1: any expression
-runs: "runs" "at" "most" "once" "per" name _NL                                // SPECIAL EX 40
-survives: "survives" "restarts" _NL                                          // SPECIAL EX 40
 holds: "holds" "when" line_condition
 because: "because" STRING
 cost: "cost" "at" "most" expr _NL                                             // SPEC 10.1
-assumes_clause: "assumes" STRING "assumed" "owner" name ["monitor" monitor_policy] _NL   // SPEC 10.1
+assumes_clause: "assumes" STRING ["monitor" monitor_policy] _NL               // SPEC 10.1
 may_block: "may" "block" STRING _NL                                           // SPEC 8.2
 // SPEC 12.3: a clause that was never true
 corrects_clause: "corrects" ("ensure" | "expect") STRING [because] _NL
@@ -135,7 +132,8 @@ component: "component" name "version" version _NL _INDENT comp_section+ _DEDENT
 need: name "from" version "as" name _NL [_INDENT "uses" name_list _NL _DEDENT]
 ?may_line: "nothing" "of" "its" "own" _NL                         -> no_authority   // SPECIAL EX 28
          | cap_spec _NL
-assumption: expr "assumed" "owner" name "monitor" monitor_policy _NL
+// an assumption is a quoted sentence, as in an operation's `assumes` clause (SPEC 10.1)
+assumption: STRING "monitor" monitor_policy _NL
 monitor_policy: "checking" | "sampling" expr
 ?failure_line: "domain" name _NL                                                    -> domain
              | "retry" name "at" "most" expr "times" "with" "backoff" expr because _NL -> retry   // SPECIAL EX 28
@@ -215,7 +213,7 @@ pipeline: "pipeline" _NL _INDENT pipe_item+ _DEDENT [on_failure]
           | "queue" "of" "at" "most" expr _NL                                   -> queue
 stop: "stop" ["all" "stages"] _NL                                               // "all stages" SPECIAL EX 39
 skip: "skip" _NL
-trust: "trust" STRING "owner" name _NL
+trust: "trust" STRING _NL
 proof: "proof" _NL _INDENT proof_stmt+ _DEDENT
 ?proof_stmt: "use" "lemma" name _NL                              -> use_lemma
            | "assert" expr _NL                                   -> assert_stmt
@@ -432,12 +430,9 @@ name: NAME
     | "network"
     | "no"
     | "non_empty"
-    | "once"
     | "one"
     | "operations"
     | "own"
-    | "owner"
-    | "per"
     | "port"
     | "positive"
     | "provides"
@@ -446,7 +441,6 @@ name: NAME
     | "read"
     | "removed"
     | "reserved"
-    | "restarts"
     | "retry"
     | "root"
     | "rules"
@@ -466,7 +460,7 @@ name: NAME
     | "version"
     | "wiring"
     | "write"
-QUANTITY.4: /\d+(\.\d+)?[ ]+(?!(compatibility|declassifies|attenuated|components|everything|idempotent|operations|authority|component|decreases|decrement|increment|interface|invariant|migration|non_empty|otherwise|anything|checking|consumed|contains|corrects|database|deadline|editable|followed|labelled|matching|pipeline|positive|produces|property|protocol|provides|reserved|restarts|sampling|subtract|succeeds|survives|together|workflow|assumed|assumes|backoff|because|changes|domains|example|failure|implies|limited|monitor|network|nothing|removed|through|turning|version|assert|before|cannot|choice|choose|define|domain|ensure|expect|handle|leaves|repeat|result|return|schema|stages|starts|system|varies|wiring|about|added|after|block|build|entry|every|fails|field|files|given|gives|holds|least|lemma|maybe|model|needs|owner|proof|queue|reach|retry|rules|sends|stage|state|there|times|trust|under|until|using|value|where|while|write|cost|each|else|fail|from|hold|host|into|less|more|most|must|none|once|only|onto|over|port|read|root|runs|skip|some|stop|than|that|then|tier|time|type|uses|when|with|add|all|and|any|but|can|for|its|let|may|mod|not|one|own|per|set|the|try|use|var|an|as|at|be|by|do|if|in|is|it|no|of|on|or|to|a)(?![A-Za-z0-9_]))[A-Za-z][A-Za-z0-9_]*/
+QUANTITY.4: /\d+(\.\d+)?[ ]+(?!(compatibility|declassifies|attenuated|components|everything|idempotent|operations|authority|component|decreases|decrement|increment|interface|invariant|migration|non_empty|otherwise|anything|checking|consumed|contains|corrects|database|deadline|editable|followed|labelled|matching|pipeline|positive|produces|property|protocol|provides|reserved|sampling|subtract|succeeds|together|assumes|backoff|because|changes|domains|example|failure|implies|limited|monitor|network|nothing|removed|through|turning|version|assert|before|cannot|choice|choose|define|domain|ensure|expect|handle|leaves|repeat|result|return|schema|stages|starts|system|varies|wiring|about|added|after|block|build|entry|every|fails|field|files|given|gives|holds|least|lemma|maybe|model|needs|proof|queue|reach|retry|rules|sends|stage|state|there|times|trust|under|until|using|value|where|while|write|cost|each|else|fail|from|hold|host|into|less|more|most|must|none|only|onto|over|port|read|root|skip|some|stop|than|that|then|tier|time|type|uses|when|with|add|all|and|any|but|can|for|its|let|may|mod|not|one|own|set|the|try|use|var|an|as|at|be|by|do|if|in|is|it|no|of|on|or|to|a)(?![A-Za-z0-9_]))[A-Za-z][A-Za-z0-9_]*/
 OR_ELSE.9: /,[ ]*or[ ]+else(?![A-Za-z0-9_])/
 COMMA_OR.8: /,[ ]*or(?![A-Za-z0-9_])/
 FOR_EACH.7: /for[ ]+each(?![A-Za-z0-9_])/

@@ -1,4 +1,4 @@
 to current_user
     produces a User
     on windows
-        assumes "the current account maps to a security ID" assumed owner os_team
+        assumes "the current account maps to a security ID"
