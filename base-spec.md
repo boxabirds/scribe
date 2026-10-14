@@ -558,7 +558,7 @@ A **contract** is what an operation requires and promises. It is the lines betwe
 | `uses`, `allocates`, `may block` | Its effects and capabilities | Compiler, completely |
 | `expect condition` | What callers must ensure | Proof at call sites, or run-time check |
 | `ensure condition` | What it guarantees. Forms: `ensure if it succeeds, ...`, `ensure if it fails, ...`, `ensure if result is some p, ...` | Proof where the checker can; otherwise a run-time check, and reports say which (10.5) |
-| `changes only x` | Everything else is untouched | Compiler |
+| `changes only x, y` | Everything else is untouched | Compiler |
 | `example call is value` | An exact result for an exact input | Run on every build |
 | `idempotent by keys` | Repeating it with the same keys has no further effect | Proof where the checker can; otherwise tests |
 
@@ -603,11 +603,14 @@ A clause can also hold in one build mode only:
 
 ```
 to write data into stream
-    given data is Bytes
+    given data is an editable Bytes
     given stream is an editable Stream
+    changes only stream
     in build race
-        ensure "buffers passed to write are overwritten after the call returns"
+        changes only stream, data
 ```
+
+In a race-detecting build, `write` scribbles over the buffer after it returns, so code that keeps using the buffer is caught.
 
 Contracts are compared once for each host binding and build mode (Section 12).
 

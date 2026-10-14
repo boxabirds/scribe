@@ -45,7 +45,7 @@ ensure_body: expr
            | "if" "it" "succeeds" "," expr                                  -> on_success
            | "if" "it" "fails" ["with" "anything" "but" name] "," expr       -> on_failure_case
            | "if" logic "," expr                                             -> conditional   // SPEC 15
-changes: "changes" "only" expr _NL
+changes: "changes" "only" place ("," place)* _NL                          // SPEC 13.2: several places
 uses_clause: "uses" name_list _NL
 idempotent: "idempotent" "by" name_list _NL
 declassifies: "declassifies" name "to" name _NL
