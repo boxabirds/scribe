@@ -28,6 +28,7 @@ from lark.exceptions import LarkError  # noqa: E402
 GRAMMAR = os.path.join(ROOT, "grammar", "scribe.lark")
 WORD = re.compile(r"[A-Za-z][A-Za-z0-9_]*\Z")
 LAYOUT = {"⏎": "newline", "⇥": "indent", "⇤": "dedent", "⋯": "elided"}
+JOINED = {name for name, _ in __import__("build_grammar").JOINED}
 
 
 def keyword_sets():
@@ -50,6 +51,11 @@ def oracle_tokens(parser, text, hard, soft):
         v = str(t)
         if v in LAYOUT:
             out.append(f"{LAYOUT[v]}\t")
+        elif t.type == "LINE_COMMA":
+            # the reference reads a line-ending comma with the line's end
+            out += ["symbol\t,", "newline\t"]
+        elif t.type in JOINED:
+            out.append(f"hard\t{v}")
         elif v.startswith("⟪"):
             out.append(f"prose\t{v[1:-1]}")
         elif v[0].isdigit():

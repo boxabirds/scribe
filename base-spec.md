@@ -188,6 +188,8 @@ type Percent is an Int with value 0 through 100
 type Email is Text matching email_format
 ```
 
+A limit in a type (`with value … through …`, `less than`, `at most`) is one term: a name, an `of`-path, a literal or brackets, so the word after it always belongs to the type: `type Small is an Int less than (limit_of plan + 1)`.
+
 ### 3.6 Units and time
 
 A number followed directly by a unit is a quantity: `30 seconds`, `5 kilometres`, `1 GiB`. Units are checked: adding a length to an area is an error, and a length divided by a time is a speed. An `Instant` and a `CalendarDate` are different types; converting between them needs a time zone, written out:
@@ -253,7 +255,7 @@ Every statement starts with a keyword, or is a call.
 | Hold a resource | `hold input as open path for reading using files` (Section 7) |
 | Concurrency | `together`, `pipeline` (Section 9) |
 
-A name, an element (`set item i of heap to x`), an `of`-path or a possessive path can be set.
+A name, an element (`set item i of heap to x`), an `of`-path or a possessive path can be set. The amount in `add … to` and `subtract … from` is one term, so `to` and `from` always belong to the update: `add price of item to total`, `add (price for item in usd) to total`.
 
 `do nothing` is for a `when` branch with nothing to do. `choose` has no catch-all branch, so a new variant is never silently absorbed: every `choose` must say what happens to it, even if that is nothing.
 
@@ -313,7 +315,7 @@ return all of
         all of customer is premium, days_since_payment of order ≤ 90
 ```
 
-A comma at the end of a line in a group is optional. If one is written, another item of the same group must follow it, so a comma that disagrees with the indentation is an error. The formatter leaves these commas out of the stored text; the review view draws them, and draws a labelled rule beside each group. A group can follow `expect`, `ensure`, `invariant`, `holds when`, `let … be` and `return`.
+On one line, an item holds no word that covers the rest of the line (a quantifier, `where`, a comprehension), since it would take in the items after it; such an item goes on its own line. A comparison that ends in `where` or a comprehension is a whole condition, never one link of a chain. A comma at the end of a line in a group is optional. If one is written, another item of the same group must follow it, so a comma that disagrees with the indentation is an error. The formatter leaves these commas out of the stored text; the review view draws them, and draws a labelled rule beside each group. A group can follow `expect`, `ensure`, `invariant`, `holds when`, `let … be` and `return`.
 
 **Open:** a condition group or an `if` / `then` pair as the condition of an `if` or `repeat while` statement, whose own block follows (Section 14).
 
@@ -325,7 +327,7 @@ let origin be a Point with x as 0, y as 0
 return a Dashboard from profile, orders, alerts
 ```
 
-Parts are given by position after `from`, by name after `with`, or both, separated by commas. A part by position is written like a call argument, so a labelled call or an operator in it goes in parentheses: `an Order from (total of cart + tax), receipt`.
+Parts are given by position after `from`, by name after `with`, or both, separated by commas. A part by position is written like a call argument, so a labelled call or an operator in it goes in brackets: `an Order from (total of cart + tax), receipt`. A record built this way runs to the end of its line, like a comprehension: it is the whole value of its line, or in brackets, so `an Order from cart and receipt` is an error rather than a record joined to a condition.
 
 ### 5.4 Collections
 
@@ -530,7 +532,7 @@ on failure in any stage
     fail with ImportFailed
 ```
 
-Every queue is bounded, so a full queue makes the stage before it wait.
+Every queue is bounded, so a full queue makes the stage before it wait. A stage is an operation call, never a record being built.
 
 ### 9.4 Work that survives a restart
 
@@ -936,8 +938,8 @@ These are the decisions this draft does not settle. Each names what blocks it. A
 | 3 | `allocates` as a contract clause, with the allocator passed as context | Proposed | Measuring how many contracts it adds lines to |
 | 4 | A small rule language for system files in place of fixed English templates | Proposed | Keyword count (Appendix A) |
 | 5 | Possessive paths: `account's balance` | Settled | Allowed, never mixed with `of` in one path (5.1) |
-| 6 | Reduce the keyword set (now 107 hard, 78 soft) | Open | Experiment 1, the comprehension test, extended to compare candidate words for the same idea: for example `hold` against `with`, `using` and `lease` |
-| 7 | Parser strategy: the grammar is not LALR(1) | Open | Deciding between a hand-written parser that follows the grammar, and changing the grammar until a generator accepts it |
+| 6 | Reduce the keyword set (now 115 hard, 70 soft) | Open | Experiment 1, the comprehension test, extended to compare candidate words for the same idea: for example `hold` against `with`, `using` and `lease` |
+| 7 | Parser strategy: the grammar is LALR(1) with no conflicts (Appendix A); whether the compiler's parser is generated from it or written by hand | Open | Comparing the error messages each gives on the pilot's real mistakes |
 | 8 | Code generator for WebAssembly, the version 1 target: a back end of our own, or one built on LLVM or Cranelift | Open | A compile-time benchmark on the pilot corpus |
 | 9 | Solver and proof format for `proven` clauses | Open | Choosing a solver that is fast and gives stable results across versions |
 | 10 | Localized views beyond English | Open | Round-trip proof for at least one other language |
@@ -950,13 +952,13 @@ These are the decisions this draft does not settle. Each names what blocks it. A
 
 The reference grammar is `grammar/scribe.lark` (version 0.3) in this project; `scribe-grammar-v0.2.lark` is the version the pilot measured. It is an Earley grammar: it states the language precisely but is not yet a production parser. `tools/check_grammar.py` tests it against a file per construct in this specification, a file per forbidden form, this specification's code blocks and the pilot corpora.
 
-**Vocabulary.** 185 reserved words: 107 hard keywords, which can never be names, and 78 soft keywords, which are names everywhere except in the position that gives them meaning. The articles `a`, `an` and `the` are hard. Reducing this count is open decision 6.
+**Vocabulary.** 185 reserved words: 115 hard keywords, which can never be names, and 70 soft keywords, which are names everywhere except in the position that gives them meaning. The articles `a`, `an` and `the` are hard. A few two-word phrases are read by the lexer as one token, so a parser looking one token ahead sees both words: `for each`, `at entry`, `, or else` and `, or`; a comma that ends a line is read with the line's end. None of this changes the text.
 
-**No special rules for expressions.** Every accepted text has exactly one parse with no disambiguation applied: `tools/check_grammar.py` parses every test, every code block in this specification and the pilot corpora with the rules switched off, and fails on any text with two readings. The pilot's rules D1 and D2 (`where` and a quantifier take the rest of the line) are now the grammar's own structure (Section 5.5), and mixing `and` with `or` is a condition group (Section 5.2). One rule remains, pending a trial on the pilot's translations: a label word attaches to the outermost call on its line, and `of` may appear at most once in a call, and first.
+**No special rules.** The grammar is unambiguous by construction. Converted to Bison it has no LALR(1) conflicts, which proves that no text has two readings, and `tools/check_lalr.py` fails the build if one appears. `tools/check_grammar.py` also parses every test, every code block in this specification and the pilot corpora with no disambiguation applied. The pilot's rules D1 and D2 are now the grammar's own structure (Section 5.5), mixing `and` with `or` is a condition group (Section 5.2), and a label word belongs to the outermost call on its line because an argument is one term: a labelled call inside an argument is in brackets.
 
 Constructions list their parts with commas, never `and`, so `and` is always logical.
 
-**Parser class.** Converted to Bison, the grammar has 253 shift/reduce and 20 reduce/reduce conflicts (version 0.2: 172 and 20), so it is not LALR(1). Most are on label words and on type suffixes; the conflicts on scope words fell from 20 to 4 when quantifiers and comprehensions came to cover the rest of their line. One ambiguity is real, not an artefact of the conversion. Open decision 7 settles the parser strategy; the requirement whichever way it goes is that every accepted text has exactly one tree, and that `scribe check --explain` shows it.
+**Parser class.** LALR(1), with no conflicts (version 0.2 had 172 shift/reduce and 20 reduce/reduce). Reaching zero changed what can be written in a few places, all recorded in Appendix B.3: phrase words such as `labelled`, `times` and `only` became hard keywords; records built with fields, and comparisons that end in `where` or a comprehension, became whole values; and a value followed by a phrase word (`add … to`, a limit in a type) became one term.
 
 ## Appendix B: evidence and history
 
@@ -1019,6 +1021,11 @@ What the replay changed in this specification:
     - bit operations are named operations, with hex and binary literals (3.1).
 - Any expression goes wherever a value goes. A grammar rule that takes only a name or a literal needs a stated reason; otherwise types decide what fits, and mistakes the grammar no longer catches are the checker's to report (1).
 - A failure is a value, and `fail with` takes any expression (6).
+- The grammar has no LALR(1) conflicts, so it is proven that no text has two readings; the build fails if one appears (Appendix A). Reaching zero meant:
+    - `labelled`, `matching`, `limited`, `added`, `assumed`, `corrects`, `times` and `only` are hard keywords, because each follows a value and could otherwise be read as part of it;
+    - a record built with fields is a whole value or in brackets (5.3), and so is a comparison that ends in `where` or a comprehension (5.2); this turned another of the pilot's silent misreadings, `an Order from cart and receipt with status Paid`, into an error;
+    - the amount in `add` and `subtract`, and a limit in a type, is one term (3.5, 4.2);
+    - an item of a one-line condition group holds no word that covers the rest of the line (5.2), and a pipeline stage is a call (9.3).
 - Source never names an operating system. A difference between hosts is a fact about a capability, declared in its interface; this replaces clauses scoped `on <platform>` (10.3).
 - Scribe is not described as a systems language. Having no garbage collector is a choice about memory management, managed at compile time as in Rust, not about the kind of software Scribe is for (1, 7).
 

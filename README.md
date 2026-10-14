@@ -52,6 +52,7 @@ specification cites it.
 
     pip install -r requirements.txt
     python3 tools/check_grammar.py
+    python3 tools/check_lalr.py          # needs Bison 3.8
 
 `check_grammar.py` rebuilds nothing and changes nothing: it fails if the built
 grammar is stale, if any file in `tests/grammar/accept` does not parse with
@@ -81,13 +82,13 @@ one reading on its own (spec Section 1).
 
 | Check | Result |
 | --- | --- |
-| Conformance tests, one per construct (`tests/grammar/accept`) | 49 of 49 parse with one reading |
-| Forbidden forms (`tests/grammar/reject`) | 27 of 27 rejected |
+| Conformance tests, one per construct (`tests/grammar/accept`) | 50 of 50 parse with one reading |
+| Forbidden forms (`tests/grammar/reject`) | 32 of 32 rejected |
 | Spec code blocks | 25 of 29; the other 4 are fragments of clauses, not whole programs |
 | Pilot doc examples, repaired | 38 of 42; the 4 others use forms the language has since changed: fields joined by `and` (05), a field without `as` (30), `none` as a value (40), a list comprehension in round brackets (46) |
-| Pilot doc examples, as written | 30 of 42 |
+| Pilot doc examples, as written | 29 of 42; examples 22 and 30 were two of the pilot's silent misreadings, and are now errors |
 | Pilot translations | 7 of 43; two parse as a logical `and` the checker must reject (`tests/checker`) |
-| Bison | 253 shift/reduce and 20 reduce/reduce conflicts, mostly on label words and type suffixes (v0.2: 172 and 20) |
+| Bison | **No LALR(1) conflicts** (v0.2: 172 shift/reduce and 20 reduce/reduce), so no text has two readings; `tools/check_lalr.py` keeps it that way |
 
 [grammar/DECISIONS.md](grammar/DECISIONS.md) lists the open questions the
 production parser needs settled.

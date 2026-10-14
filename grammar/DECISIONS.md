@@ -34,11 +34,23 @@ Decisions from the review of readability and unambiguous presentation
 | 3 | A word that opens a scope (`for every`, `there is`, `where`, `for each`, `if …,` in `ensure`) covers the rest of its line; any other grouping uses a block. Replaces rules D1 and D2 | Approved; in spec and grammar |
 | 4 | Parentheses group arithmetic only; logic is grouped by layout, and `and` and `or` never mix on one line | Approved; in spec and grammar |
 | 5 | A block indented under a line is part of that line's structure, as for statements; a line never continues onto the next | Approved; in spec and grammar |
-| 6 | Which call a label belongs to, and calls inside lists: trial a rule on the pilot translations before deciding | Approved: trial to run |
+| 6 | Which call a label belongs to, and calls inside lists: trial a rule on the pilot translations before deciding | Settled by 15: an argument is one term, so a label belongs to the outermost call; a labelled call inside an argument is bracketed. No trial needed |
 | 7 | `some`, `try` and `not` apply to a single term | Approved; in spec and grammar |
 | 11 | Commas at line ends in condition blocks are optional on input, checked if present, left out of the stored text and drawn by the review view; one-line groups need them | Approved; in spec and grammar |
 | 12 | `is` only introduces a test (variant, `nothing`, predicate, membership); equality is only `=` and `≠` | Approved; in spec and grammar |
 | 13 | Bit operations are named operations on fixed-width unsigned types (`bitwise_and flags with mask`, `shift_left value by 1`); hex and binary literals | Approved; in spec and grammar |
 | 14 | `followed by` joins single terms; arithmetic in an operand takes brackets | Approved; in spec and grammar |
-| 15 | The reference grammar has zero LALR(1) conflicts, checked in CI, so it is proven unambiguous | Proposed |
-| 16 | Generated or hand-written parser, decided once 15 holds, by comparing error messages | Proposed |
+| 15 | The reference grammar has zero LALR(1) conflicts, checked in CI, so it is proven unambiguous | Approved; done. Zero conflicts, checked in CI by tools/check_lalr.py |
+| 16 | Generated or hand-written parser, decided once 15 holds, by comparing error messages | Approved; to do: compare error messages on the pilot's real mistakes |
+
+### What reaching zero conflicts changed (decision 15)
+
+| Change | Why | Effect on what is written |
+| --- | --- | --- |
+| `labelled`, `matching`, `limited`, `added`, `assumed`, `corrects`, `times`, `only` are hard keywords | Each follows a value and could be read as part of it | They cannot be names |
+| A record built with fields is a whole value or in brackets | Its last field ran into what followed: `a Point with x as 1 + 2` | `let p be a Point with …` is unchanged; inside a larger expression it is bracketed. Turned the pilot's misreading `an Order from cart and receipt` into an error |
+| A comparison ending in `where` or a comprehension is a whole condition | The `where` covers the rest of the line, so nothing can follow it | Not usable as one link of an `and` chain; use a group |
+| The amount in `add`/`subtract`, and a limit in a type, is one term | `add price of item to total`: the `to` must belong to `add` | A labelled call or arithmetic there is bracketed |
+| An item of a one-line group holds no scope word | `any of x where c, y`: the `where` would take in `y` | Such an item goes on its own line |
+| A pipeline stage is a call; the condition before the comma in `ensure if …,` is a plain condition | A record's commas ran into the phrase's comma | None in practice |
+| `for each`, `at entry`, `, or else`, `, or`, and a comma ending a line, are read as one token by the lexer | Lets a one-token parser see both words | None: the text is unchanged |

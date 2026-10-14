@@ -1,0 +1,15 @@
+type Small is an Int less than limit_of plan
+type Ratio is an Int with value (-100) through count of items
+
+to settle item into cart
+    given item is an Item
+    given cart is an editable Cart
+    ensure any of
+        status of cart is Open
+        count of item where price of item > 10,
+        cart is empty
+    add price of item to total of cart
+    add (price for item in usd) to total of cart
+    subtract item's discount from total of cart
+    let orders be [(an Order from cart, receipt), other_order]
+    let alerts be fetch alerts of user from services, or else nothing

@@ -2,12 +2,14 @@
 # hard: reserved everywhere. soft: a keyword only inside its own phrase.
 hard a
 hard add
+hard added
 hard after
 hard all
 hard an
 hard and
 hard any
 hard as
+hard assumed
 hard assumes
 hard at
 hard attenuated
@@ -19,6 +21,7 @@ hard changes
 hard choice
 hard choose
 hard component
+hard corrects
 hard deadline
 hard declassifies
 hard decreases
@@ -51,9 +54,12 @@ hard into
 hard invariant
 hard is
 hard it
+hard labelled
 hard least
 hard less
 hard let
+hard limited
+hard matching
 hard may
 hard migration
 hard mod
@@ -65,6 +71,7 @@ hard not
 hard nothing
 hard of
 hard on
+hard only
 hard onto
 hard or
 hard otherwise
@@ -93,6 +100,7 @@ hard then
 hard there
 hard through
 hard tier
+hard times
 hard to
 hard together
 hard trust
@@ -108,10 +116,8 @@ hard while
 hard with
 hard workflow
 soft about
-soft added
 soft anything
 soft assert
-soft assumed
 soft authority
 soft backoff
 soft block
@@ -124,7 +130,6 @@ soft compatibility
 soft components
 soft consumed
 soft contains
-soft corrects
 soft cost
 soft database
 soft domain
@@ -137,11 +142,8 @@ soft files
 soft gives
 soft host
 soft its
-soft labelled
 soft leaves
 soft lemma
-soft limited
-soft matching
 soft maybe
 soft monitor
 soft must
@@ -151,7 +153,6 @@ soft no
 soft non_empty
 soft once
 soft one
-soft only
 soft operations
 soft own
 soft owner
@@ -176,7 +177,6 @@ soft state
 soft succeeds
 soft that
 soft time
-soft times
 soft turning
 soft under
 soft use

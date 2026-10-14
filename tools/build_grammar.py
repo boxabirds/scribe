@@ -25,6 +25,7 @@ deadline runs survives holds because assumes may
 let be var starts set return fail try handle on failure if otherwise for each
 increment decrement add subtract do
 all any none then
+labelled matching limited added assumed corrects times only
 from until through repeat while invariant decreases stop skip choose when hold
 together pipeline trust proof
 type choice define component system protocol schema migration workflow example
@@ -34,6 +35,31 @@ less more than most least after before followed attenuated
 with in into onto over using by as
 a an the
 """.split())
+
+
+# Phrases the lexer reads as one token, so a parser that looks one token ahead
+# sees both words at once. Each is written with its words separated by spaces;
+# the text a reader sees is unchanged.
+JOINED = [
+    ("OR_ELSE", [",", "or", "else"]),
+    ("COMMA_OR", [",", "or"]),
+    ("FOR_EACH", ["for", "each"]),
+    ("AT_ENTRY", ["at", "entry"]),
+]
+
+
+def joined_terminals():
+    lines = []
+    # earlier entries take priority, so `, or else` is tried before `, or`
+    for rank, (name, parts) in enumerate(JOINED):
+        pattern = ""
+        for i, part in enumerate(parts):
+            if part == ",":
+                pattern += ","
+            else:
+                pattern += ("[ ]*" if i and parts[i - 1] == "," else "[ ]+" if i else "") + part
+        lines.append(f"{name}.{9 - rank}: /{pattern}(?![A-Za-z0-9_])/")
+    return "\n".join(lines) + "\n"
 
 
 def keyword_list(hard, soft):
@@ -49,6 +75,7 @@ def build(tmpl_path, out_path, keywords_path=None):
     # literal words used in the grammar, ignoring comments
     body = "\n".join(line.split("//")[0] for line in text.split("\n"))
     words = set(re.findall(r'"([A-Za-z_][A-Za-z0-9_]*)"', body))
+    words |= {part for _, parts in JOINED for part in parts if part != ","}
     soft = sorted(words - HARD)
     missing_hard = sorted(HARD - words)
     # longest first, so no keyword matches as a prefix of another; ties by spelling,
@@ -58,7 +85,7 @@ def build(tmpl_path, out_path, keywords_path=None):
     name_rule = "name: NAME\n    | " + "\n    | ".join(f'"{w}"' for w in soft) + "\n"
     quantity = ("QUANTITY.4: /\\d+(\\.\\d+)?[ ]+(?!(" + lookahead +
                 ")(?![A-Za-z0-9_]))[A-Za-z][A-Za-z0-9_]*/\n")
-    out = text + "\n// ---- generated\n" + name_rule + quantity
+    out = text + "\n// ---- generated\n" + name_rule + quantity + joined_terminals()
     open(out_path, "w").write(out)
     if keywords_path:
         open(keywords_path, "w").write(keyword_list(HARD & words, soft))

@@ -66,8 +66,8 @@ fixed-width unsigned types, so they need no precedence:
 
 ## Reserved words
 
-Scribe reserves more words than most languages: 107 hard keywords, which can
-never be names, and 78 soft keywords, which are keywords only inside their own
+Scribe reserves more words than most languages: 115 hard keywords, which can
+never be names, and 70 soft keywords, which are keywords only inside their own
 phrase and ordinary names everywhere else. Scribe is written by machines and
 read by people, so a word reserved to make a line unambiguous costs readers
 nothing (specification, Section 2.5).
@@ -125,7 +125,7 @@ make this easier than the list suggests:
 | `choice` | Declares a choice type | User selections | `selection`, `option`, `pick` |
 | `workflow` | Work that survives a restart | Jobs, processes | `job`, `process`, `flow` |
 | `pipeline` | Stages joined by bounded queues | Build or data pipelines | `stages`, `chain`, `flow` |
-| `repeat` | `repeat while` loops | Repetition counts | `repeat_count`, `times` |
+| `repeat` | `repeat while` loops | Repetition counts | `repeat_count`, `count` |
 | `when` | A branch of `choose` | Times and moments | `moment`, `at_time`, `occurred_at` |
 | `where` | Filters in comprehensions and quantifiers | Locations | `place`, `location`, `site` |
 | `while`, `until` | Loop and range words | End times | `end_time`, `due`, `limit` |
@@ -138,6 +138,10 @@ make this easier than the list suggests:
 | `let`, `var` | Bindings | Template variables | `variable`, `binding` |
 | `may` | `may block` | The month (lower case) | `month_may`, or the capitalised variant `May` |
 | `all`, `any`, `none` | Condition groups: `all of`, `any of`, `none of` | Collection helpers, flags | `everything`, `any_found`, `none_found`, `empty` |
+| `only` | `changes only`, `read only` | Filters and flags | `sole`, `exclusive`, `just_one` |
+| `times` | `retry … at most 3 times` | Counts and timestamps | `count`, `occurrences`, `timestamps` |
+| `labelled`, `matching`, `limited` | Type limits: `Text labelled untrusted`, `Text matching email_format` | Flags and filters | `has_label`, `is_match`, `capped` |
+| `added`, `assumed`, `corrects` | Schema history, assumptions, corrections | Change records | `added_at`, `assumption`, `correction` |
 
 ### Other hard keywords
 

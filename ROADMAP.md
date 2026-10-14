@@ -23,6 +23,8 @@ exact oracle.
 | One command that runs all grammar checks and fails on any regression | done |
 | List the open decisions the parser needs settled, with a recommendation each ([grammar/DECISIONS.md](grammar/DECISIONS.md)) | done |
 | Settle those decisions in the spec, then update the grammar and tests to match | done, except `assume` (decision 6) |
+| Readability review: every line has exactly one reading; condition groups; no disambiguation rules | done |
+| The grammar has no LALR(1) conflicts, checked in CI, so it is proven unambiguous | done |
 
 Done when: the spec's own code blocks and the conformance snippets all parse
 with one reading, the negative cases fail, and the pilot corpora still pass.
@@ -33,7 +35,8 @@ with one reading, the negative cases fail, and the pilot corpora still pass.
 | --- | --- |
 | Choose the implementation language for the compiler (Rust) and set up the workspace and CI | done |
 | Lexer with the layout rules of Section 2.6 and the hard and soft keywords; agrees with the reference grammar's lexer token for token on every test, spec and corpus file | done |
-| Hand-written parser producing a syntax tree, tested against the Earley grammar on every build: same accept or reject, same tree | now |
+| Decide between a parser generated from the grammar and a hand-written one, by comparing their error messages on the pilot's real mistakes | now |
+| The parser, producing a syntax tree, tested against the Earley grammar on every build: same accept or reject, same tree | |
 | Formatter that writes the stored form, with display forms; formatting twice changes nothing, and every view round-trips | |
 | Diagnostics as Section 13.2 describes, and `scribe check --explain` | |
 | Diagnostics for spellings the language has dropped: `give back x` parses as a call to `give`, so name resolution should suggest `return` | |

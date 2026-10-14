@@ -225,6 +225,32 @@ fn is_elision(content: &str) -> bool {
     !middle.contains('.')
 }
 
+/// If `word` at `start` begins a two-word phrase the lexer reads as one token
+/// (`for each`, `at entry`), the end of the phrase.
+fn joined_word_phrase(chars: &[char], word: &str, word_end: usize) -> Option<usize> {
+    let second = match word {
+        "for" => "each",
+        "at" => "entry",
+        _ => return None,
+    };
+    let mut e = word_end;
+    while chars.get(e) == Some(&' ') {
+        e += 1;
+    }
+    if e == word_end {
+        return None;
+    }
+    word_at(chars, e, second)
+}
+
+/// If the whole word `word` starts at `k`, the index just after it.
+fn word_at(chars: &[char], k: usize, word: &str) -> Option<usize> {
+    let end = k + word.chars().count();
+    let matches = chars.get(k..end).is_some_and(|s| s.iter().copied().eq(word.chars()));
+    let whole = !chars.get(end).is_some_and(|&c| is_word_char(c));
+    (matches && whole).then_some(end)
+}
+
 fn word_token(word: &str, line: usize, column: usize) -> Token {
     let kind = match classify(word) {
         WordKind::Hard => TokenKind::Hard,
@@ -286,8 +312,37 @@ fn lex_line(content: &str, line: usize, first_column: usize, out: &mut Vec<Token
                 k += 1;
             }
             let word: String = chars[start..k].iter().collect();
+            if let Some(end) = joined_word_phrase(&chars, &word, k) {
+                let text: String = chars[start..end].iter().collect();
+                out.push(Token { kind: TokenKind::Hard, text, line, column });
+                k = end;
+                continue;
+            }
             out.push(word_token(&word, line, column));
             continue;
+        }
+        if c == ',' {
+            // `, or else` and `, or` are read as one token (see JOINED in
+            // tools/build_grammar.py); any other comma, including one that ends
+            // the line, is a symbol
+            let mut e = k + 1;
+            while chars.get(e) == Some(&' ') {
+                e += 1;
+            }
+            if let Some(after_or) = word_at(&chars, e, "or") {
+                let mut f = after_or;
+                while chars.get(f) == Some(&' ') {
+                    f += 1;
+                }
+                let end = match word_at(&chars, f, "else") {
+                    Some(after_else) if f > after_or => after_else,
+                    _ => after_or,
+                };
+                let text: String = chars[k..end].iter().collect();
+                out.push(Token { kind: TokenKind::Hard, text, line, column });
+                k = end;
+                continue;
+            }
         }
         if c == '\'' && chars.get(k + 1) == Some(&'s') {
             out.push(Token { kind: TokenKind::Symbol, text: "'s".to_string(), line, column });
@@ -495,6 +550,20 @@ mod tests {
     fn symbols_longest_first() {
         assert_eq!(texts("return a <= b != c\n")[2..6], ["<=", "b", "!=", "c"]);
         assert_eq!(texts("return x ≤ y ∧ ¬ z\n")[1..7], ["x", "≤", "y", "∧", "¬", "z"]);
+    }
+
+    #[test]
+    fn joined_phrases() {
+        let k = kinds("let a be [x for each x in xs], or else nothing\n");
+        assert!(k.contains(&(TokenKind::Hard, "for each".into())));
+        assert!(k.contains(&(TokenKind::Hard, ", or else".into())));
+        let k = kinds("server sends one of Done, or Failed\n");
+        assert!(k.contains(&(TokenKind::Hard, ", or".into())));
+        let k = kinds("ensure x = x at entry\n");
+        assert!(k.contains(&(TokenKind::Hard, "at entry".into())));
+        let k = kinds("let a be [1, order]\n");
+        assert!(k.contains(&(TokenKind::Name, "order".into())));
+        assert!(!k.iter().any(|(_, t)| t.starts_with(", or")));
     }
 
     #[test]
