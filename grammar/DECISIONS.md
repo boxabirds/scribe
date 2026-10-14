@@ -21,3 +21,21 @@ until the specification says so.
 | 12 | ~~A statement that does nothing~~ Settled: `do nothing`; `choose` keeps no catch-all branch | 4.2 | Accepted; `do` is reserved | Done |
 | 13 | ~~What names a platform in `on <platform>`~~ Settled: source never names a platform. Host differences are facts declared on capability interfaces (`varies by host`, spec 10.3, Proposed), and contracts are compared once per host binding | 10.3 | `on <platform>` rejected; `varies by host` accepted in interfaces | Re-express the change replay's platform-specific breakages with it before adopting the syntax (open decision 11) |
 | 14 | ~~Positions limited to a name or literal~~ Settled: deadlines, queue sizes, concurrency, refinements, sampling, retries, record parts and capability parts take expressions. Values in contracts and authority must be constant expressions (checker). Kept on purpose: free text, declaration versions, names being introduced, and an unmarked capability resource, which must be a string | 1 | Accepted | Constant check in phase 3 |
+
+## Readability review
+
+Decisions from the review of readability and unambiguous presentation
+(spec Section 1: every line has exactly one reading).
+
+| # | Decision | Status |
+| --- | --- | --- |
+| 1 | Every line has exactly one reading, visible without knowing any precedence rule beyond school arithmetic; this holds for the stored text and every view | Approved; in spec Section 1 |
+| 2 | Condition groups: `all of`, `any of` and `none of` open blocks that nest; one condition per line inside a block; `implies` across lines is `if` / `then` on two aligned lines; `all`, `any` and `none` reserved | Open |
+| 3 | A word that opens a scope (`for every`, `there is`, `where`, `for each`, `if …,` in `ensure`) covers the rest of its line; any other grouping uses a block. Replaces rules D1 and D2 | Open |
+| 4 | Parentheses group arithmetic only; logic is grouped by layout, and `and` and `or` never mix on one line | Open |
+| 5 | A block indented under a line is part of that line's structure, as for statements; a line never continues onto the next | Open |
+| 6 | Which call a label belongs to, and calls inside lists: trial a rule on the pilot translations before deciding | Open |
+| 7 | `some`, `try` and `not` apply to a single term | Open |
+| 11 | Commas at line ends in condition blocks are optional on input, checked if present, left out of the stored text and drawn by the review view; one-line groups need them | Approved; takes effect with 2 |
+| 12 | `is` only introduces a test (variant, `nothing`, predicate, membership); equality is only `=` and `≠` | Open |
+| 13 | Bit operations are named operations on fixed-width unsigned types (`bitwise_and flags with mask`, `shift_left value by 1`); hex and binary literals | Open |
