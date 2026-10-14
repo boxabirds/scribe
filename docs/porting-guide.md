@@ -1,7 +1,24 @@
 # Porting to Scribe
 
 A guide for translating code from other languages into Scribe. It grows as
-porting finds more to say; for now it covers names.
+porting finds more to say; for now it covers parameters and names.
+
+## Parameters
+
+A function's parameters become an operation's header. Parameters with no
+natural label are listed first, separated by commas; parameters that read
+better with a label word follow:
+
+| Source | Scribe header | Call |
+| --- | --- | --- |
+| `gcd(a, b)` | `to gcd first, second` | `gcd 12, 18` |
+| `withdraw(account, amount)` | `to withdraw amount from account` | `withdraw 50 from savings` |
+| `move(x, y, grid)` | `to move x, y to grid` | `move 3, 4 to board` |
+
+The label words are `from`, `to`, `in`, `into`, `onto`, `over`, `for`, `with`,
+`by`, `as`, `using` and `of`. A call with several unlabelled arguments stands
+bare only as a whole statement or a whole value (`let g be gcd a, b`);
+anywhere else it goes in parentheses: `if (gcd a, b) = 1`.
 
 ## Reserved words
 
@@ -101,3 +118,4 @@ These are rarely names in other languages, so they seldom need renaming.
 | `together` | Runs lines at once |
 | `followed` | `followed by`, joining sequences |
 | `attenuated` | Narrows a capability |
+| `do` | `do nothing`, for a branch with nothing to do |

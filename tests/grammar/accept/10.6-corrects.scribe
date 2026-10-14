@@ -1,4 +1,3 @@
 to finish writer
     given writer is an editable Writer
-    ensure "every write failure is reported, including the failure to finish compression"
-        corrects "only the first write failure was reported" because "the old behaviour lost errors"
+    ensure "every write failure is reported, including the failure to finish compression" corrects "only the first write failure was reported" because "the old behaviour lost errors"

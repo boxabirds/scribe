@@ -56,16 +56,17 @@ These tools started as copies of the pilot's. Since then: the grammar build is
 deterministic (the pilot ordered keywords of equal length by Python's set
 order), and the pre-lexer reports a tab at the start of a line as a tab.
 
-### Version 0.3 against spec 0.4
+### Version 0.3 against the current spec
 
 | Check | Result |
 | --- | --- |
-| Conformance tests, one per construct (`tests/grammar/accept`) | 34 of 34 parse with one reading |
-| Forbidden forms (`tests/grammar/reject`) | 12 of 12 rejected |
-| Spec code blocks | 23 of 26; the other 3 are fragments, not whole programs |
-| Pilot doc examples, repaired | 41 of 42; example 05 separates fields with `and`, which spec 3.3 forbids |
+| Conformance tests, one per construct (`tests/grammar/accept`) | 42 of 42 parse with one reading |
+| Forbidden forms (`tests/grammar/reject`) | 19 of 19 rejected |
+| Spec code blocks | 24 of 27; the other 3 are fragments, not whole programs |
+| Pilot doc examples, repaired | 40 of 42; example 05 separates fields with `and` (spec 3.3), and example 30 names a field without `as` (spec 5.3) |
 | Pilot doc examples, as written | 31 of 42; example 22's `run ReportExporter with reports and partner`, one of the pilot's silent misreadings, is now an error |
-| Bison | 183 shift/reduce and 20 reduce/reduce conflicts (v0.2: 172 and 20); the one proven ambiguity is still quantifier scope, which rule D2 resolves |
+| Pilot translations | 7 of 43, up from 5; two of the new ones parse as a logical `and` the checker must reject (`tests/checker`) |
+| Bison | 206 shift/reduce and 20 reduce/reduce conflicts (v0.2: 172 and 20) |
 
 [grammar/DECISIONS.md](grammar/DECISIONS.md) lists the open questions the
 production parser needs settled.

@@ -1,0 +1,4 @@
+to boss_name of user
+    given user is a User
+    produces Text
+    return name of user's manager

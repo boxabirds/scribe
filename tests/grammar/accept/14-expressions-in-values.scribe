@@ -1,0 +1,13 @@
+type Upload is Bytes at most limit_of plan
+
+to import_all from source into store using root
+    given source is a Source
+    given store is an editable Store
+    given root is the Authority
+    deadline base_timeout * 2
+    uses root
+    let partner be root attenuated to network host partner_host port https_port
+    pipeline
+        stage read_rows from source
+        queue of at most batch_size
+        stage parse_row, workers * 2 at a time

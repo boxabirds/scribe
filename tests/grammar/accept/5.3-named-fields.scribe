@@ -1,0 +1,7 @@
+to origin_and_order of cart with receipt
+    given cart is a Cart
+    given receipt is a Receipt
+    produces an Order
+    let origin be a Point with x as 0, y as 0
+    let order be an Order from (total of cart + tax), receipt with status as Paid, note as "first order"
+    return order

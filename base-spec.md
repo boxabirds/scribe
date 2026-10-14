@@ -36,7 +36,7 @@ Principles that follow from these and decide individual rules:
 | A promise is code, not commentary | Contracts are checked against the body on every build. Only quoted informal clauses are unchecked, and they are labelled as such |
 | Never overclaim | Every proof, verdict and report states the assumptions and unchecked parts it rests on |
 | Nothing implicit that matters | No ambient authority, no implicit conversion, no missing value without a `maybe`, no failure without a `fails with` |
-| Any expression wherever a value goes | No position in the grammar is limited to a name or a literal without a stated reason; types, not keywords, decide what fits |
+| Any expression wherever a value goes | No position in the grammar is limited to a name or a literal without a stated reason; types, not keywords, decide what fits. A value in a contract or a grant of authority must be a constant expression, because impact analysis compares it without running code |
 
 ## 2. Source text
 
@@ -119,7 +119,8 @@ A reserved word is judged by what it costs readers, not authors. Scribe is writt
 
 - Blocks are opened by a header line and four spaces of indentation. Tabs are a syntax error. There are no braces, colons or semicolons.
 - A line starting with `note` is a comment.
-- Every statement is a whole line; no assignment inside an expression.
+- Every statement and every clause is one whole line, and nothing continues onto the next line. A view may wrap a long line on screen; that wrapping is never part of the text.
+- No assignment inside an expression.
 - Lists of parts are separated by commas. `and` is only logic.
 
 ## 3. Values and types
@@ -221,7 +222,7 @@ to withdraw amount from account
 
 The header line names the operation, its first parameter, and further parameters introduced by label words: `to withdraw amount from account`. The label words are a fixed set of single words: `from`, `to`, `in`, `into`, `onto`, `over`, `for`, `with`, `by`, `as`, `using`, `of`. A call uses the same shape: `withdraw 50 from savings`.
 
-**Proposed:** several unlabelled parameters, separated by commas: `to coerce first, second`. Real code needs this often (Appendix B).
+An operation may take several unlabelled parameters, separated by commas, before any labelled ones: `to gcd first, second`, called as `gcd 12, 18`. Use a label where one reads better: `to withdraw amount from account`.
 
 The lines between the header and the body are the operation's **contract** (Section 10). An operation with no `uses` line uses no capability and is pure; the review view shows a `pure` tag.
 
@@ -244,12 +245,13 @@ Every statement starts with a keyword, or is a call.
 | Iterate | `for each order in orders` |
 | Loop | `repeat while condition`, with `invariant` and `decreases` lines |
 | Leave or continue a loop | `stop`, `skip` |
+| Do nothing | `do nothing` |
 | Hold a resource | `hold input as open path for reading using files` (Section 7) |
 | Concurrency | `together`, `pipeline` (Section 9) |
 
-Only a name or an `of`-path can be set. **Proposed:** setting one element of a list, `set item i of heap to x`.
+A name, an element (`set item i of heap to x`), an `of`-path or a possessive path can be set.
 
-**Proposed:** a statement that does nothing, for a `when` branch with nothing to do.
+`do nothing` is for a `when` branch with nothing to do. `choose` has no catch-all branch, so a new variant is never silently absorbed: every `choose` must say what happens to it, even if that is nothing.
 
 ### 4.3 Functions as values
 
@@ -267,6 +269,8 @@ A call is the operation's name, its first argument, then label words with furthe
 - The argument after `of` may itself be an `of`-path or a call with plain arguments: `count of contents of queue`, `sum of total_of order ...`.
 - Every other label belongs to the outermost call on the line. To pass a labelled call as an argument, put it in parentheses.
 - A label is one word. `with key request_id` is a call to `key`, not a two-word label.
+- A call with several unlabelled arguments, `gcd a, b`, stands bare only as a whole statement or as the whole value of `let`, `var`, `set`, `return` or `fail`. Anywhere else it goes in parentheses, `[(gcd 12, 18), 6]` or `if (gcd a, b) = 1`, because a comma also separates list items, parts and quantifier ranges.
+- `account's balance` is another spelling of `balance of account`, and possessives chain: `user's manager's name` is `name of manager of user`. A path uses possessives or `of`, never both, so `name of user's manager` is an error: each direction is clear alone, but mixed, the reader would need a precedence rule to know which applies first. The formatter chooses the clearer spelling for each path.
 
 ### 5.2 Precedence
 
@@ -275,11 +279,12 @@ From loosest to tightest: `implies`; a chain of `and` or a chain of `or` (never 
 ### 5.3 Constructing records
 
 ```
-let order be an Order from cart, receipt with status Paid
+let order be an Order from cart, receipt with status as Paid
+let origin be a Point with x as 0, y as 0
 return a Dashboard from profile, orders, alerts
 ```
 
-Parts are separated by commas. **Proposed:** naming fields during construction, `a Point with x as 1, y as 2`.
+Parts are given by position after `from`, by name after `with`, or both, separated by commas. A part by position is written like a call argument, so a labelled call or an operator in it goes in parentheses: `an Order from (total of cart + tax), receipt`.
 
 ### 5.4 Collections
 
@@ -344,7 +349,7 @@ Rules:
 - `on failure A or B as problem` binds the failure so it can be passed on: `fail with problem`.
 - Adding a way to fail is a change to the contract (Section 12).
 
-A failure is a value. Failures are declared as variants of a `choice`, so a failure can carry fields and two failures with the same name can be told apart, and `fail with` takes any expression whose value is a failure: `fail with an OutOfRange from clamped`. Failures that carried no data were the most common gap in translated real code. **Open:** the type rules for failure values (Section 14).
+A failure is a value. Failures are declared as variants of a `choice`, so a failure can carry fields and two failures with the same name can be told apart, and `fail with` takes any expression whose value is a failure: `fail with an OutOfRange with value as clamped`. Failures that carried no data were the most common gap in translated real code. **Open:** the type rules for failure values (Section 14).
 
 **Open:** whether panics exist at all. The current rule is that a `checked` operation cannot panic, and the compiler proves it; what an unprovable bounds check does at lower tiers is undecided.
 
@@ -527,7 +532,7 @@ A **contract** is what an operation requires and promises. It is the lines betwe
 | `ensure condition` | What it guarantees. Forms: `ensure if it succeeds, ...`, `ensure if it fails, ...`, `ensure if result is some p, ...` | Proof, or run-time check, by tier |
 | `changes only x` | Everything else is untouched | Compiler |
 | `example call is value` | An exact result for an exact input | Run on every build |
-| `cost at most ...` | A cost bound | Benchmarks, at the `tested` tier |
+| `cost at most ...` | A cost bound: an amount (`cost at most 50 milliseconds`), or how cost grows with an input | Benchmarks for amounts, at the `tested` tier; impact analysis compares growth (12.3) |
 | `idempotent by keys` | Repeating it with the same keys has no further effect | Tests; proof at higher tiers |
 | `assumes "..." assumed owner team` | A fact about the outside world it relies on | Not proven. Listed in every report that depends on it; may carry a run-time monitor |
 | `"a quoted sentence"` in place of a condition | An informal clause | Not checked. Labelled informal everywhere it appears |
@@ -607,8 +612,7 @@ Proof hints go in a `proof` block at the end of the operation, folded by default
 When a change fixes a bug that callers may have relied on, the new clause can say so:
 
 ```
-ensure "every write failure is reported, including the failure to finish compression"
-    corrects "only the first write failure was reported" because "the old behaviour lost errors"
+ensure "every write failure is reported, including the failure to finish compression" corrects "only the first write failure was reported" because "the old behaviour lost errors"
 ```
 
 A `corrects` line makes the change a review item rather than a breaking change (Section 12). It is removed at the next release.
@@ -799,8 +803,7 @@ Three points of detail:
 - **A correction is not a breakage of the false promise.** A change may declare that an old clause was never true:
 
 ```
-    corrects ensure "names are returned in sorted order"
-        because "the order was never sorted on Plan 9; see issue 4417"
+corrects ensure "names are returned in sorted order" because "the order was never sorted on Plan 9; see issue 4417"
 ```
 
 The report shows corrected clauses separately. Dependents that relied on the clause are still listed with needs review, because their code may have depended on the false promise in practice.
@@ -894,20 +897,21 @@ These are the decisions this draft does not settle. Each names what blocks it. A
 | 2 | No `async` keyword: blocking is declared with `may block` and the runtime schedules | Proposed | A prototype scheduler and a latency measurement |
 | 3 | `allocates` as a contract clause, with the allocator passed as context | Proposed | Measuring how many contracts it adds lines to |
 | 4 | A small rule language for system files in place of fixed English templates | Proposed | Keyword count (Appendix A) |
-| 5 | Possessive paths: accept `account's balance` as a form of `balance of account` | Proposed | A grammar run. `'s` would bind tighter than any call, so `total of cart's lines` means `total of (lines of cart)`. Bare `account balance` is not possible: it already reads as a call of `account`, and it would look almost the same as the name `account_balance` in the review view |
-| 6 | Reduce the keyword set (now 102 hard, 80 soft) | Open | Experiment 1, the comprehension test, extended to compare candidate words for the same idea: for example `hold` against `with`, `using` and `lease` |
+| 5 | Possessive paths: `account's balance` | Settled | Allowed, never mixed with `of` in one path (5.1) |
+| 6 | Reduce the keyword set (now 103 hard, 80 soft) | Open | Experiment 1, the comprehension test, extended to compare candidate words for the same idea: for example `hold` against `with`, `using` and `lease` |
 | 7 | Parser strategy: the grammar is not LALR(1) | Open | Deciding between a hand-written parser that follows the grammar, and changing the grammar until a generator accepts it |
 | 8 | Code generator for WebAssembly, the version 1 target: a back end of our own, or one built on LLVM or Cranelift | Open | A compile-time benchmark on the pilot corpus |
 | 9 | Solver and proof format for `proven` clauses | Open | Choosing a solver that is fast and gives stable results across versions |
 | 10 | Localized views beyond English | Open | Round-trip proof for at least one other language |
 | 11 | How host-dependent facts are declared (10.3), and which host bindings impact analysis compares by default | Proposed | Re-expressing the replay's platform-specific breakages with it |
 | 12 | Type rules for failures as values: how a failure `choice` relates to `fails with`, and how impact analysis compares a failure's fields | Open | Roadmap phase 5, with the translation wave that needs them |
+| 13 | How a cost that grows with an input is written (`cost at most`, 10.1), so impact analysis can compare orders of growth (12.3) | Open | A vocabulary of growth (constant, logarithmic, linear, `n log n`, quadratic) in terms of a named input; if it is not ready, version 1 has amounts only |
 
 ## Appendix A: grammar notes
 
 The reference grammar is `grammar/scribe.lark` (version 0.3) in this project; `scribe-grammar-v0.2.lark` is the version the pilot measured. It is an Earley grammar: it states the language precisely but is not yet a production parser. `tools/check_grammar.py` tests it against a file per construct in this specification, a file per forbidden form, this specification's code blocks and the pilot corpora.
 
-**Vocabulary.** 182 reserved words: 102 hard keywords, which can never be names, and 80 soft keywords, which are names everywhere except in the position that gives them meaning. The articles `a`, `an` and `the` are hard. Reducing this count is open decision 6.
+**Vocabulary.** 183 reserved words: 103 hard keywords, which can never be names, and 80 soft keywords, which are names everywhere except in the position that gives them meaning. The articles `a`, `an` and `the` are hard. Reducing this count is open decision 6.
 
 **Special rules.** Twelve rules resolve what the grammar alone leaves ambiguous. The four that most affect readers:
 
@@ -920,7 +924,7 @@ The reference grammar is `grammar/scribe.lark` (version 0.3) in this project; `s
 
 Constructions list their parts with commas, never `and`, so `and` is always logical.
 
-**Parser class.** Converted to Bison, the grammar has 183 shift/reduce and 20 reduce/reduce conflicts (version 0.2: 172 and 20), so it is not LALR(1). One ambiguity is real, not an artefact of the conversion. Open decision 7 settles the parser strategy; the requirement whichever way it goes is that every accepted text has exactly one tree, and that `scribe check --explain` shows it.
+**Parser class.** Converted to Bison, the grammar has 206 shift/reduce and 20 reduce/reduce conflicts (version 0.2: 172 and 20), so it is not LALR(1). One ambiguity is real, not an artefact of the conversion. Open decision 7 settles the parser strategy; the requirement whichever way it goes is that every accepted text has exactly one tree, and that `scribe check --explain` shows it.
 
 ## Appendix B: evidence and history
 
@@ -970,6 +974,10 @@ What the replay changed in this specification:
 - Version 1 emits WebAssembly only (1, 13).
 - `return` replaces `give back` as the statement that ends an operation with its result (4.2).
 - Reserved words are judged by what they cost readers, not authors: Scribe is written by machines, so a word reserved to make a line unambiguous is cheap. `increment`, `decrement`, `add` and `subtract` are reserved so the update forms can never be read as calls (2.1, 2.5).
+- An operation may take several unlabelled parameters (4.1); a call with several unlabelled arguments stands bare only as a whole statement or value (5.1).
+- Possessive paths are allowed and never mixed with `of` in one path, the same rule that keeps `and` and `or` apart (5.1).
+- Records can be built with fields by name: `a Point with x as 1, y as 2` (5.3). One element can be set: `set item i of heap to x`. `do nothing` fills a branch with nothing to do (4.2).
+- Every statement and every clause is one line; no clause continues onto the next (2.6, 10.6, 12.3).
 - Any expression goes wherever a value goes. A grammar rule that takes only a name or a literal needs a stated reason; otherwise types decide what fits, and mistakes the grammar no longer catches are the checker's to report (1).
 - A failure is a value, and `fail with` takes any expression (6).
 - Source never names an operating system. A difference between hosts is a fact about a capability, declared in its interface; this replaces clauses scoped `on <platform>` (10.3).
