@@ -57,5 +57,6 @@ repaired).
 
 11 of experiment 7's 48 source excerpts are not in this repository, because
 their licences (GPL, LGPL, Redis's, and one project with no licence) do not
-allow it. [research/corpus/exp7/source/NOTICE.md](research/corpus/exp7/source/NOTICE.md)
-lists every excerpt with its licence, and how to restore the missing ones.
+allow it. [research/corpus/exp7/NOTICE.md](research/corpus/exp7/NOTICE.md)
+lists every excerpt and translation with its licence, and how to restore the
+missing excerpts. The 15 translations of those excerpts were removed as well.
