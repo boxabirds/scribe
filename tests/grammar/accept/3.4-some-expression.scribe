@@ -1,0 +1,5 @@
+to with_tax of total
+    given total is a Money
+    produces a maybe Money
+    ensure if result is some p, p ≥ total
+    return some total + tax_on total

@@ -96,7 +96,7 @@
   "F09.scribe": "fail",
   "F10.scribe": "fail",
   "F11.scribe": "fail",
-  "F12.scribe": "fail",
+  "F12.scribe": "ok",
   "F13.scribe": "fail",
   "F14.scribe": "fail",
   "F16.scribe": "fail",
@@ -121,7 +121,7 @@
   "F39.scribe": "fail",
   "F40.scribe": "fail",
   "F42.scribe": "fail",
-  "F43.scribe": "fail",
+  "F43.scribe": "ok",
   "F44.scribe": "fail",
   "F46.scribe": "fail",
   "F47.scribe": "fail"

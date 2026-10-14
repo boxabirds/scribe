@@ -50,6 +50,7 @@ formatter is idempotent on all of them.
 | Failures, effects and capabilities, checked completely | |
 | Ownership conventions: read, editable, consumed; linear resources | |
 | `example` lines evaluated by an interpreter, before there is a back end | |
+| Run `tests/checker`: text the grammar accepts but the checker must reject, each with its expected diagnostic | |
 
 Done when: the spec's examples check, and a deliberately broken copy of each
 fails with the diagnostic the spec describes.

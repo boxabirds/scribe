@@ -173,7 +173,8 @@ set: "set" place "to" expr _NL
        | "subtract" sum "from" place _NL                        -> subtract_from
 place: name ["of" place]                                                      // FIX-7 a settable place is a name or an of-path
 return_stmt: "return" expr _NL
-fail: "fail" "with" name _NL
+// SPEC 6: a failure is a value, so `fail with` takes any expression
+fail: "fail" "with" expr _NL
 if_stmt: "if" expr block ("otherwise" "if" expr block)* ["otherwise" block]
 for_each: "for" "each" name "from" expr range_word expr block
         | "for" "each" name "in" expr block                        -> for_each_in
@@ -236,7 +237,10 @@ comp_op: "is" | "=" | "=="
        | "is" "not" "in"
        | "is" "after" | "is" "not" "after" | "is" "before"
 
-?concat: sum ("followed" "by" sum)*
+?concat: some_level ("followed" "by" some_level)*
+// SPEC 3.4: `some` takes the whole arithmetic expression after it
+?some_level: "some" some_level                                 -> some
+           | sum
 ?sum: product (("+" | "-") product)*
 ?product: unary (("*" | "/" | "mod") unary)*
 ?unary: "-" unary -> neg
@@ -275,7 +279,6 @@ construction: article name "from" operand ("," operand)* ["with" name operand]
      | "[" [expr ("," expr)*] "]"                               -> list
      | "result"                                                 -> result
      | "nothing"                                                -> nothing
-     | "some" operand                                           -> some
 ?literal: INT | DECIMAL | VERSION | STRING | QUANTITY | DATE
 
 version: VERSION | DECIMAL | INT

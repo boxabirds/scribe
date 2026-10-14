@@ -1,0 +1,8 @@
+to parse_port text
+    given text is Text
+    produces a Port
+    fails with OutOfRange
+    let number be try parse_int text
+    if number > 65535
+        fail with an OutOfRange from number
+    return number

@@ -36,6 +36,7 @@ Principles that follow from these and decide individual rules:
 | A promise is code, not commentary | Contracts are checked against the body on every build. Only quoted informal clauses are unchecked, and they are labelled as such |
 | Never overclaim | Every proof, verdict and report states the assumptions and unchecked parts it rests on |
 | Nothing implicit that matters | No ambient authority, no implicit conversion, no missing value without a `maybe`, no failure without a `fails with` |
+| Any expression wherever a value goes | No position in the grammar is limited to a name or a literal without a stated reason; types, not keywords, decide what fits |
 
 ## 2. Source text
 
@@ -171,7 +172,7 @@ A choice is used through `choose`, which must handle every variant. Adding a var
 
 ### 3.4 Missing values
 
-There is no null. A value that may be absent has type `maybe T`, with values `some x` and `nothing`. A `maybe` value must go through `choose` before the value inside it is used.
+There is no null. A value that may be absent has type `maybe T`, with values `some x` and `nothing`. A `maybe` value must go through `choose` before the value inside it is used. `some` applies to the whole arithmetic expression after it: `some total + tax` is `some (total + tax)`.
 
 ### 3.5 Refinements
 
@@ -343,7 +344,7 @@ Rules:
 - `on failure A or B as problem` binds the failure so it can be passed on: `fail with problem`.
 - Adding a way to fail is a change to the contract (Section 12).
 
-**Proposed:** failures as values with fields, declared as a `choice`, so a failure can carry data and two failures with the same name can be told apart: `fail with OutOfRange with value clamped`. This was the most common gap in translated real code.
+A failure is a value. Failures are declared as variants of a `choice`, so a failure can carry fields and two failures with the same name can be told apart, and `fail with` takes any expression whose value is a failure: `fail with an OutOfRange from clamped`. Failures that carried no data were the most common gap in translated real code. **Open:** the type rules for failure values (Section 14).
 
 **Open:** whether panics exist at all. The current rule is that a `checked` operation cannot panic, and the compiler proves it; what an unprovable bounds check does at lower tiers is undecided.
 
@@ -900,6 +901,7 @@ These are the decisions this draft does not settle. Each names what blocks it. A
 | 9 | Solver and proof format for `proven` clauses | Open | Choosing a solver that is fast and gives stable results across versions |
 | 10 | Localized views beyond English | Open | Round-trip proof for at least one other language |
 | 11 | How host-dependent facts are declared (10.3), and which host bindings impact analysis compares by default | Proposed | Re-expressing the replay's platform-specific breakages with it |
+| 12 | Type rules for failures as values: how a failure `choice` relates to `fails with`, and how impact analysis compares a failure's fields | Open | Roadmap phase 5, with the translation wave that needs them |
 
 ## Appendix A: grammar notes
 
@@ -968,6 +970,8 @@ What the replay changed in this specification:
 - Version 1 emits WebAssembly only (1, 13).
 - `return` replaces `give back` as the statement that ends an operation with its result (4.2).
 - Reserved words are judged by what they cost readers, not authors: Scribe is written by machines, so a word reserved to make a line unambiguous is cheap. `increment`, `decrement`, `add` and `subtract` are reserved so the update forms can never be read as calls (2.1, 2.5).
+- Any expression goes wherever a value goes. A grammar rule that takes only a name or a literal needs a stated reason; otherwise types decide what fits, and mistakes the grammar no longer catches are the checker's to report (1).
+- A failure is a value, and `fail with` takes any expression (6).
 - Source never names an operating system. A difference between hosts is a fact about a capability, declared in its interface; this replaces clauses scoped `on <platform>` (10.3).
 - Scribe is not described as a systems language. Having no garbage collector is a choice about memory management, managed at compile time as in Rust, not about the kind of software Scribe is for (1, 7).
 

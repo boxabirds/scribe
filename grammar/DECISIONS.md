@@ -9,13 +9,13 @@ until the specification says so.
 | --- | --- | --- | --- | --- |
 | 1 | ~~How are the update forms (`increment count`, `add price to total`, `subtract`, `decrement`) recognised?~~ Settled: the four words are hard keywords, because a reserved word costs readers nothing and Scribe's authors are machines | 2.1 | Update statements; the words cannot be names | Done; listed in the porting guide |
 | 2 | Several unlabelled parameters: `to coerce first, second` | 4.1, Proposed | Rejected | Adopt. Signatures were the largest single cause of parse failures in the pilot's translations (34, together with label words the spec does not have) |
-| 3 | `some` with a call: `some item 0 of items` | 3.4 | Needs parentheses: `some (item 0 of items)` | Allow a call after `some` |
+| 3 | ~~`some` with a call~~ Settled: `some` takes the whole arithmetic expression after it, under the rule that any expression goes wherever a value goes | 3.4 | `some item 0 of items` accepted | Done |
 | 4 | What follows `cost at most` | 10.1 | Any expression; the spec gives no example | Start with a quantity (`cost at most 50 milliseconds`); design orders of growth (Section 12.3 compares them) separately |
 | 5 | `corrects` has two shapes: under an `ensure` (10.6), and as its own clause with `because` on the next line (12.3) | 10.6, 12.3 | Both accepted | Keep both meanings, but put `because` on the same line in 12.3; that is the only place a clause continues onto a new line |
 | 6 | `assume`, the escape hatch, has no syntax | 10.5 | Not accepted | `assume condition because "..." owner team`, mirroring `trust` |
-| 7 | Keyword count: the grammar now has 99 hard and 79 soft keywords (was 96 and 77). `interface` must be hard, because it starts an item; `assumes` and `may` must be hard, because a clause starting with a soft word can also be read as a call | 2.5, Open 6 | As stated | Accept for now; the comprehension test in open decision 6 should include these |
+| 7 | ~~Keyword count~~ Settled: not a concern. Scribe is written by machines, so a large keyword set costs readers nothing | 2.5 | 102 hard, 80 soft | Done |
 | 8 | Possessive paths: `account's balance` | Open 5 | Not accepted | Not for 1.0: it binds tighter than any call, which surprises readers |
-| 9 | Failures carrying data: `fail with OutOfRange with value clamped` | 6, Proposed | Not accepted | Adopt the syntax now; the type rules come in phase 5 |
+| 9 | ~~Failures carrying data~~ Settled: a failure is a value and `fail with` takes any expression; fields are given with record construction (5.3), so the named-field form waits on decision 10 | 6 | `fail with an OutOfRange from clamped` accepted | Type rules in phase 5 (spec open decision 12) |
 | 10 | Naming fields when constructing: `a Point with x as 1, y as 2` | 5.3, Proposed | Not accepted | Adopt |
 | 11 | Setting one element: `set item i of heap to x` | 4.2, Proposed | Rejected | Adopt |
 | 12 | A statement that does nothing, for a `when` branch with nothing to do. `choose` must name every variant, so adding a variant breaks every `choose` that misses it, and a block needs at least one line | 4.2, Proposed | Not accepted | Adopt, spelled `do nothing`, rather than a catch-all branch that would hide new variants |

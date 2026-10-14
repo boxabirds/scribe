@@ -3,4 +3,4 @@ to first_of items
     produces a maybe Int
     if items is empty
         return nothing
-    return some (item 0 of items)
+    return some item 0 of items
