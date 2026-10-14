@@ -1,7 +1,20 @@
 # Scribe
 
-A systems language for code written by machines and reviewed by people. The
-specification is [base-spec.md](base-spec.md) (draft 0.3).
+A language for code written by machines and reviewed by people, built so that
+the impact of a proposed change can be assessed before it is merged, quickly,
+in a codebase of any size.
+
+1. **Rapid impact assessment.** Programme- and architecture-level constructs
+   (components, manifests, interfaces, systems) and a strict syntax with
+   checked contracts make every path a change can travel declared, so its
+   impact is computed from the declarations rather than by reading the code.
+2. **Human readability is paramount.** Code is written by AI and read by
+   people: the syntax balances terseness against unfamiliar notation, and
+   loses to impact assessment only when no spelling serves both.
+3. **Correctness by construction.**
+
+Version 1 compiles to WebAssembly. The specification is
+[base-spec.md](base-spec.md) (draft 0.4).
 
 | Path | What it is |
 | --- | --- |

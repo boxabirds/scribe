@@ -2,7 +2,7 @@
 
 Oct 14, 2026 · @Julian Harris
 
-**Draft 0.3.** This document is the whole specification as it stands. It replaces the syntax doc, the pilot results and the change replay as the place to read what Scribe is; those remain as evidence, summarised in Appendix B.
+**Draft 0.4.** This document is the whole specification as it stands. It replaces the syntax doc, the pilot results and the change replay as the place to read what Scribe is; those remain as evidence, summarised in Appendix B.
 
 Every rule is normative unless it carries one of two marks:
 
@@ -15,14 +15,16 @@ Code examples are shown in the **review view**, the default way people read Scri
 
 Scribe is a systems language for a world where most code is written by machines and read, reviewed and owned by people. It has three aims, in order:
 
-1. **Readability.** Every token a reviewer sees is understood at reading speed. When readability and any other aim conflict, Scribe finds the more readable spelling rather than giving up the other aim.
-2. **Correctness by construction.** No undefined behaviour, no missing-value errors, no data races, no leaked resources, no unhandled failures. Beyond that, contracts are proven to the depth the code deserves.
-3. **Change you can assess before you make it.** Every operation and component states what it promises, needs and may do, in a form a tool can compare between two versions. The impact of a change is computed from those statements before it is merged.
+1. **Rapid impact assessment.** Every operation and component states what it promises, needs and may do, in a form a tool can compare between two versions. The impact of a proposed change is computed from those statements before it is merged, in time that grows with the change and the components that depend on it, not with the size of the codebase.
+2. **Human readability.** Every token a reviewer sees is understood at reading speed. When readability and impact assessment conflict, Scribe looks for a spelling that serves both; only when there is none does impact assessment win, and the cost to readability is recorded as a decision. Against every other aim, readability wins.
+3. **Correctness by construction.** No undefined behaviour, no missing-value errors, no data races, no leaked resources, no unhandled failures. Beyond that, contracts are proven to the depth the code deserves.
 
 And two constraints:
 
 - **Fast, predictable compilation**, closer to Zig than to Rust.
 - **No garbage collector** and no hidden allocation.
+
+Version 1 compiles to WebAssembly.
 
 Principles that follow from these and decide individual rules:
 
@@ -828,7 +830,7 @@ Suggested version: 4.0.0 (a breaking change)
 | Command | Does |
 | --- | --- |
 | `scribe check` | Parses, formats to the stored form, type-checks, checks ownership, effects, authority and every contract at its stated tier. This is the build's gate |
-| `scribe build` | Check, then compile. `in build` modes select debug or release |
+| `scribe build` | Check, then compile to WebAssembly (version 1). `in build` modes select debug or release |
 | `scribe test` | Runs `example` and `property` lines and test blocks |
 | `scribe prove` | Discharges `proven` clauses with the solver and reports any it cannot, with a counterexample where one exists |
 | `scribe impact` | Compares two versions (Section 12) |
@@ -874,7 +876,7 @@ These are the decisions this draft does not settle. Each names what blocks it. A
 | 5 | Possessive paths: accept `account's balance` as a form of `balance of account` | Proposed | A grammar run. `'s` would bind tighter than any call, so `total of cart's lines` means `total of (lines of cart)`. Bare `account balance` is not possible: it already reads as a call of `account`, and it would look almost the same as the name `account_balance` in the review view |
 | 6 | Reduce the keyword set (now 96 hard, 77 soft) | Open | Experiment 1, the comprehension test, extended to compare candidate words for the same idea: for example `hold` against `with`, `using` and `lease` |
 | 7 | Parser strategy: the grammar is not LALR(1) | Open | Deciding between a hand-written parser that follows the grammar, and changing the grammar until a generator accepts it |
-| 8 | Code generator: LLVM, or a smaller back end of our own for fast debug builds | Open | A compile-time benchmark on the pilot corpus |
+| 8 | Code generator for WebAssembly, the version 1 target: a back end of our own, or one built on LLVM or Cranelift | Open | A compile-time benchmark on the pilot corpus |
 | 9 | Solver and proof format for `proven` clauses | Open | Choosing a solver that is fast and gives stable results across versions |
 | 10 | Localized views beyond English | Open | Round-trip proof for at least one other language |
 | 11 | Whether `on <platform>` contract scoping needs a platform lattice (for example, "every Unix") | Open | Replay cases with platform-specific breakages |
@@ -942,6 +944,8 @@ What the replay changed in this specification:
 - No `uses nothing` line: an operation with no `uses` line is pure.
 - "Contract", not "description", for the clauses between header and body, because they are enforced, not informational.
 - Update forms such as `subtract amount from balance of account` (2).
+- The aims are reordered: rapid impact assessment first, human readability second, correctness by construction third. Impact assessment is the problem Scribe exists to solve; readability is how it must be solved (1).
+- Version 1 emits WebAssembly only (1, 13).
 
 ### B.4 Earlier documents
 
