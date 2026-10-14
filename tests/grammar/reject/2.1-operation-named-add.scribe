@@ -1,3 +1,0 @@
-to add item to cart
-    given item is an Item
-    given cart is an editable Cart

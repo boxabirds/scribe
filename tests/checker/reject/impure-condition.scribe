@@ -1,0 +1,10 @@
+note A condition in a contract may call only pure functions (no `uses`).
+note Expected diagnostic: `is_reachable` uses `network`, so it cannot be called in `expect`.
+function is_reachable(host: Text, network: Network) -> Bool
+    uses network
+    return ping(host, network)
+
+function connect(host: Text, network: Network) -> Connection
+    expect is_reachable(host, network)
+    uses network
+    return open_connection(host, network)

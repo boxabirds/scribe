@@ -1,7 +1,0 @@
-to f x
-    given x is an Int
-    produces an Int
-    assert x = x
-    trust
-        assert x + 0 = x
-    return x

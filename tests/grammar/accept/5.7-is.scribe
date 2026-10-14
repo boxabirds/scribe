@@ -1,5 +1,0 @@
-to describe found
-    given found is a Price or nothing
-    produces Bool
-    ensure if result is not nothing, result > 0
-    return found is nothing or status is Paid or items is sorted or x is in items

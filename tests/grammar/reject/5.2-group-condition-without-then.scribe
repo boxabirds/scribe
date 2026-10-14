@@ -1,6 +1,5 @@
-to settle account
-    given account is an Account
+function f(a: Bool, b: Bool)
     if all of
-        account is open
-        account is funded
-        close account
+        a
+        b
+        do nothing

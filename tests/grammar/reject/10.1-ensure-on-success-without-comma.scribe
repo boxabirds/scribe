@@ -1,0 +1,3 @@
+function f(x: Int) -> Int
+    ensure on success result > 0
+    return x

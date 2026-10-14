@@ -1,5 +1,0 @@
-to search target in items
-    given target is an Int
-    given items is a List of Int
-    produces a Count
-    ensure 0 ≤ result ≤ count of items

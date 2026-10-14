@@ -1,6 +1,0 @@
-to largest of items
-    given items is a List of Int
-    produces an Int
-    ensure ∀ x in items, x ≤ result
-    ensure ∃ an item in items where item = result
-    ensure result ∈ items

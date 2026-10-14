@@ -8,14 +8,13 @@ Checks, in order:
      builds from the template;
   2. every file in tests/grammar/accept parses with exactly one reading;
   3. every file in tests/grammar/reject is rejected;
-  4. the code blocks of base-spec.md and the pilot corpora in research/corpus
-     give the results recorded in tests/grammar/expected.json;
+  4. the code blocks of base-spec.md give the results recorded in
+     tests/grammar/expected.json;
   5. docs/porting-guide.md lists every hard keyword, and nothing else, and none
      of the names it suggests instead is itself a hard keyword.
 
-The pilot corpora are a record and are never edited. Where the language has
-renamed something since the pilot, the rename is applied to a temporary copy
-before parsing (RENAMES below), so the corpora still test the grammar.
+The pilot corpora in research/corpus use the pilot's syntax, which draft 0.5
+replaced, so they are kept as a record and no longer parsed.
 
 A change to the recorded results is a decision, so --update only rewrites
 expected.json; review its diff before committing it.
@@ -40,41 +39,12 @@ TESTS = os.path.join(ROOT, "tests", "grammar")
 EXPECTED = os.path.join(TESTS, "expected.json")
 SPEC = os.path.join(ROOT, "base-spec.md")
 PORTING = os.path.join(ROOT, "docs", "porting-guide.md")
-CORPORA = ["doc", "doc-repaired", "exp7/scribe-A", "exp7/scribe-B"]
+# The pilot corpora (research/corpus) are written in the pilot's English-sentence
+# syntax, which draft 0.5 replaced; they are a historical record, not tests.
+CORPORA = []
 
 # Spellings changed since the pilot: (pattern, replacement, specification change)
-RENAMES = [
-    (r"\bgive back\b", "return", "draft 0.4: `return` replaces `give back`"),
-    (r"(?m)^(\s+)field (\w+) as ", r"\1\2 as ", "draft 0.4: record members have no `field` word"),
-    (r"(\bfor every \w+) that is ", r"\1 as ", "draft 0.4: a quantifier over a type is `for every x as T`"),
-    (r"(?m)^(\s*)choice ", r"\1enum ", "draft 0.4: `enum` replaces `choice`"),
-    (r"\bis at most\b", "≤", "draft 0.4: comparisons are symbols"),
-    (r"\bis at least\b", "≥", "draft 0.4: comparisons are symbols"),
-    (r"\bis less than\b", "<", "draft 0.4: comparisons are symbols"),
-    (r"\bis more than\b", ">", "draft 0.4: comparisons are symbols"),
-    (r", or else\b", ", otherwise", "draft 0.4: `, otherwise` replaces `, or else`"),
-    (r"\busing\b", "with", "draft 0.4: the label `using` is `with`"),
-    (r"\bonto\b", "to", "draft 0.4: the label `onto` is `to`"),
-    (r"\ban? (?:positive|non_empty) (\w+)",
-     lambda m: ("an " if m.group(1)[0] in "AEIOUaeiou" else "a ") + m.group(1),
-     "draft 0.4: `positive` and `non_empty` are contracts, not type words"),
-    (r"\b(?:positive|non_empty) ", "", "draft 0.4: `positive` and `non_empty` are contracts, not type words"),
-    (r"\bif it succeeds,", "on success,", "draft 0.4: `ensure on success`"),
-    (r"\bif it fails with (\w+(?: or \w+)*),", r"on failure \1,", "draft 0.4: `ensure on failure`"),
-    (r"\bif it fails,", "on failure,", "draft 0.4: `ensure on failure`"),
-    (r"(?m)^(\s*)fails with\b", r"\1can fail with", "draft 0.4: `can fail with` replaces `fails with`"),
-    (r"\bfor every\b", "for all", "draft 0.4: `for all` replaces `for every`"),
-    (r"\bnone of\b", "not any of", "draft 0.4: `not any of` replaces `none of`"),
-    (r"(?m)^(\s*)choose ", r"\1match ", "draft 0.4: `match` replaces `choose`"),
-    (r"(?m)^(\s*)component ", r"\1module ", "draft 0.4: `module` replaces `component`"),
-    (r"(?m)^(\s+)needs$", r"\1requires", "draft 0.4: `requires` replaces `needs`"),
-    (r"(?m)^(\s+)provides$", r"\1exports", "draft 0.4: `exports` replaces `provides`"),
-    (r"\ban? maybe ((?:List of )?\w+)",
-     lambda m: ("an " if m.group(1)[0] in "AEIOaeio" else "a ") + m.group(1) + " or nothing",
-     "draft 0.4: `a T or nothing` replaces `a maybe T`"),
-    (r"\bmaybe (\w+)", r"\1 or nothing", "draft 0.4: `T or nothing` replaces `maybe T`"),
-    (r"(?m)^(\s*(?:return|set \S.* to|let \w+ be)) some ", r"\1 ", "draft 0.4: no `some` wrapper"),
-]
+RENAMES = []
 
 
 def scribe_files(directory):

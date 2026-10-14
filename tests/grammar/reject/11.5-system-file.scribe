@@ -1,3 +1,0 @@
-system Shop
-    rules
-        only Payments can reach host "payments.example.com"

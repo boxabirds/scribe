@@ -2,8 +2,10 @@ module Checkout
     requires
         Payments as payments
             uses charge, refund
+        Inventory as inventory
     exports
-        to place_order cart
-            given cart is a Cart
-            produces an Order
-            uses payments
+        function place_order(cart: Cart, customer: CustomerId) -> Order
+            can fail with EmptyCart, PaymentDeclined
+            expect count(cart.lines) > 0
+            ensure on success, result.status is Paid
+            uses payments, inventory

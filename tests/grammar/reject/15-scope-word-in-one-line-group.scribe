@@ -1,4 +1,0 @@
-to f p with q
-    given p is a Bool
-    given q is a Bool
-    return any of count of x where p, q

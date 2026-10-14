@@ -1,5 +1,0 @@
-to f x
-    given x is an Int
-    return x
-    proof
-        assert x = x

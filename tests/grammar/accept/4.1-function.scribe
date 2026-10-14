@@ -1,0 +1,18 @@
+type Account
+    balance: Money
+    is_open: Bool
+
+type Receipt
+    amount: Money
+
+function withdraw(amount: Money, account: editable Account) -> Receipt
+    can fail with InsufficientFunds
+    expect amount > 0
+    expect account.is_open
+    ensure on success, account.balance == old(account.balance) - amount
+    ensure on failure, account.balance == old(account.balance)
+    changes only account.balance
+    if account.balance < amount
+        fail with InsufficientFunds
+    account.balance = account.balance - amount
+    return Receipt(amount: amount)

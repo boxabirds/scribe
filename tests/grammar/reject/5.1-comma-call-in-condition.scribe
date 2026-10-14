@@ -1,5 +1,0 @@
-to f a, b
-    given a is an Int
-    given b is an Int
-    if gcd a, b = 1
-        return a

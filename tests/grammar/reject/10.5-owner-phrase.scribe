@@ -1,4 +1,0 @@
-to f x
-    given x is an Int
-    trust owner os_team
-        assert x = x

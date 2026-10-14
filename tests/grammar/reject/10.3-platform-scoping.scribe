@@ -1,4 +1,0 @@
-to current_user
-    produces a User
-    on windows
-        expect account_maps_to_security_id

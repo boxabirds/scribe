@@ -1,0 +1,4 @@
+function f(a: Bool, b: Bool) -> Bool
+    return all of
+        a,
+        b,

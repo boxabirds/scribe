@@ -1,0 +1,4 @@
+function paid_totals(orders: List[Order]) -> List[Money]
+    let empty = []
+    let small = [1, 2, 3]
+    return [o.total for o in orders where o.status is Paid]

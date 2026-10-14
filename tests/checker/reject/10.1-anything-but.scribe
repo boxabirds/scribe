@@ -1,9 +1,0 @@
-note `anything but` is not part of the language, and `it` is no longer a keyword: this
-note line reads as calls to operations named `it` and `anything`. Name the failures:
-note `ensure on failure PermissionDenied, …`.
-note Expected diagnostic: there is no operation `it`.
-to remove path in files
-    given path is a Path
-    given files is an editable Files
-    can fail with NotFound, PermissionDenied
-    ensure if it fails with anything but NotFound, path is in names of files

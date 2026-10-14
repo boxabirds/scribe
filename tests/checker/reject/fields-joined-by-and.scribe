@@ -1,8 +1,0 @@
-note From the pilot's translations F12 and F43: fields separated by `and`
-note parse as a logical `and` of calls, which is not a condition.
-note Expected diagnostic: `and` joins conditions; separate a record's fields with commas.
-to decode text
-    given text is Text
-    produces a Value
-    can fail with JSONDecodeError
-    fail with JSONDecodeError with msg "Extra data" and doc s and pos end

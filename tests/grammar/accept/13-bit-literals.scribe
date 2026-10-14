@@ -1,7 +1,0 @@
-to low_byte of value
-    given value is a U32
-    produces a U32
-    let mask be 0xFF
-    let flags be 0b1010_0001
-    let wide be 0xFFFF_FFFF
-    return bitwise_and value with mask

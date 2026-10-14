@@ -1,4 +1,3 @@
-to names_in directory
-    given directory is a Directory
-    ensure result is sorted
-        and result is not empty
+function f(x: Int)
+    expect x > 0
+        and x < 10

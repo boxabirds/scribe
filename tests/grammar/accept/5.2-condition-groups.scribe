@@ -1,0 +1,10 @@
+function can_ship(order: Order, customer: Customer) -> Bool
+    return all of
+        order.status in [Paid, Shipped]
+        customer.is_active
+        not any of
+            order.is_disputed
+            customer.is_suspended
+        any of
+            order.days_since_payment <= 30
+            all of customer.is_premium, order.days_since_payment <= 90

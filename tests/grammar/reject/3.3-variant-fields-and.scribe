@@ -1,2 +1,0 @@
-enum Shape
-    Rectangle with width as a Length and height as a Length

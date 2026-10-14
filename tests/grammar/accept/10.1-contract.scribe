@@ -1,0 +1,11 @@
+function charge(customer: editable Customer, amount: Money, payments: Payments) -> Receipt
+    can fail with Declined, CardExpired
+    expect amount > 0
+    ensure on success, customer.total_charged == old(customer.total_charged) + amount
+    ensure on failure, customer.total_charged == old(customer.total_charged)
+    ensure on failure Declined, customer.declines == old(customer.declines) + 1
+    ensure if amount > 1000, result.needs_review
+    changes only customer.total_charged, customer.declines
+    uses payments
+    example charge(test_customer, 10, fake_payments) == Receipt(amount: 10)
+    property for all n: Money, n <= 0 or n == n

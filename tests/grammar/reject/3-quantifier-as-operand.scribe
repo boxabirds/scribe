@@ -1,3 +1,0 @@
-to f items
-    given items is a List of Int
-    ensure (for all x in items, x > 0) or count of items = 0

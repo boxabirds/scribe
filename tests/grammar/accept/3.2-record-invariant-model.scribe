@@ -1,5 +1,0 @@
-type Queue of T
-    capacity as a Count
-    items as a Ring of T
-    model contents as sequence_of items
-    invariant count of contents ≤ capacity

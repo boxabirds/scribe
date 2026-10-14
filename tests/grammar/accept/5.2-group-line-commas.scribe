@@ -1,0 +1,4 @@
+function ok(a: Int, b: Int) -> Bool
+    return any of
+        a > 0,
+        b > 0

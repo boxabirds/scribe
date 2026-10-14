@@ -1,0 +1,5 @@
+function load(user: UserId, services: Services) -> Dashboard
+    uses services
+    let profile = try fetch_profile(user, services)
+    let alerts = try fetch_alerts(user, services) else nothing
+    return Dashboard(profile: profile, alerts: alerts)

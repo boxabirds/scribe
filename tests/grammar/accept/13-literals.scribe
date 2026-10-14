@@ -1,0 +1,8 @@
+function constants() -> List[Int]
+    let mask = 0xFF
+    let wide = 0xFFFF_FFFF
+    let bits = 0b1010_0001
+    let rate = 2.5
+    let wait = 30 seconds
+    let greeting = "hello \"world\""
+    return [mask, wide, bits]

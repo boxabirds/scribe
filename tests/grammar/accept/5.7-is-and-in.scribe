@@ -1,0 +1,10 @@
+function describe(status: OrderStatus, found: User or nothing, x: Int, items: List[Int]) -> Bool
+    return any of
+        status is Paid
+        status is not Draft
+        found is nothing
+        x in items
+        x not in items
+        x ∈ items
+        x != 3
+        x ≠ 4

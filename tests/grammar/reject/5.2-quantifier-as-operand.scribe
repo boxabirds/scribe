@@ -1,0 +1,2 @@
+function f(items: List[Int]) -> Bool
+    return (for all x in items, x > 0) or count(items) == 0

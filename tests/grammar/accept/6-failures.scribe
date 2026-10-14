@@ -1,9 +1,17 @@
-to port_or_default text
-    given text is Text
-    produces a Port
-    can fail with Unexpected
+enum ParseFailure
+    NotANumber(text: Text)
+    OutOfRange(value: Int)
+
+function parse_port(text: Text) -> Port
+    can fail with NotANumber, OutOfRange
+    let n = try parse_int(text)
+    if n > 65535
+        fail with OutOfRange(value: n)
+    return Port(number: n)
+
+function port_or_default(text: Text) -> Port
     handle
-        return try parse_port text
+        return try parse_port(text)
     on failure NotANumber or OutOfRange as problem
-        log problem
-        fail with Unexpected
+        log(problem)
+        return Port(number: 80)

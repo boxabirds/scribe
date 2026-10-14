@@ -1,0 +1,14 @@
+enum Shape
+    Circle(radius: Int)
+    Rectangle(width: Int, height: Int)
+    Empty
+
+function area(shape: Shape) -> Int
+    match shape
+        case Circle(radius)
+            return radius * radius * 3
+        case Rectangle(width, height)
+            return width * height
+        case Empty
+            do nothing
+    return 0

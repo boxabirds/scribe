@@ -1,0 +1,2 @@
+function f(xs: List[Int], b: Bool) -> Bool
+    return all of for all x in xs, x > 0, b

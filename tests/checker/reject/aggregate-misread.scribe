@@ -1,7 +1,0 @@
-note A comprehension in round brackets is an aggregate: this is the operation
-note `price` applied to a list of items, not a list of prices. The checker
-note catches it because `price` takes one item.
-note Expected diagnostic: `price` takes an Item, not a list; for a list of prices write [price of item for each item in items].
-to prices of items
-    given items is a List of Item
-    let prices be (price of item for each item in items)

@@ -1,0 +1,11 @@
+type OrderLine
+    product: ProductId
+    quantity: Int
+    unit_price: Money
+    invariant quantity > 0
+
+type Queue[T]
+    capacity: Int
+    items: Ring[T]
+    model contents = sequence_of(items)
+    invariant count(contents) <= capacity

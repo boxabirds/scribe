@@ -1,0 +1,2 @@
+enum Shape
+    Rectangle(width: Int and height: Int)

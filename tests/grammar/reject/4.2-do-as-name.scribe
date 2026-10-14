@@ -1,3 +1,0 @@
-to f x
-    given x is an Int
-    let do be x

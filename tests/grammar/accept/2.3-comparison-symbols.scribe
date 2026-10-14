@@ -1,5 +1,0 @@
-to check x with y
-    given x is an Int
-    given y is an Int
-    produces Bool
-    return x ≤ y and x ≥ 0 and x ≠ y and x == y and x != 3 and x <= 9 and y >= 1

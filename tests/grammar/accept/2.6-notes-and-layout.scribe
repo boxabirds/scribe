@@ -1,0 +1,4 @@
+note A note line is a comment; it may stand anywhere a line can.
+function double(x: Int) -> Int
+    note the result is twice the input
+    return x * 2

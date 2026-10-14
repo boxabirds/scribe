@@ -1,0 +1,2 @@
+function f(a: Bool, b: Bool, c: Bool) -> Bool
+    return a and b or c

@@ -1,8 +1,5 @@
-to first_line of path with files
-    given path is a Path
-    given files is the Files
-    produces Text
+function first_line(path: Path, files: Files) -> Text
     can fail with ReadFailed
     uses files
-    hold input as open path for reading with files
-        return try read_line from input
+    hold input = open(path, files)
+        return try read_line(input)

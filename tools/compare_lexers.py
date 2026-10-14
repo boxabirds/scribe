@@ -1,6 +1,5 @@
 """Check that the compiler's lexer and the reference grammar's agree, token for
-token, on every test file, every code block in the specification and every
-file in the pilot corpora.
+token, on every test file and every code block in the specification.
 
 usage: python3 tools/compare_lexers.py [--verbose]
 

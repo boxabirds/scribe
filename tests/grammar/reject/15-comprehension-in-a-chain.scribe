@@ -1,3 +1,0 @@
-to f xs
-    given xs is a List of Int
-    return p and total = sum of x for each x in xs

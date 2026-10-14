@@ -1,3 +1,0 @@
-to f item
-    given item is an Item
-    add price for item in usd to total

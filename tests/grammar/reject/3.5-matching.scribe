@@ -1,1 +1,0 @@
-type Email is Text matching email_format

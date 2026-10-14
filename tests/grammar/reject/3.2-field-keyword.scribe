@@ -1,2 +1,0 @@
-type OrderLine
-    field quantity as an Int

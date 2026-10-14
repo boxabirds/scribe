@@ -1,4 +1,0 @@
-to largest of items
-    given items is a List of Int
-    produces an Int
-    property for all items as a List of Int, largest of items is in items

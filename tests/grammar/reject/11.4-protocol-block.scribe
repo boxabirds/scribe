@@ -1,2 +1,0 @@
-protocol Upload
-    client sends Begin with size as Bytes

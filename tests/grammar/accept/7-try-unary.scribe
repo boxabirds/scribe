@@ -1,6 +1,0 @@
-to with_tax of total
-    given total is a Money
-    produces a Money or nothing
-    let n be try parse_int text
-    let k be (try parse_int text) + 1
-    return (total + tax_on total)

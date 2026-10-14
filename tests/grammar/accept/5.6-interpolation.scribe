@@ -1,4 +1,0 @@
-to confirm order
-    given order is an Order
-    produces Text
-    return "Your order {id of order} is confirmed."

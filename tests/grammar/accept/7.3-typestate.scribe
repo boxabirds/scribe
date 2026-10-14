@@ -1,13 +1,9 @@
 type Connection
-    socket as a Socket
+    socket: Socket
     states Closed, Open
 
-to send data to connection
-    given data is Bytes
-    given connection is an editable Open Connection
-    transmit data to connection
+function send(data: Bytes, connection: editable Open Connection)
+    transmit(data, connection.socket)
 
-to close connection
-    given connection is a consumed Open Connection
-    produces a Closed Connection
-    return release_socket connection
+function close(connection: consumed Open Connection) -> Closed Connection
+    return release(connection)

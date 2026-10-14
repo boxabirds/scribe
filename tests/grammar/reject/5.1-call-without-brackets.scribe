@@ -1,0 +1,2 @@
+function f(items: List[Int]) -> Int
+    return count of items

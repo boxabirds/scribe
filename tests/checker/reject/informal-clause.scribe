@@ -1,6 +1,5 @@
-note A quoted sentence is Text, not a condition: a contract holds only what
-note the compiler can check. Explanations go in note lines.
+note A quoted sentence is Text, not a condition: a contract holds only what the
+note compiler can check. Explanations go in note lines.
 note Expected diagnostic: `ensure` takes a condition, and this is Text.
-to charge customer
-    given customer is a CustomerId
+function charge(customer: CustomerId) -> Receipt
     ensure "the customer is charged at most once"

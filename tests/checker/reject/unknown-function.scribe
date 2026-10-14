@@ -1,0 +1,4 @@
+note Every call must name a function that exists; there are no implicit helpers.
+note Expected diagnostic: there is no function `receipt_for`.
+function pay(amount: Money) -> Receipt
+    return receipt_for(amount)

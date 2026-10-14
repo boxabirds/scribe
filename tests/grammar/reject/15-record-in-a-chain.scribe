@@ -1,3 +1,0 @@
-to f cart
-    given cart is a Cart
-    let order be an Order from cart and receipt with status as Paid

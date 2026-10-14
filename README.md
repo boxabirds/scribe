@@ -1,20 +1,34 @@
 # Scribe
 
-A language for code written by machines and reviewed by people, built so that
-the impact of a proposed change can be assessed before it is merged, quickly,
-in a codebase of any size.
+A language written by agents and read by humans, built so that the impact of a
+proposed change can be assessed before it is merged, quickly and reliably, in a
+codebase of any size.
 
-1. **Rapid impact assessment.** Programme- and architecture-level constructs
-   (components, manifests, interfaces, systems) and a strict syntax with
-   checked contracts make every path a change can travel declared, so its
-   impact is computed from the declarations rather than by reading the code.
-2. **Human readability is paramount.** Code is written by AI and read by
-   people: the syntax balances terseness against unfamiliar notation, and
-   loses to impact assessment only when no spelling serves both.
-3. **Correctness by construction.**
+1. **Quick, reliable impact assessment.** Everything that links one piece of
+   code to another (ownership, effects, capabilities, failures, states,
+   contracts) is stated in the source, so standard static analysis finds every
+   linkage.
+2. **As easy to read as possible.** Code that reads like code, with English
+   only where it carries meaning: contracts and condition groups.
+3. **Almost provably correct.** Agents write the code, so the language can
+   demand rigour no person would type: Rust-style ownership, typestate and a
+   contract on every function.
+
+```
+function withdraw(amount: Money, account: editable Account) -> Receipt
+    can fail with InsufficientFunds
+    expect amount > 0
+    ensure on success, account.balance == old(account.balance) - amount
+    changes only account.balance
+
+    if amount > account.balance
+        fail with InsufficientFunds
+    account.balance = account.balance - amount
+    return Receipt(amount: amount)
+```
 
 Version 1 compiles to WebAssembly. The specification is
-[base-spec.md](base-spec.md) (draft 0.4).
+[base-spec.md](base-spec.md) (draft 0.5).
 
 | Path | What it is |
 | --- | --- |
@@ -35,8 +49,8 @@ phase 2: the lexer is done, the parser is next.
     cargo run -q -p scribe-cli -- lex FILE...
     python3 tools/compare_lexers.py
 
-`compare_lexers.py` lexes every test file, every code block in the
-specification and every pilot corpus file with both the compiler and the
+`compare_lexers.py` lexes every test file and every code block in the
+specification with both the compiler and the
 reference grammar, and fails on any difference in any token. The keyword list
 is generated once, by the grammar build, into `grammar/keywords.txt`, and the
 compiler embeds that file, so the two cannot disagree about which words are
@@ -44,7 +58,7 @@ reserved. CI runs all of this on every push.
 
 ## Reference grammar
 
-`grammar/scribe.lark` is the Earley grammar of spec Appendix A, version 0.3,
+`grammar/scribe.lark` is the Earley grammar of spec Appendix A, version 0.4,
 built from `grammar/scribe.lark.tmpl`. It states the language precisely and is
 the oracle a production parser will be tested against; it is not a production
 parser. `scribe-grammar-v0.2.lark` is the pilot's version, as the
@@ -57,7 +71,7 @@ specification cites it.
 `check_grammar.py` rebuilds nothing and changes nothing: it fails if the built
 grammar is stale, if any file in `tests/grammar/accept` does not parse with
 exactly one reading, if any file in `tests/grammar/reject` is accepted, or if
-the spec's code blocks or the pilot corpora give results other than those in
+the spec's code blocks give results other than those in
 `tests/grammar/expected.json`. After a deliberate change, `--update` rewrites
 that file; review its diff.
 
@@ -67,8 +81,7 @@ To work on the grammar:
     python3 tools/run3.py grammar/scribe.lark FILE_OR_DIR...
 
 `tools/pre.py` turns layout into tokens (`⏎` end of line, `⇥` indent, `⇤`
-dedent) and `tools/run3.py` parses with every reading kept, then
-applies rules D1 and D2. `tools/to_bison.py` converts the grammar for Bison's
+dedent) and `tools/run3.py` parses with every reading kept. `tools/to_bison.py` converts the grammar for Bison's
 conflict and counterexample reports.
 
 These tools started as copies of the pilot's. Since then: the grammar build is
@@ -82,19 +95,17 @@ one reading on its own (spec Section 1).
 
 | Check | Result |
 | --- | --- |
-| Conformance tests, one per construct (`tests/grammar/accept`) | 47 of 47 parse with one reading |
-| Forbidden forms (`tests/grammar/reject`) | 45 of 45 rejected |
-| Spec code blocks | 22 of 24; the other 2 are fragments, not whole programs |
-| Pilot doc examples, repaired | 19 of 42; the 23 others use forms the language has since removed or moved to libraries: capability descriptions, labels, `define`, tiers and proof blocks, owners, protocols, pipelines, schemas, manifests' `may` sections, the old typestate form, `matching`, `some` patterns, time, system files and workflows. Each file's result is in `tests/grammar/expected.json` |
-| Pilot doc examples, as written | 16 of 42; examples 22 and 30 were two of the pilot's silent misreadings, and are now errors |
-| Pilot translations | 4 of 43; two parse as a logical `and` the checker must reject (`tests/checker`) |
+| Conformance tests, one per construct (`tests/grammar/accept`) | 30 of 30 parse with one reading |
+| Forbidden forms (`tests/grammar/reject`) | 20 of 20 rejected |
+| Spec code blocks | 24 of 26; the other 2 are contract fragments, not whole programs |
 | Bison | **No LALR(1) conflicts** (v0.2: 172 shift/reduce and 20 reduce/reduce), so no text has two readings; `tools/check_lalr.py` keeps it that way |
 
 [grammar/DECISIONS.md](grammar/DECISIONS.md) lists the open questions the
 production parser needs settled.
 
-The pilot corpora are parsed as they would be written today: the check renames
-`give back` to `return` in a temporary copy, and never edits `research/`.
+The pilot corpora in `research/` are written in the pilot's English-sentence
+syntax, which draft 0.5 replaced, so they are kept as a record and no longer
+parsed.
 
 ## The pilot
 

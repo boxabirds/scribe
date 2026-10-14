@@ -1,0 +1,9 @@
+function both(p: Bool, q: Bool) -> Bool
+    ensure result == p ∧ q
+    ensure p && q
+    ensure ¬ result
+    ensure !result
+    ensure p ∨ q || result
+    ensure p and q and result
+    ensure not p
+    return p and q

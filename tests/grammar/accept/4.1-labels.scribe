@@ -1,8 +1,0 @@
-to move item from source into target for owner with key by rate as kind
-    given item is an Item
-    given source is a Place
-    given target is a Place
-    given owner is a User
-    given key is a Key
-    given rate is a Rate
-    given kind is a Kind

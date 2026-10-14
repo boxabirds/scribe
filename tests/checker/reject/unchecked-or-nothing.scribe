@@ -1,0 +1,7 @@
+note A `User or nothing` must be tested before its fields are read.
+note Expected diagnostic: `found` may be nothing; test `found is nothing` first.
+type User
+    name: Text
+
+function name_of(found: User or nothing) -> Text
+    return found.name

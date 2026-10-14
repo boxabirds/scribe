@@ -1,2 +1,0 @@
-schema Order version 4 compatibility backward_transitive
-    id as an OrderId

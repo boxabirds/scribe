@@ -1,6 +1,0 @@
-to boss_name of user
-    given user is a User
-    produces Text
-    set account's balance to 0
-    charge account's owner for user's total
-    return user's manager's name

@@ -1,0 +1,2 @@
+to withdraw amount from account
+    given amount is Money

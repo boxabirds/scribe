@@ -1,3 +1,0 @@
-workflow nightly for date
-    given date is a CalendarDate
-    survives restarts

@@ -1,8 +1,0 @@
-to area of shape
-    given shape is a Shape
-    produces an Area
-    match shape
-        when Circle with radius
-            return radius * radius * 3
-        when Rectangle with width, height
-            return width * height

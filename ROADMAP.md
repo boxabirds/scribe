@@ -27,22 +27,21 @@ exact oracle.
 | The grammar has no LALR(1) conflicts, checked in CI, so it is proven unambiguous | done |
 
 Done when: the spec's own code blocks and the conformance snippets all parse
-with one reading, the negative cases fail, and the pilot corpora still pass.
+with one reading, and the negative cases fail. (Draft 0.5 replaced the pilot's syntax, so the pilot corpora are now a record, not tests.)
 
 ## Phase 2. Front end
 
 | Task | Status |
 | --- | --- |
 | Choose the implementation language for the compiler (Rust) and set up the workspace and CI | done |
-| Lexer with the layout rules of Section 2.6 and the hard and soft keywords; agrees with the reference grammar's lexer token for token on every test, spec and corpus file | done |
-| Decide between a parser generated from the grammar and a hand-written one, by comparing their error messages on the pilot's real mistakes | now |
+| Lexer with the layout rules of Section 2.6 and the hard and soft keywords; agrees with the reference grammar's lexer token for token on every test and spec block | done |
+| Decide between a parser generated from the grammar and a hand-written one, by comparing their error messages on realistic mistakes | now |
 | The parser, producing a syntax tree, tested against the Earley grammar on every build: same accept or reject, same tree | |
-| Formatter that writes the stored form, with display forms; formatting twice changes nothing, and every view round-trips | |
+| Formatter that writes the stored form; formatting twice changes nothing, and every view round-trips | |
 | Diagnostics as Section 13.2 describes, and `scribe check --explain` | |
-| Diagnostics for spellings the language has dropped: `give back x` parses as a call to `give`, so name resolution should suggest `return` | |
 
-Done when: the parser and the oracle agree on every corpus file, and the
-formatter is idempotent on all of them.
+Done when: the parser and the oracle agree on every test and spec block, and
+the formatter is idempotent on all of them.
 
 ## Phase 3. Checker
 

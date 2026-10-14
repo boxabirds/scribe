@@ -1,0 +1,5 @@
+function score(a: Int, b: Int, text: Text) -> Int
+    let x = (a + b) * 2
+    let y = -(a - b)
+    let z = (try parse_int(text)) + 1
+    return x % 7 + y / 2 - z

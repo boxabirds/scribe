@@ -1,10 +1,8 @@
-to load_dashboard user with services
-    given user is a UserId
-    given services is the DashboardServices
-    produces a Dashboard
+function load_dashboard(user: UserId, services: DashboardServices) -> Dashboard
     can fail with DashboardUnavailable
     uses services
     together
-        let profile be fetch profile of user from services
-        let alerts be fetch alerts of user from services, otherwise nothing
-    return a Dashboard from profile, alerts
+        let profile = try fetch_profile(user, services)
+        let orders = try fetch_orders(user, services)
+        let alerts = try fetch_alerts(user, services) else nothing
+    return Dashboard(profile: profile, orders: orders, alerts: alerts)

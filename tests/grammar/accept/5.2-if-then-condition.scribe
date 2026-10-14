@@ -1,0 +1,7 @@
+function check(items: List[Int], limit: Int)
+    ensure
+        if for all x in items, x > 0
+        then count(items) < limit
+    invariant all of
+        limit > 0
+        count(items) <= limit

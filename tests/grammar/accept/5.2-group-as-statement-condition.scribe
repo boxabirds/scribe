@@ -1,20 +1,16 @@
-to settle account for amount
-    given account is an editable Account
-    given amount is a Money
+function settle(account: editable Account, amount: Money)
     if all of
-        account is open
-        any of
-            balance of account ≥ amount
-            overdraft_allowed of account
+        account.is_open
+        account.balance >= amount
     then
-        subtract amount from balance of account
-    otherwise if not any of account is frozen, account is closed
+        account.balance = account.balance - amount
+    else if not any of account.is_frozen, account.is_closed
     then
-        flag account
-    otherwise
+        flag(account)
+    else
         do nothing
-    repeat while all of
-        balance of account < 0
-        retries of account > 0
+    while all of
+        account.balance < 0
+        account.retries > 0
     do
-        decrement retries of account
+        account.retries = account.retries - 1

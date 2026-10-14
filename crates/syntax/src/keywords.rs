@@ -71,8 +71,8 @@ mod tests {
     #[test]
     fn classifies_words() {
         assert_eq!(classify("return"), WordKind::Hard);
-        assert_eq!(classify("add"), WordKind::Hard);
-        assert_eq!(classify("entry"), WordKind::Soft);
+        assert_eq!(classify("function"), WordKind::Hard);
+        assert_eq!(classify("requires"), WordKind::Soft);
         assert_eq!(classify("windows"), WordKind::Name);
         assert_eq!(classify("give"), WordKind::Name);
     }

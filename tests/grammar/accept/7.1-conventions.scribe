@@ -1,0 +1,5 @@
+function close(connection: consumed Connection)
+    release(connection)
+
+function clear(list: editable List[Int])
+    list = []

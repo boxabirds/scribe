@@ -1,0 +1,6 @@
+type Stack[T]
+    items: List[T]
+    capacity: Int
+
+function sizes(table: Map[Text, List[Int]]) -> List[Int]
+    return [count(row) for row in values(table)]

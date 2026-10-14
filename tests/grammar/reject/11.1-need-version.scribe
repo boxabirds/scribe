@@ -1,3 +1,0 @@
-module Checkout
-    requires
-        Payments from 3.1 as payments

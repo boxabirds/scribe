@@ -1,6 +1,0 @@
-note A fact about the outside world is not an instruction, so `assumes` is not part
-note of the language: this line is a call to an operation named `assumes`.
-note Expected diagnostic: there is no operation `assumes`; a contract holds only conditions the compiler checks.
-to charge customer
-    given customer is a CustomerId
-    assumes "the card network answers within 30 seconds"

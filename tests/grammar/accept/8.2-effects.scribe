@@ -1,4 +1,0 @@
-to wait_for_lock of file with locks
-    given file is a File
-    given locks is the Locks
-    uses locks, clock

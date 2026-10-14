@@ -92,10 +92,10 @@ pub struct LexOptions {
 
 const INDENT_WIDTH: usize = 4;
 
-const SYMBOLS_2: [&str; 6] = ["<=", ">=", "!=", "==", "&&", "||"];
-const SYMBOLS_1: [char; 22] = [
-    '+', '-', '*', '/', '=', '<', '>', '(', ')', '[', ']', ',', '!', '≤', '≥', '≠', '∧', '∨', '¬', '⇒', '∀',
-    '∃',
+const SYMBOLS_2: [&str; 7] = ["<=", ">=", "!=", "==", "&&", "||", "->"];
+const SYMBOLS_1: [char; 24] = [
+    '+', '-', '*', '/', '%', '=', '<', '>', '(', ')', '[', ']', ',', '.', ':', '!', '≤', '≥', '≠', '∧', '∨',
+    '¬', '∀', '∃',
 ];
 const MEMBER: char = '∈';
 
@@ -190,32 +190,6 @@ fn is_elision(content: &str) -> bool {
     !middle.contains('.')
 }
 
-/// If `word` at `start` begins a two-word phrase the lexer reads as one token
-/// (`for each`, `at entry`), the end of the phrase.
-fn joined_word_phrase(chars: &[char], word: &str, word_end: usize) -> Option<usize> {
-    let second = match word {
-        "for" => "each",
-        "at" => "entry",
-        _ => return None,
-    };
-    let mut e = word_end;
-    while chars.get(e) == Some(&' ') {
-        e += 1;
-    }
-    if e == word_end {
-        return None;
-    }
-    word_at(chars, e, second)
-}
-
-/// If the whole word `word` starts at `k`, the index just after it.
-fn word_at(chars: &[char], k: usize, word: &str) -> Option<usize> {
-    let end = k + word.chars().count();
-    let matches = chars.get(k..end).is_some_and(|s| s.iter().copied().eq(word.chars()));
-    let whole = !chars.get(end).is_some_and(|&c| is_word_char(c));
-    (matches && whole).then_some(end)
-}
-
 fn word_token(word: &str, line: usize, column: usize) -> Token {
     let kind = match classify(word) {
         WordKind::Hard => TokenKind::Hard,
@@ -277,33 +251,7 @@ fn lex_line(content: &str, line: usize, first_column: usize, out: &mut Vec<Token
                 k += 1;
             }
             let word: String = chars[start..k].iter().collect();
-            if let Some(end) = joined_word_phrase(&chars, &word, k) {
-                let text: String = chars[start..end].iter().collect();
-                out.push(Token { kind: TokenKind::Hard, text, line, column });
-                k = end;
-                continue;
-            }
             out.push(word_token(&word, line, column));
-            continue;
-        }
-        if c == ',' {
-            // `, otherwise` is read as one token (see JOINED in
-            // tools/build_grammar.py); any other comma, including one that ends
-            // the line, is a symbol
-            let mut e = k + 1;
-            while chars.get(e) == Some(&' ') {
-                e += 1;
-            }
-            if let Some(end) = word_at(&chars, e, "otherwise") {
-                let text: String = chars[k..end].iter().collect();
-                out.push(Token { kind: TokenKind::Hard, text, line, column });
-                k = end;
-                continue;
-            }
-        }
-        if c == '\'' && chars.get(k + 1) == Some(&'s') {
-            out.push(Token { kind: TokenKind::Symbol, text: "'s".to_string(), line, column });
-            k += 2;
             continue;
         }
         if let Some(two) = chars.get(k..k + 2).map(|s| s.iter().collect::<String>())
@@ -413,14 +361,14 @@ mod tests {
 
     #[test]
     fn layout_opens_and_closes_blocks() {
-        let src = "to f x\n    given x is an Int\n    return x\nlet y be 1\n";
+        let src = "function f(x: Int)\n    expect x > 0\n    return x\nlet y = 1\n";
         let k: Vec<TokenKind> = kinds(src).into_iter().map(|(k, _)| k).collect();
         use TokenKind::*;
         assert_eq!(
             k,
             vec![
-                Hard, Name, Name, Newline, Indent, Hard, Name, Hard, Hard, Name, Newline, Hard, Name,
-                Newline, Dedent, Hard, Name, Hard, Int, Newline
+                Hard, Name, Symbol, Name, Symbol, Name, Symbol, Newline, Indent, Hard, Name, Symbol, Int,
+                Newline, Hard, Name, Newline, Dedent, Hard, Name, Symbol, Int, Newline
             ]
         );
     }
@@ -434,7 +382,7 @@ mod tests {
 
     #[test]
     fn drops_blank_and_note_lines() {
-        assert_eq!(texts("note hello\n\nlet x be 1\n"), vec!["let", "x", "be", "1", ""]);
+        assert_eq!(texts("note hello\n\nlet x = 1\n"), vec!["let", "x", "=", "1", ""]);
     }
 
     #[test]
@@ -446,7 +394,7 @@ mod tests {
 
     #[test]
     fn numbers() {
-        let k = kinds("let a be [1, 2.5, 2026-10-14, 30 seconds, 4 of items]\n");
+        let k = kinds("let a = [1, 2.5, 2026-10-14, 30 seconds, 4 of items]\n");
         let numbers: Vec<_> = k
             .into_iter()
             .filter(|(k, _)| matches!(k, TokenKind::Int | TokenKind::Decimal | TokenKind::Quantity))
@@ -467,7 +415,7 @@ mod tests {
 
     #[test]
     fn hex_and_binary() {
-        let k = kinds("let a be [0xFF, 0xFFFF_FFFF, 0b1010_0001, 0]\n");
+        let k = kinds("let a = [0xFF, 0xFFFF_FFFF, 0b1010_0001, 0]\n");
         assert!(k.contains(&(TokenKind::Hex, "0xFF".into())));
         assert!(k.contains(&(TokenKind::Hex, "0xFFFF_FFFF".into())));
         assert!(k.contains(&(TokenKind::Binary, "0b1010_0001".into())));
@@ -476,7 +424,7 @@ mod tests {
 
     #[test]
     fn strings_keep_escapes() {
-        let k = kinds("let s be \"a \\\"quoted\\\" {x} word\"\n");
+        let k = kinds("let s = \"a \\\"quoted\\\" {x} word\"\n");
         assert_eq!(k[3], (TokenKind::Str, "\"a \\\"quoted\\\" {x} word\"".into()));
         assert!(lex("let s be \"open\n", LexOptions::default()).is_err());
     }
@@ -488,29 +436,21 @@ mod tests {
     }
 
     #[test]
-    fn joined_phrases() {
-        let k = kinds("let a be [x for each x in xs], otherwise nothing\n");
-        assert!(k.contains(&(TokenKind::Hard, "for each".into())));
-        assert!(k.contains(&(TokenKind::Hard, ", otherwise".into())));
-        let k = kinds("let a be b, or c\n");
-        assert!(k.contains(&(TokenKind::Symbol, ",".into())));
-        assert!(k.contains(&(TokenKind::Hard, "or".into())));
-        let k = kinds("ensure x = x at entry\n");
-        assert!(k.contains(&(TokenKind::Hard, "at entry".into())));
-        let k = kinds("let a be [1, order]\n");
-        assert!(k.contains(&(TokenKind::Name, "order".into())));
-        assert!(!k.iter().any(|(_, t)| t.starts_with(", otherwise")));
-    }
-
-    #[test]
-    fn possessives() {
-        assert_eq!(texts("return user's manager's name\n")[1..6], ["user", "'s", "manager", "'s", "name"]);
+    fn calls_fields_and_arrows() {
+        let t = texts("function f(a: Int) -> Int\n");
+        assert_eq!(t[..9], ["function", "f", "(", "a", ":", "Int", ")", "->", "Int"]);
+        assert_eq!(
+            texts("return account.balance % 2 == 0\n")[1..8],
+            ["account", ".", "balance", "%", "2", "==", "0"]
+        );
+        let k = kinds("let total = 2.5\n");
+        assert!(k.contains(&(TokenKind::Decimal, "2.5".into())));
     }
 
     #[test]
     fn unknown_characters_are_errors() {
-        let e = lex("let x be 1 ; 2\n", LexOptions::default()).unwrap_err();
-        assert_eq!((e.line, e.column), (1, 12));
+        let e = lex("let x = 1 ; 2\n", LexOptions::default()).unwrap_err();
+        assert_eq!((e.line, e.column), (1, 11));
         assert!(e.message.contains('`'));
     }
 }

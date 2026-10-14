@@ -1,6 +1,0 @@
-note Unquoted prose in a contract reads as a chain of calls to operations that do not
-note exist (`every`, `read`, `either`).
-note Expected diagnostic: there is no operation `every`; a contract holds only conditions the compiler checks.
-to f rows
-    given rows is a List of Row
-    ensure every row read is either saved or listed in rejects of result

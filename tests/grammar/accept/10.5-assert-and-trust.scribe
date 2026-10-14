@@ -1,0 +1,8 @@
+function sorted_copy(items: List[Int], native: NativeSort) -> List[Int]
+    ensure is_sorted(result)
+    uses native
+    let copy = sort(items, native)
+    assert count(copy) == count(items)
+    trust
+        assert is_sorted(copy)
+    return copy

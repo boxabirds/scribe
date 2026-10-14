@@ -1,0 +1,6 @@
+function transfer(amount: Money, source: editable Account, target: editable Account)
+    move(amount, from: source, to: target)
+    source.history = append(source.history, amount)
+    let first = source.history[0]
+    let owner_name = target.owner.name
+    log(text_of(first), level: 2)

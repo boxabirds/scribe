@@ -1,0 +1,10 @@
+function sum_to(n: Int) -> Int
+    expect n >= 0
+    var total = 0
+    var i = 0
+    while i < n
+        invariant total == i * (i - 1) / 2
+        decreases n - i
+        total = total + i
+        i = i + 1
+    return total

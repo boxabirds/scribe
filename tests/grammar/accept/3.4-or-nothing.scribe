@@ -1,6 +1,14 @@
-to first_of items
-    given items is a List of Int
-    produces an Int or nothing
-    if items is empty
+type User
+    name: Text
+
+function describe(found: User or nothing) -> Text
+    ensure if found is not nothing, result == found.name
+    if found is nothing
+        return "nobody"
+    else
+        return found.name
+
+function first(items: List[Int]) -> Int or nothing
+    if count(items) == 0
         return nothing
-    return item 0 of items
+    return items[0]

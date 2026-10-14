@@ -20,30 +20,18 @@ import re
 import sys
 
 HARD = set("""
-to given produces can expect ensure changes uses
-let be var starts set return fail try handle on failure if otherwise for each
-increment decrement add subtract do
-all any then
-only
-from until through repeat while invariant decreases stop skip match when hold
-together trust assert
-type enum module example states
-editable consumed
-property model interface
-is not and or mod of there where result nothing at
-with in into by as
-a an the
+function can fail with expect ensure on success failure changes only uses example property
+type enum module interface model invariant states editable consumed
+let var return do nothing if else then for in while match case handle hold together
+break continue trust assert decreases result old try
+all any not and or is there where until through as
 """.split())
 
 
 # Phrases the lexer reads as one token, so a parser that looks one token ahead
 # sees both words at once. Each is written with its words separated by spaces;
 # the text a reader sees is unchanged.
-JOINED = [
-    ("COMMA_OTHERWISE", [",", "otherwise"]),
-    ("FOR_EACH", ["for", "each"]),
-    ("AT_ENTRY", ["at", "entry"]),
-]
+JOINED = []
 
 
 def joined_terminals():
@@ -80,7 +68,7 @@ def build(tmpl_path, out_path, keywords_path=None):
     # so the build is the same on every run
     keywords = sorted(words | HARD, key=lambda w: (-len(w), w))
     lookahead = "|".join(keywords)
-    name_rule = "name: NAME\n    | " + "\n    | ".join(f'"{w}"' for w in soft) + "\n"
+    name_rule = "name: NAME\n" + "".join(f'    | "{w}"\n' for w in soft)
     quantity = ("QUANTITY.4: /\\d+(\\.\\d+)?[ ]+(?!(" + lookahead +
                 ")(?![A-Za-z0-9_]))[A-Za-z][A-Za-z0-9_]*/\n")
     out = text + "\n// ---- generated\n" + name_rule + quantity + joined_terminals()

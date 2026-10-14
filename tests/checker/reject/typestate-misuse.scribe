@@ -1,0 +1,18 @@
+note `send` needs an Open Connection; after `close` the connection is consumed,
+note and `closed` is a Closed Connection.
+note Expected diagnostic: `connection` was consumed by `close` on the line before.
+note Expected diagnostic: `send` needs an Open Connection; `closed` is Closed.
+type Connection
+    socket: Socket
+    states Closed, Open
+
+function send(data: Bytes, connection: editable Open Connection)
+    transmit(data, connection.socket)
+
+function close(connection: consumed Open Connection) -> Closed Connection
+    return release(connection)
+
+function misuse(connection: consumed Open Connection, data: Bytes)
+    let closed = close(connection)
+    send(data, connection)
+    send(data, closed)
