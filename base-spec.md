@@ -544,23 +544,39 @@ to redirect_body for location
 
 Properties generalise examples and run as generated tests: `property for every items that is a non_empty List of Int, largest of items is in items`.
 
-### 10.3 Platform and build scoping
+### 10.3 Host-dependent behaviour and build scoping
 
-A clause can hold on one platform or build mode only:
+Source never names an operating system or a host. Everything that can behave differently from one host to another reaches code through a capability (Section 8.1), so a difference between hosts is a fact about a capability, and it is stated where the capability is declared.
+
+**Proposed:** a capability's interface lists the facts that vary by host. Each is a predicate a contract can test:
 
 ```
-to current_user
-    produces a User
-    fails with UserLookupFailed
-    on windows
-        assumes "the current account maps to a security ID" assumed owner os_team
-    on linux
-        assumes "getpwuid_r succeeds for the effective user id" assumed owner os_team
+interface Files
+    varies by host
+        names_ignore_case because "two names that differ only in case name the same file"
+        rename_replaces_target because "renaming onto an existing file replaces it"
+
+    to rename source to target in files
+        given source is a Path
+        given target is a Path
+        given files is an editable Self
+        fails with NotFound, TargetExists
+        ensure if rename_replaces_target of files, "an existing target is replaced"
+```
+
+An operation whose contract tests a host-dependent fact holds wherever the fact has the value it tests for; a contract that tests none must hold on every host. Each host binding, the implementation of a capability's interface for one host, gives every fact its value and carries the assumptions it makes about that host. The toolchain supplies the host bindings, and they are the only place a particular operating system is named.
+
+A clause can also hold in one build mode only:
+
+```
+to write data into stream
+    given data is Bytes
+    given stream is an editable Stream
     in build race
         ensure "buffers passed to write are overwritten after the call returns"
 ```
 
-Contracts are compared one platform and build at a time (Section 12).
+Contracts are compared once for each host binding and build mode (Section 12).
 
 ### 10.4 Loops, types and predicates
 
@@ -739,7 +755,7 @@ Impact analysis answers one question before a change is merged: **what could thi
 2. **any possible caller**, using the public contract alone, because most users of a library are outside its repository;
 3. **every system rule** in every system file that includes the component.
 
-Where a contract has clauses scoped `on <platform>` or `in build <mode>`, the comparison is made separately for each platform and build mode, and a verdict names the platforms it applies to. A guarantee that weakens only on Windows is reported as breaking on Windows, not hidden in an average.
+Where a contract tests a host-dependent fact or has clauses scoped `in build <mode>` (Section 10.3), the comparison is made separately for each host binding and build mode, and a verdict names the bindings it applies to. A guarantee that weakens only where file names ignore case is reported as breaking there, not hidden in an average.
 
 ### 12.2 Verdicts
 
@@ -879,7 +895,7 @@ These are the decisions this draft does not settle. Each names what blocks it. A
 | 8 | Code generator for WebAssembly, the version 1 target: a back end of our own, or one built on LLVM or Cranelift | Open | A compile-time benchmark on the pilot corpus |
 | 9 | Solver and proof format for `proven` clauses | Open | Choosing a solver that is fast and gives stable results across versions |
 | 10 | Localized views beyond English | Open | Round-trip proof for at least one other language |
-| 11 | Whether `on <platform>` contract scoping needs a platform lattice (for example, "every Unix") | Open | Replay cases with platform-specific breakages |
+| 11 | How host-dependent facts are declared (10.3), and which host bindings impact analysis compares by default | Proposed | Re-expressing the replay's platform-specific breakages with it |
 
 ## Appendix A: grammar notes
 
@@ -928,7 +944,7 @@ What the replay changed in this specification:
 | Finding | Change |
 | --- | --- |
 | Green results were given for code the contract did not speak to | "Unchanged, checked" and "Unchanged, unchecked" replace "no impact"; contract coverage (12.2, 12.4) |
-| Platform-specific breakages were averaged away | Clauses scoped `on <platform>`, compared per platform (10, 12.1) |
+| Platform-specific breakages were averaged away | Host-dependent facts stated on capabilities, and contracts compared once per host binding (10.3, 12.1) |
 | Interfaces had no contract, so implementations drifted | Interfaces carry contracts that bind every implementation (11.2) |
 | Fixing a false promise was reported as breaking it | `corrects` (12.3) |
 | False alarms on controls | Removal breaking only for callers left untouched; effects compared per component; lint on implementation-detail informal clauses (12.3) |
@@ -947,6 +963,7 @@ What the replay changed in this specification:
 - The aims are reordered: rapid impact assessment first, human readability second, correctness by construction third. Impact assessment is the problem Scribe exists to solve; readability is how it must be solved (1).
 - Version 1 emits WebAssembly only (1, 13).
 - `return` replaces `give back` as the statement that ends an operation with its result (4.2).
+- Source never names an operating system. A difference between hosts is a fact about a capability, declared in its interface; this replaces clauses scoped `on <platform>` (10.3).
 - Scribe is not described as a systems language. Having no garbage collector is a choice about memory management, managed at compile time as in Rust, not about the kind of software Scribe is for (1, 7).
 
 ### B.4 Earlier documents

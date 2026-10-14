@@ -1,0 +1,11 @@
+interface Files
+    varies by host
+        names_ignore_case because "two names that differ only in case name the same file"
+        rename_replaces_target
+
+    to rename source to target in files
+        given source is a Path
+        given target is a Path
+        given files is an editable Self
+        fails with NotFound, TargetExists
+        ensure if rename_replaces_target of files, "an existing target is replaced"

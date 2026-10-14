@@ -62,8 +62,9 @@ assumes_clause: "assumes" STRING "assumed" "owner" name ["monitor" monitor_polic
 may_block: "may" "block" STRING _NL                                           // SPEC 8.2
 // SPEC 12.3: a clause that was never true; the reason may sit on the next line
 corrects_clause: "corrects" ("ensure" | "expect") STRING (because _NL | _NL [_INDENT because _NL _DEDENT])
-// SPEC 10.3: clauses that hold on one platform or in one build mode only
-scoped: ("on" name | "in" "build" name) _NL _INDENT clause+ _DEDENT
+// SPEC 10.3: clauses that hold in one build mode only. Source never names a
+// platform: host differences are facts declared on capability interfaces
+scoped: "in" "build" name _NL _INDENT clause+ _DEDENT
 
 name_list: name ("," name)*
 
@@ -106,7 +107,9 @@ predicate_phrase: name | article name ["of" name]
 
 example: "example" expr _NL
 // SPEC 11.2: an interface states contracts every implementation must meet
-interface: "interface" name _NL _INDENT operation+ _DEDENT
+interface: "interface" name _NL _INDENT [host_facts] operation+ _DEDENT
+// SPEC 10.3 (Proposed): the facts about a capability that vary by host
+host_facts: "varies" "by" "host" _NL _INDENT (name [because] _NL)+ _DEDENT
 property: "property" quantified _NL
 
 // ---------------------------------------------------------------- protocols

@@ -1,9 +1,0 @@
-to current_user
-    produces a User
-    fails with UserLookupFailed
-    on windows
-        assumes "the current account maps to a security ID" assumed owner os_team
-    on linux
-        assumes "getpwuid_r succeeds for the effective user id" assumed owner os_team
-    in build race
-        ensure "buffers passed to write are overwritten after the call returns"
