@@ -25,12 +25,12 @@ let be var starts set return fail try handle on failure if otherwise for each
 increment decrement add subtract do
 all any then
 only
-from until through repeat while invariant decreases stop skip choose when hold
+from until through repeat while invariant decreases stop skip match when hold
 together trust assert
-type enum component example states
-editable consumed maybe
+type enum module example states
+editable consumed
 property model interface
-is not and or mod of there where result some nothing at
+is not and or mod of there where result nothing at
 with in into by as
 a an the
 """.split())

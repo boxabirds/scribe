@@ -3,7 +3,7 @@ to sift heap by i
     given i is a Count
     set item i of heap to 0
     increment item 0 of heap
-    choose status of heap
+    match status of heap
         when Sorted
             do nothing
         when Unsorted

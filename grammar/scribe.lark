@@ -18,7 +18,7 @@
 
 start: (item)*
 
-?item: operation | typedecl | enum | component | example | property
+?item: operation | typedecl | enum | module | example | property
      | interface
      | stmt
 
@@ -52,9 +52,10 @@ name_list: name ("," name)*
 typeexpr: [article] modifier* [type_state] type_name type_suffix*
 type_state: name
 article: "a" | "an" | "the"
-modifier: "editable" | "consumed" | "maybe"
+modifier: "editable" | "consumed"
 type_name: name ["of" modifier* type_name]
 ?type_suffix: "with" name term range_word term        -> refine_range
+            | "or" "nothing"                          -> or_nothing   // SPEC 3.4: may be absent
             | "as" name                               -> role
 range: expr range_word expr
 range_word: "until" | "through"
@@ -75,17 +76,18 @@ example: "example" expr _NL
 interface: "interface" name _NL _INDENT operation+ _DEDENT
 property: "property" quantified _NL
 
-// ---------------------------------------------------------------- components and systems
+// ---------------------------------------------------------------- modules
 // SPEC 11.1: versions are kept in the package file, outside the language
-component: "component" name _NL _INDENT comp_section+ _DEDENT
-?comp_section: "needs" _NL _INDENT need+ _DEDENT                  -> needs
-             | "provides" _NL _INDENT operation+ _DEDENT          -> provides
+// SPEC 11.1: the static dependency graph impact analysis walks, as in Java modules
+module: "module" name _NL _INDENT module_section+ _DEDENT
+?module_section: "requires" _NL _INDENT need+ _DEDENT             -> requires
+               | "exports" _NL _INDENT operation+ _DEDENT          -> exports
 need: name "as" name _NL [_INDENT "uses" name_list _NL _DEDENT]
 
 
 // ---------------------------------------------------------------- statements
 ?stmt: let | var | set | update | return_stmt | fail | do_nothing | if_stmt | for_each
-     | repeat_while | invariant | decreases | choose | handle | hold
+     | repeat_while | invariant | decreases | match | handle | hold
      | together | stop | skip | trust | assert_stmt | elided
      | expr_stmt
 
@@ -127,11 +129,9 @@ repeat_while: "repeat" "while" expr block
             | "repeat" "while" group "do" block
 invariant: "invariant" line_condition
 decreases: "decreases" expr _NL
-choose: "choose" expr _NL _INDENT when+ _DEDENT
+match: "match" expr _NL _INDENT when+ _DEDENT                            // as in Rust, Scala, Python
 when: "when" pattern block
-pattern: "some" name                              -> some_pattern
-       | "nothing"                                -> nothing_pattern
-       | name ["with" name ("," name)*]         -> variant_pattern
+pattern: name ["with" name ("," name)*]         -> variant_pattern
 handle: "handle" block on_failure+
 on_failure: "on" "failure" name ("or" name)* ["as" name] block
 hold: "hold" name "as" expr block
@@ -227,9 +227,8 @@ comp_op: "is" | "=" | "=="
 ?concat: sum
 ?sum: product (("+" | "-") product)*
 ?product: unary (("*" | "/" | "mod") unary)*
-// SPEC 7: `-`, `some` and `try` apply to the next term, as minus does at school
+// SPEC 7: `-` and `try` apply to the next term, as minus does at school
 ?unary: "-" unary -> neg
-      | "some" unary -> some
       | postfix
 ?postfix: application
         | application AT_ENTRY                                -> at_entry
@@ -308,10 +307,10 @@ NAME: /[A-Za-z][A-Za-z0-9_]*/
 // ---- generated
 name: NAME
     | "entry"
-    | "needs"
-    | "provides"
+    | "exports"
+    | "requires"
     | "success"
-QUANTITY.4: /\d+(\.\d+)?[ ]+(?!(component|decreases|decrement|increment|interface|invariant|otherwise|consumed|editable|produces|property|provides|subtract|together|changes|example|failure|nothing|success|through|assert|choose|ensure|expect|handle|repeat|result|return|starts|states|entry|given|maybe|model|needs|there|trust|until|where|while|each|enum|fail|from|hold|into|only|skip|some|stop|then|type|uses|when|with|add|all|and|any|can|for|let|mod|not|set|the|try|var|an|as|at|be|by|do|if|in|is|of|on|or|to|a)(?![A-Za-z0-9_]))[A-Za-z][A-Za-z0-9_]*/
+QUANTITY.4: /\d+(\.\d+)?[ ]+(?!(decreases|decrement|increment|interface|invariant|otherwise|consumed|editable|produces|property|requires|subtract|together|changes|example|exports|failure|nothing|success|through|assert|ensure|expect|handle|module|repeat|result|return|starts|states|entry|given|match|model|there|trust|until|where|while|each|enum|fail|from|hold|into|only|skip|stop|then|type|uses|when|with|add|all|and|any|can|for|let|mod|not|set|the|try|var|an|as|at|be|by|do|if|in|is|of|on|or|to|a)(?![A-Za-z0-9_]))[A-Za-z][A-Za-z0-9_]*/
 COMMA_OTHERWISE.9: /,[ ]*otherwise(?![A-Za-z0-9_])/
 FOR_EACH.8: /for[ ]+each(?![A-Za-z0-9_])/
 AT_ENTRY.7: /at[ ]+entry(?![A-Za-z0-9_])/

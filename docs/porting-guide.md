@@ -66,7 +66,7 @@ fixed-width unsigned types, so they need no precedence:
 
 ## Reserved words
 
-Scribe reserves more words than most languages: 78 hard keywords, which can
+Scribe reserves more words than most languages: 76 hard keywords, which can
 never be names, and 4 soft keywords, which are keywords only inside their own
 phrase and ordinary names everywhere else. Scribe is written by machines and
 read by people, so a word reserved to make a line unambiguous costs readers
@@ -107,23 +107,24 @@ make this easier than the list suggests:
 | `uses` | Says which capabilities an operation uses | Usage counts | `usage_count`, `usages` |
 | `expect` | A precondition | Test assertions (JavaScript) | `expected`, `require` |
 | `model` | The abstract state of a type | Data models, ML models | `data_model`, `entity`, `predictor` |
-| `component` | A unit of review and versioning | UI components, parts | `part`, `module`, `widget` |
+| `module` | A module: what it requires and exports | Module names, Python modules | `unit`, `package_name`, `part` |
 | `interface` | An interface's contract | APIs, network interfaces | `api`, `port`, `nic` |
 | `property` | A generated test | Object properties, attributes | `attribute`, `prop`, `trait_name` |
 | `example` | An exact example in a contract | Samples, fixtures | `sample`, `specimen`, `fixture` |
 | `assert` | A condition the compiler proves at that point | Test assertions | `check`, `verify` |
 | `trust` | A block the checker does not verify | Trust levels, scores | `trust_level`, `confidence` |
 | `repeat` | `repeat while` loops | Repetition counts | `repeat_count`, `count` |
-| `when` | A branch of `choose` | Times and moments | `moment`, `at_time`, `occurred_at` |
+| `match` | Matches every variant of an enum | Regex matches, results | `found`, `hit`, `matched` |
+| `when` | A branch of `match` | Times and moments | `moment`, `at_time`, `occurred_at` |
 | `where` | Filters in comprehensions and quantifiers | Locations | `place`, `location`, `site` |
 | `while`, `until` | Loop and range words | End times | `end_time`, `due`, `limit` |
 | `from`, `to` | Argument labels | Senders and recipients, range ends | `sender`, `recipient`, `start`, `end`, `source`, `target` |
 | `in`, `into`, `for`, `with`, `by`, `as`, `of` | Argument labels | Inputs, options, units | `input`, `options`, `unit`, a name for what it holds |
-| `editable`, `consumed`, `maybe` | Parameter conventions and optional values | Flags | `is_editable`, `used_up`, `optional` |
+| `editable`, `consumed` | Parameter conventions | Flags | `is_editable`, `used_up` |
 | `states` | The states a type moves through | State lists | `state_list`, `phases` |
 | `can` | `can fail with`, the failures an operation may produce | Permission flags | `allowed`, `able` |
 | `mod` | Remainder | Modules, modulus | `module_name`, `modulus` |
-| `some`, `nothing` | Present and absent values of a `maybe` | Rarely names; `some` in some query code | `any_of`, `empty` |
+| `nothing` | The absent value: `a User or nothing` | Rarely a name | `empty`, `none_found` |
 | `let`, `var` | Bindings | Template variables | `variable`, `binding` |
 | `all`, `any` | Condition groups `all of`, `any of`, `not any of`; the quantifier `for all` | Collection helpers, flags | `everything`, `any_found`, `empty` |
 | `only` | `changes only`, `read only` | Filters and flags | `sole`, `exclusive`, `just_one` |
@@ -144,7 +145,6 @@ These are rarely names in other languages, so they seldom need renaming.
 | `given`, `produces` | Parameters and results in a contract |
 | `ensure` | A guarantee |
 | `invariant`, `decreases` | Loop and type reasoning |
-| `choose` | Matches every variant of an enum |
 | `enum` | Declares an enum: variants that may carry data, as in Rust |
 | `together` | Runs lines at once |
 | `do` | `do nothing`, for a branch with nothing to do |

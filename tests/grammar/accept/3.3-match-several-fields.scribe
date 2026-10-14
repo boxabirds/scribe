@@ -1,7 +1,7 @@
 to area of shape
     given shape is a Shape
     produces an Area
-    choose shape
+    match shape
         when Circle with radius
             return radius * radius * 3
         when Rectangle with width, height

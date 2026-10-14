@@ -13,8 +13,6 @@ hard be
 hard by
 hard can
 hard changes
-hard choose
-hard component
 hard consumed
 hard decreases
 hard decrement
@@ -40,9 +38,10 @@ hard into
 hard invariant
 hard is
 hard let
-hard maybe
+hard match
 hard mod
 hard model
+hard module
 hard not
 hard nothing
 hard of
@@ -57,7 +56,6 @@ hard result
 hard return
 hard set
 hard skip
-hard some
 hard starts
 hard states
 hard stop
@@ -79,6 +77,6 @@ hard where
 hard while
 hard with
 soft entry
-soft needs
-soft provides
+soft exports
+soft requires
 soft success

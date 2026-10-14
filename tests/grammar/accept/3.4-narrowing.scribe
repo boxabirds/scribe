@@ -1,0 +1,8 @@
+to describe found
+    given found is a User or nothing
+    produces Text
+    ensure if found is not nothing, result = name of found
+    if found is nothing
+        return "nobody"
+    otherwise
+        return name of found

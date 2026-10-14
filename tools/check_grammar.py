@@ -65,6 +65,15 @@ RENAMES = [
     (r"(?m)^(\s*)fails with\b", r"\1can fail with", "draft 0.4: `can fail with` replaces `fails with`"),
     (r"\bfor every\b", "for all", "draft 0.4: `for all` replaces `for every`"),
     (r"\bnone of\b", "not any of", "draft 0.4: `not any of` replaces `none of`"),
+    (r"(?m)^(\s*)choose ", r"\1match ", "draft 0.4: `match` replaces `choose`"),
+    (r"(?m)^(\s*)component ", r"\1module ", "draft 0.4: `module` replaces `component`"),
+    (r"(?m)^(\s+)needs$", r"\1requires", "draft 0.4: `requires` replaces `needs`"),
+    (r"(?m)^(\s+)provides$", r"\1exports", "draft 0.4: `exports` replaces `provides`"),
+    (r"\ban? maybe ((?:List of )?\w+)",
+     lambda m: ("an " if m.group(1)[0] in "AEIOaeio" else "a ") + m.group(1) + " or nothing",
+     "draft 0.4: `a T or nothing` replaces `a maybe T`"),
+    (r"\bmaybe (\w+)", r"\1 or nothing", "draft 0.4: `T or nothing` replaces `maybe T`"),
+    (r"(?m)^(\s*(?:return|set \S.* to|let \w+ be)) some ", r"\1 ", "draft 0.4: no `some` wrapper"),
 ]
 
 

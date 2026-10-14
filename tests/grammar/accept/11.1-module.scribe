@@ -1,0 +1,9 @@
+module Checkout
+    requires
+        Payments as payments
+            uses charge, refund
+    exports
+        to place_order cart
+            given cart is a Cart
+            produces an Order
+            uses payments

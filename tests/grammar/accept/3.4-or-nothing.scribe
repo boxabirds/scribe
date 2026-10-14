@@ -1,6 +1,6 @@
 to first_of items
     given items is a List of Int
-    produces a maybe Int
+    produces an Int or nothing
     if items is empty
         return nothing
-    return some item 0 of items
+    return item 0 of items

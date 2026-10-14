@@ -38,7 +38,7 @@ Principles that follow from these and decide individual rules:
 | Words where words are clearer, symbols where symbols are | School-level maths symbols for arithmetic and comparison; words for logic and structure |
 | A promise is code, not commentary | Contracts are checked against the body on every build. A contract holds only conditions the compiler can check; explanations go in `note` lines |
 | Never overclaim | Every proof, verdict and report states the unchecked code (`trust` blocks) it rests on |
-| Nothing implicit that matters | No ambient authority, no implicit conversion, no missing value without a `maybe`, no failure without a `can fail with` |
+| Nothing implicit that matters | No ambient authority, no implicit conversion, no missing value without `or nothing`, no failure without a `can fail with` |
 | If in doubt, make it a library | As in Rust, the language is kept minimal. A construct is language only if it cannot be an ordinary type or operation without losing what the compiler must check; everything else (capability narrowing, time, pipelines, serialisation) is a library |
 | Any expression wherever a value goes | No position in the grammar is limited to a name or a literal without a stated reason; types, not keywords, decide what fits. A value in a contract or a grant of authority must be a constant expression, because impact analysis compares it without running code |
 
@@ -176,11 +176,23 @@ enum OrderStatus
     Cancelled with reason as Text
 ```
 
-An enum's variants may carry data, as in Rust and Swift. An enum is used through `choose`, which must handle every variant. Adding a variant makes every `choose` that does not handle it fail to compile.
+An enum's variants may carry data, as in Rust and Swift. An enum is used through `match`, which must handle every variant. Adding a variant makes every `match` that does not handle it fail to compile.
 
 ### 3.4 Missing values
 
-There is no null. A value that may be absent has type `maybe T`, with values `some x` and `nothing`. A `maybe` value must go through `choose` before the value inside it is used. `some` applies to the next term, as a minus sign does: `some (total + tax)`. Written without brackets, `some total + tax` adds a number to a `maybe`, which is a type error, not a different reading.
+There is no null. A value that may be absent has a type that says so in English: `a User or nothing`. A `User` is already a valid `User or nothing`, so returning one needs no wrapper. Before the value is used, it is tested, and after the test the compiler knows which it is, as in Kotlin and TypeScript:
+
+```
+to describe found
+    given found is a User or nothing
+    produces Text
+    if found is nothing
+        return "nobody"
+    otherwise
+        return name of found
+```
+
+Using `name of found` before the test is a compile error.
 
 ### 3.5 Refinements
 
@@ -247,7 +259,7 @@ Every statement starts with a keyword, or is a call.
 | Pass a failure up | `try parse_port text` (also inside expressions: `let n be try parse_int text`) |
 | Handle failures | `handle` block, then `on failure Name` blocks (Section 6) |
 | Branch | `if` / `otherwise if` / `otherwise` |
-| Match | `choose value` with `when Variant with field` blocks |
+| Match | `match value` with `when Variant with field` blocks |
 | Count | `for each i from 0 until count of items` |
 | Iterate | `for each order in orders` |
 | Loop | `repeat while condition`, with `invariant` and `decreases` lines |
@@ -258,7 +270,7 @@ Every statement starts with a keyword, or is a call.
 
 A name, an element (`set item i of heap to x`), an `of`-path or a possessive path can be set. The amount in `add … to` and `subtract … from` is one term, so `to` and `from` always belong to the update: `add price of item to total`, `add (price for item in usd) to total`.
 
-`do nothing` is for a `when` branch with nothing to do. `choose` has no catch-all branch, so a new variant is never silently absorbed: every `choose` must say what happens to it, even if that is nothing.
+`do nothing` is for a `when` branch with nothing to do. `match` has no catch-all branch, so a new variant is never silently absorbed: every `match` must say what happens to it, even if that is nothing.
 
 ### 4.3 Functions as values
 
@@ -286,7 +298,7 @@ Every line has exactly one reading (Section 1), and the only precedence a reader
 | From tightest to loosest | Example | Why a reader already knows it |
 | --- | --- | --- |
 | Calls, `of`, `at entry` | `total of cart + tax` is `(total of cart) + tax` | Like `sin x + 1` |
-| `-`, `some`, `try` before a term | `-a + b`, `(try parse_int text) + 1` | A minus sign applies to the next term |
+| `-`, `try` before a term | `-a + b`, `(try parse_int text) + 1` | A minus sign applies to the next term |
 | `*`, `/`, `mod`, then `+`, `-` | `a + b * c` | School arithmetic |
 | Comparisons, which chain | `0 ≤ i < n` | School arithmetic |
 | A chain of `and`, or a chain of `or` | `x > 0 and y > 0` | Plain English |
@@ -373,7 +385,7 @@ Text in double quotes, with `{expression}` interpolation: `"Your order {id of or
 
 ### 5.7 What `is` means
 
-`x is y` is parsed the same way in every case, but what it means depends on what `y` is: a variant (`status is Paid`), `nothing`, or a pattern that binds a name (`result is some p`). This is the one place where meaning needs name resolution, which happens after parsing.
+`x is y` is parsed the same way in every case, but what it means depends on what `y` is: a variant (`status is Paid`) or `nothing` (`found is nothing`). This is the one place where meaning needs name resolution, which happens after parsing.
 
 ## 6. Failures
 
@@ -488,7 +500,7 @@ to main root
     run ReportExporter with [reports, partner]
 ```
 
-Narrowing a capability is an ordinary standard-library operation, not syntax; its contract says what the result can reach. Because authority only flows along capabilities, and the arguments that narrow it are constants, "what can this component reach?" has a static answer, with the path as evidence:
+Narrowing a capability is an ordinary standard-library operation, not syntax; its contract says what the result can reach. Because authority only flows along capabilities, and the arguments that narrow it are constants, "what can this module reach?" has a static answer, with the path as evidence:
 
 ```
 $ scribe query reach ReportExporter network
@@ -502,7 +514,7 @@ An operation's effects are what it may do beyond computing its result. They are 
 
 | Effect | Declared as |
 | --- | --- |
-| Use a capability (files, network, clock, database,    N  another component) | `uses files, clock` |
+| Use a capability (files, network, clock, database,    N  another module) | `uses files, clock` |
 | Request memory (**Proposed**) | `allocates` |
 
 An operation with none of these is pure, and calling an effectful operation from it is a compile error naming the call. Clocks are capabilities, so code that depends on the time says so, and tests pass a fake clock.
@@ -565,7 +577,7 @@ A **contract** is what an operation requires and promises. It is the lines betwe
 | `can fail with A, B` | Every way it can fail | Compiler, completely |
 | `uses`, `allocates` | Its effects and capabilities. Waiting needs a capability too, so it shows in `uses` (9.5) | Compiler, completely |
 | `expect condition` | What callers must ensure | Proof at call sites, or run-time check |
-| `ensure condition` | What it guarantees. Forms: `ensure on success, ...`, `ensure on failure, ...`, `ensure if result is some p, ...` | Proof where the checker can; otherwise a run-time check, and reports say which (10.5) |
+| `ensure condition` | What it guarantees. Forms: `ensure on success, ...`, `ensure on failure, ...`, `ensure if result is not nothing, ...` | Proof where the checker can; otherwise a run-time check, and reports say which (10.5) |
 | `changes only x, y` | Everything else is untouched | Compiler |
 | `example call is value` | An exact result for an exact input | Run on every build |
 
@@ -618,6 +630,8 @@ Contracts are compared once for each host binding (Section 12).
 
 The source does not say how hard to check. On every build the compiler proves that there is no undefined behaviour, no unhandled failure and no run-time error, and checks types, effects, capabilities, units and states. It then proves each `ensure`, `expect` and invariant where it can; a clause it cannot prove is checked at run time instead. `example` and `property` lines run as tests. Every report says, for each clause, which of these held it.
 
+A condition in a contract or an `assert` may call only pure operations, ones with no `uses` line, as in Dafny and SPARK. Checking a condition must never change the program, and the prover can only reason about calls that cannot.
+
 Two statements belong to the body:
 
 ```
@@ -646,25 +660,25 @@ Removed from the language. A `corrects` line described an earlier version of the
 Impact analysis is only as good as contracts are complete (Appendix B), so the toolchain treats completeness as a measured property:
 
 - `scribe draft` proposes a first contract from the code: failures, effects, capabilities, and examples recorded from tests. A person reviews and edits it.
-- **Contract coverage** reports, for each operation, the observable outputs that no clause or example constrains: results, failure kinds and effects. It is shown in reviews as a figure per component.
+- **Contract coverage** reports, for each operation, the observable outputs that no clause or example constrains: results, failure kinds and effects. It is shown in reviews as a figure per module.
 - An operation that provides results but has no `ensure` or `example` gets a weak-contract warning.
 
-## 11. Components, interfaces and manifests
+## 11. Modules and interfaces
 
-### 11.1 Components and manifests
+### 11.1 Modules
 
-A **component** is the unit of review, versioning and deployment. Its **manifest** is its contract as a whole, written at the top of the component's source:
+A **module** groups operations and types, and declares its static relationships: which modules it requires, which of their operations it calls, and which of its own operations it exports. These relationships are the graph impact analysis walks; nothing in them happens at run time. The declaration is written at the top of the module's source, as Java declares modules:
 
 ```
-component Checkout
+module Checkout
 
-    needs
+    requires
         Payments as payments
             uses charge, refund, total_charged_to
         Inventory as inventory
             uses reserve, release
 
-    provides
+    exports
         to place_order cart for customer with request_id
             given cart is a Cart
             given customer is a CustomerId
@@ -679,10 +693,10 @@ component Checkout
 
 | Section | Says |
 | --- | --- |
-| `needs` | Each component it depends on, and which of its operations it uses. Impact is judged against exactly these |
-| `provides` | The operations other components may call, with their contracts |
+| `requires` | Each module it depends on, and which of its operations it uses. Impact is judged against exactly these |
+| `exports` | The operations other modules may call, with their contracts |
 
-Version numbers, of the component and of what it needs, are not part of the language: they are kept in the component's package file. The toolchain computes the next version from the change to the manifest (Section 12), and a person may raise it but not lower it.
+Version numbers, of the module and of what it requires, are not part of the language: they are kept in the module's package file. The toolchain computes the next version from the change to the module declaratiost (Section 12), and a person may raise it but not lower it.
 
 ### 11.2 Interfaces
 
@@ -720,7 +734,7 @@ Removed from the language. Checked conversations (session types) are research-gr
 
 ### 11.5 Systems (removed)
 
-Removed from the language. A program is assembled in code: its entry point hands each component its capabilities and calls it (8.1), and each component's `needs` say what it calls. Whole-program questions, such as what can reach a host or where a sensitive type can flow, are answered from that code by `scribe query`; a project that wants one checked on every change runs the query in its own build.
+Removed from the language. A program is assembled in code: its entry point hands each module its capabilities and calls it (8.1), and each module's `requires` say what it calls. Whole-program questions, such as what can reach a host or where a sensitive type can flow, are answered from that code by `scribe query`; a project that wants one checked on every change runs the query in its own build.
 
 ## 12. Impact analysis
 
@@ -728,9 +742,9 @@ Impact analysis answers one question before a change is merged: **what could thi
 
 ### 12.1 What is compared
 
-`scribe impact` compares two versions of a component: its manifest, every contract in it, its effects and authority, and whether its implementation still meets its contracts. It then checks the result against:
+`scribe impact` compares two versions of a module: its declaration, every contract in it, its effects and authority, and whether its implementation still meets its contracts. It then checks the result against:
 
-1. **every known dependent**, using the clauses that dependent's `needs` entry relies on (written or inferred from its code);
+1. **every known dependent**, using the clauses that dependent's `requires` entry relies on (written or inferred from its code);
 2. **any possible caller**, using the public contract alone, because most users of a library are outside its repository.
 
 Where a contract tests a host-dependent fact (Section 10.3), the comparison is made separately for each host binding, and a verdict names the bindings it applies to. A guarantee that weakens only where file names ignore case is reported as breaking there, not hidden in an average.
@@ -744,7 +758,7 @@ Each provided operation and each dependent gets exactly one verdict:
 | Compatible | The new contract refines the old: preconditions no stronger, guarantees no weaker, no new failure or effect | A proof, or the solver's reason |
 | Breaking | Some caller can observe a difference the old contract promised would not happen | A witness: a concrete input or scenario |
 | Needs review | The tool cannot decide: a guarantee changed in a way that may or may not matter, or a `trust` block changed | The clause and the reason |
-| Authority change | The component now holds or uses authority it did not before | The new capability and the path to it |
+| Authority change | The module now holds or uses authority it did not before | The new capability and the path to it |
 | Unchanged, checked | The contract did not change, the new implementation was checked against it, and the contract covers the code that changed | How each clause was checked, and the coverage |
 | Unchanged, unchecked | The contract did not change, but the changed code does something the contract does not speak to, or was not checked | The uncovered lines or behaviours |
 
@@ -759,19 +773,19 @@ Each provided operation and each dependent gets exactly one verdict:
 | Weaker or removed guarantee | Breaking for dependents that rely on it; needs review for unknown callers |
 | New way to fail | Breaking for callers that handle every failure by name; needs review otherwise |
 | New or changed `trust` block | Needs review |
-| New capability or effect for the component | Authority change |
+| New capability or effect for the module | Authority change |
 | Removed or renamed operation | Breaking for every caller the same change leaves untouched; compatible for callers the change updates |
 
 Two points of detail:
 
-- **Effects are compared per component.** Moving an existing effect from one operation to another inside the same component is not an authority change. It is reported against the operations concerned under the rules above.
+- **Effects are compared per module.** Moving an existing effect from one operation to another inside the same module is not an authority change. It is reported against the operations concerned under the rules above.
 - **A removed guarantee is reported, even when it was never true.** A change that drops a clause the old code did not meet is still a weaker guarantee: dependents that relied on it are listed, because their code may have depended on the false promise in practice. Saying that the old clause was false belongs in the change's review, not in the source.
 
 ### 12.4 Contract coverage
 
 The tool knows which lines of an implementation each contract clause constrains: by proof, by the checker's dependency tracking, or by the tests generated from `example` and `property` lines. Code that no clause constrains is **uncovered**. A change that touches only covered code can be reported as "Unchanged, checked"; a change that touches uncovered code is reported as "Unchanged, unchecked" with the uncovered behaviour named, for example a new retry loop, a changed timeout, or a new order of side effects.
 
-`scribe coverage` reports coverage for a component, and a project may set a floor below which merges are refused.
+`scribe coverage` reports coverage for a module, and a project may set a floor below which merges are refused.
 
 ### 12.5 The report
 
@@ -801,7 +815,7 @@ Suggested version: 4.0.0 (a breaking change)
 
 ### 12.6 Deployment (removed)
 
-Removed from the language. Ordering a rollout so that no component runs alongside a dependency it breaks against is a deployment tool, which can be built on the impact comparison of Section 12; it is not part of what a program means.
+Removed from the language. Ordering a rollout so that no module runs alongside a dependency it breaks against is a deployment tool, which can be built on the impact comparison of Section 12; it is not part of what a program means.
 
 ## 13. Toolchain and diagnostics
 
@@ -816,11 +830,11 @@ Removed from the language. Ordering a rollout so that no component runs alongsid
 | `scribe impact` | Compares two versions (Section 12) |
 | `scribe coverage` | Reports which code each contract clause constrains (12.4) |
 | `scribe draft` | Proposes a contract for an operation from its body and tests. The proposal is marked as a draft until a person accepts it, and never counts as checked on its own |
-| `scribe query reach` | Answers "what can reach this capability, value or component, and by which path?" |
+| `scribe query reach` | Answers "what can reach this capability, value or module, and by which path?" |
 | `scribe review` | Shows a change in the review view: contract changes first, then the impact report, then the code |
 | `scribe view` | Renders source in a chosen view (review, compact, localized) and converts it back |
 
-The compiler is one program with no build scripts that run arbitrary code. A component compiles from its source and its dependencies' manifests alone, so components compile in parallel and a change to an implementation never recompiles its callers.
+The compiler is one program with no build scripts that run arbitrary code. A module compiles from its source and its dependencies' declarations alone, so modules compile in parallel and a change to an implementation never recompiles its callers.
 
 ### 13.2 Diagnostics
 
@@ -853,7 +867,7 @@ These are the decisions this draft does not settle. Each names what blocks it. A
 | 3 | `allocates` as a contract clause, with the allocator passed as context | Proposed | Measuring how many contracts it adds lines to |
 | 4 | ~~A rule language for system files~~ | Removed | System files are removed; `scribe query` answers reach and flow questions from the code (8.1) |
 | 5 | Possessive paths: `account's balance` | Settled | Allowed, never mixed with `of` in one path (5.1) |
-| 6 | Reduce the keyword set (now 78 hard, 4 soft) | Open | Experiment 1, the comprehension test, extended to compare candidate words for the same idea: for example `hold` against `with` and `lease` |
+| 6 | Reduce the keyword set (now 76 hard, 4 soft) | Open | Experiment 1, the comprehension test, extended to compare candidate words for the same idea: for example `hold` against `with` and `lease` |
 | 7 | Parser strategy: the grammar is LALR(1) with no conflicts (Appendix A); whether the compiler's parser is generated from it or written by hand | Open | Comparing the error messages each gives on the pilot's real mistakes |
 | 8 | Code generator for WebAssembly, the version 1 target: a back end of our own, or one built on LLVM or Cranelift | Open | A compile-time benchmark on the pilot corpus |
 | 9 | Solver for proving contracts | Open | Choosing a solver that is fast and gives stable results across versions |
@@ -867,7 +881,7 @@ These are the decisions this draft does not settle. Each names what blocks it. A
 
 The reference grammar is `grammar/scribe.lark` (version 0.3) in this project; `scribe-grammar-v0.2.lark` is the version the pilot measured. It is an Earley grammar: it states the language precisely but is not yet a production parser. `tools/check_grammar.py` tests it against a file per construct in this specification, a file per forbidden form, this specification's code blocks and the pilot corpora.
 
-**Vocabulary.** 82 reserved words: 78 hard keywords, which can never be names, and 4 soft keywords, which are names everywhere except in the position that gives them meaning. The articles `a`, `an` and `the` are hard. A few two-word phrases are read by the lexer as one token, so a parser looking one token ahead sees both words: `for each`, `at entry` and `, otherwise`; a comma that ends a line is read with the line's end. None of this changes the text.
+**Vocabulary.** 80 reserved words: 76 hard keywords, which can never be names, and 4 soft keywords, which are names everywhere except in the position that gives them meaning. The articles `a`, `an` and `the` are hard. A few two-word phrases are read by the lexer as one token, so a parser looking one token ahead sees both words: `for each`, `at entry` and `, otherwise`; a comma that ends a line is read with the line's end. None of this changes the text.
 
 **No special rules.** The grammar is unambiguous by construction. Converted to Bison it has no LALR(1) conflicts, which proves that no text has two readings, and `tools/check_lalr.py` fails the build if one appears. `tools/check_grammar.py` also parses every test, every code block in this specification and the pilot corpora with no disambiguation applied. The pilot's rules D1 and D2 are now the grammar's own structure (Section 5.5), mixing `and` with `or` is a condition group (Section 5.2), and a label word belongs to the outermost call on its line because an argument is one term: a labelled call inside an argument is in brackets.
 
@@ -950,7 +964,8 @@ What the replay changed in this specification:
 - A condition group may be the condition of an `if` or `repeat while`, with `then` or `do` on its own line between the two blocks (5.2).
 - `enum` replaces `choice`, following Rust, Swift and Scala 3; no popular language uses `choice` (3.3).
 - Every keyword is a contract word, an instruction (flow, storage, loops) or a word that makes a line read as English, and no two keywords look alike. Removed for that reason: typestate (`in state`; distinct types do it, as in Rust); `matching`, `positive` and `non_empty` (contracts and distinct types say these); the comparison words `less`, `least`, `more`, `most`, `than` (the school symbols `<`, `≤`, `>`, `≥` remain); `followed by` (a library `join`); the labels `onto`, `over` and `using`; `anything but` (name the failures instead); and `, or else`, which looked like `otherwise` and is now `, otherwise` (2.3, 3.5, 4.1, 7.3, 9.1).
-- Typestate is part of the language: a type lists its `states`, and a state reads as an adjective, `an Open Connection`. `editable`, `consumed` and `maybe` became hard keywords so a state name is never mistaken for one (7.3).
+- Typestate is part of the language: a type lists its `states`, and a state reads as an adjective, `an Open Connection`. `editable` and `consumed` became hard keywords so a state name is never mistaken for one (7.3).
+- A value that may be absent is `a User or nothing`, with no `maybe` and no `some`: a `User` is already a valid `User or nothing`, and testing `is nothing` tells the compiler which it is (3.4). `match` replaces `choose`, as in Rust, Scala and Python (3.3). A module declares what it `requires` and `exports`, as Java modules do, replacing `component`, `needs` and `provides` (11.1). Conditions in contracts may call only pure operations (10.5).
 - Look-alike keywords are replaced: the contract `fails with` (next to the statement `fail with`) is `can fail with`; `ensure if it succeeds` and `ensure if it fails` are `ensure on success` and `ensure on failure`; the quantifier `for every` (next to the loop `for each`) is `for all`; and the group `none of` (next to the value `nothing`) is `not any of` (5.2, 5.5, 6, 10.1).
 - Scribe is not described as a systems language. Having no garbage collector is a choice about memory management, managed at compile time as in Rust, not about the kind of software Scribe is for (1, 7).
 
