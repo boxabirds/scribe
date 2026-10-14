@@ -1,0 +1,6 @@
+note A reason is not an instruction, so `because` is not part of the language: this
+note line calls an operation named `because`. Explanations go in note lines.
+note Expected diagnostic: there is no operation `because`; to explain a clause, write a note line above it.
+to debit account
+    given account is an Account
+    expect account is open because "closed accounts cannot be debited"

@@ -1,0 +1,3 @@
+component Checkout version 3.0.0
+    needs
+        Payments as payments

@@ -2,4 +2,4 @@ type Queue of T
     field capacity as a Count
     field items as a Ring of T
     model contents as sequence_of items
-    invariant count of contents ≤ capacity because "a queue never overflows"
+    invariant count of contents ≤ capacity

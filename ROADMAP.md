@@ -22,7 +22,7 @@ exact oracle.
 | Update `grammar/scribe.lark.tmpl` until every snippet parses with one reading and every negative case is rejected | done |
 | One command that runs all grammar checks and fails on any regression | done |
 | List the open decisions the parser needs settled, with a recommendation each ([grammar/DECISIONS.md](grammar/DECISIONS.md)) | done |
-| Settle those decisions in the spec, then update the grammar and tests to match | done, except `assume` (decision 6) |
+| Settle those decisions in the spec, then update the grammar and tests to match | done |
 | Readability review: every line has exactly one reading; condition groups; no disambiguation rules | done |
 | The grammar has no LALR(1) conflicts, checked in CI, so it is proven unambiguous | done |
 
@@ -124,5 +124,5 @@ Done when: wave 2 translates most functions without a gap.
 
 ## After 1.0
 
-The `proven` tier and its solver, a native back end with direct C interop,
+A solver for proving contracts (until then, a clause the compiler cannot prove is checked at run time), a native back end with direct C interop,
 localised views, and the system-level rule language.

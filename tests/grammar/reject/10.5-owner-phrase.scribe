@@ -1,3 +1,4 @@
 to f x
     given x is an Int
-    trust "the clock is monotonic" owner os_team
+    trust owner os_team
+        assert x = x

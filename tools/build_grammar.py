@@ -20,14 +20,14 @@ import re
 import sys
 
 HARD = set("""
-to given produces fails expect ensure changes uses tier idempotent declassifies
-deadline holds because assumes may
+to given produces fails expect ensure changes uses idempotent declassifies
+deadline holds may
 let be var starts set return fail try handle on failure if otherwise for each
 increment decrement add subtract do
 all any none then
 labelled matching limited added only
 from until through repeat while invariant decreases stop skip choose when hold
-together pipeline trust proof
+together pipeline trust assert
 type choice define component system protocol schema migration example
 property field model interface
 is not and or implies mod of every there where result it some nothing at

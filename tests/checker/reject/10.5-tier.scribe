@@ -1,0 +1,7 @@
+note Tiers are not part of the language: the checker proves what it can and
+note reports how each clause was checked. This line calls an operation `tier`.
+note Expected diagnostic: there is no operation `tier`.
+to f x
+    given x is an Int
+    tier proven
+    return x

@@ -80,6 +80,6 @@ mod tests {
     #[test]
     fn list_is_not_empty() {
         let (hard, soft) = counts();
-        assert!(hard > 100 && soft > 50, "{hard} hard, {soft} soft");
+        assert!(hard > 50 && soft > 20, "{hard} hard, {soft} soft");
     }
 }

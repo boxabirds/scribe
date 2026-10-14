@@ -25,38 +25,33 @@ start: (item)*
 
 block: _NL _INDENT stmt+ _DEDENT
 
-// FIX-9: a clause whose expression is a single quoted string is informal (prose).
-
 // ---------------------------------------------------------------- operations
-operation: "to" signature _NL [_INDENT clause* stmt* proof? _DEDENT]        // DOC
+operation: "to" signature _NL [_INDENT clause* stmt* _DEDENT]              // DOC
 signature: name [name ("," name)*] ((label | "of") name)*              // DOC; FIX-3; SPEC 4.1 several unlabelled parameters
 
 ?clause: given | produces | fails | expect | ensure | changes | uses_clause
-       | tier | idempotent | declassifies | deadline | holds
-       | example | property | assumes_clause | may_block
+       | idempotent | declassifies | deadline | holds
+       | example | property | may_block
        | scoped
 
 given: "given" name "is" typeexpr _NL
 produces: "produces" typeexpr _NL
 fails: "fails" "with" name_list _NL
 expect: "expect" line_condition
-ensure: "ensure" ensure_body [because] _NL
+ensure: "ensure" ensure_body _NL
        | "ensure" group                                                    -> ensure_group
-       | "ensure" [because] if_then                                        -> ensure_if_then
+       | "ensure" if_then                                                 -> ensure_if_then
 ensure_body: expr
            | "if" "it" "succeeds" "," expr                                  -> on_success
            | "if" "it" "fails" ["with" "anything" "but" name] "," expr       -> on_failure_case
            | "if" logic "," expr                                             -> conditional   // SPEC 15
 changes: "changes" "only" expr _NL
 uses_clause: "uses" name_list _NL
-tier: "tier" name ["for" name ("," name "for" "everything" "else")?] _NL
 idempotent: "idempotent" "by" name_list _NL
-declassifies: "declassifies" name "to" name because _NL
+declassifies: "declassifies" name "to" name _NL
 deadline: "deadline" expr _NL                                                // SPEC 1: any expression
 holds: "holds" "when" line_condition
-because: "because" STRING
-assumes_clause: "assumes" STRING _NL                                           // SPEC 10.1
-may_block: "may" "block" STRING _NL                                           // SPEC 8.2
+may_block: "may" "block" _NL                                                  // SPEC 8.2
 // SPEC 10.3: clauses that hold in one build mode only. Source never names a
 // platform: host differences are facts declared on capability interfaces
 scoped: "in" "build" name _NL _INDENT clause+ _DEDENT
@@ -106,7 +101,7 @@ example: "example" expr _NL
 // SPEC 11.2: an interface states contracts every implementation must meet
 interface: "interface" name _NL _INDENT [host_facts] operation+ _DEDENT
 // SPEC 10.3 (Proposed): the facts about a capability that vary by host
-host_facts: "varies" "by" "host" _NL _INDENT (name [because] _NL)+ _DEDENT
+host_facts: "varies" "by" "host" _NL _INDENT (name _NL)+ _DEDENT
 property: "property" quantified _NL
 
 // ---------------------------------------------------------------- protocols
@@ -118,31 +113,22 @@ role_send: name "sends" message_spec _NL
 message_spec: name ["with" field_decl ("," field_decl)*]
 
 // ---------------------------------------------------------------- components and systems
-component: "component" name "version" version _NL _INDENT comp_section+ _DEDENT
+// SPEC 11.1: versions are kept in the package file, outside the language
+component: "component" name _NL _INDENT comp_section+ _DEDENT
 ?comp_section: "needs" _NL _INDENT need+ _DEDENT                  -> needs
              | "may" _NL _INDENT may_line+ _DEDENT                -> may
-             | "assumes" _NL _INDENT assumption+ _DEDENT          -> assumes
              | "provides" _NL _INDENT operation+ _DEDENT          -> provides
-             | tier
-need: name "from" version "as" name _NL [_INDENT "uses" name_list _NL _DEDENT]
+need: name "as" name _NL [_INDENT "uses" name_list _NL _DEDENT]
 ?may_line: "nothing" "of" "its" "own" _NL                         -> no_authority   // SPECIAL EX 28
          | cap_spec _NL
-// an assumption is a quoted sentence, as in an operation's `assumes` clause (SPEC 10.1)
-assumption: STRING _NL
 
-system: "system" name "version" version _NL _INDENT sys_section+ _DEDENT
-?sys_section: "components" _NL _INDENT (name version _NL)+ _DEDENT                  -> components
-            | "authority" _NL _INDENT authority_line+ _DEDENT                   -> authority
-            | "wiring" _NL _INDENT wiring_line+ _DEDENT                         -> wiring
-            | "rules" _NL _INDENT rule_line+ _DEDENT                            -> rules
-?authority_line: "root" "gives" name cap_spec _NL                               -> grant
-               | "nothing" "else" "holds" "authority" _NL                       -> no_other_authority   // SPECIAL
-wiring_line: name "needs" name_list ["(" "read" "operations" "only" ")"] _NL   // SPECIAL parenthesised qualifier
+// SPEC 11.5: a system states rules about the whole program; `main` builds it
+system: "system" name _NL _INDENT "rules" _NL _INDENT rule_line+ _DEDENT _DEDENT
 ?rule_line: "only" name "can" "reach" cap_spec _NL                              -> reach_rule   // SPECIAL
           | "no" "value" "labelled" name "leaves" name _NL                      -> flow_rule    // SPECIAL
           | name "cannot" "write" "to" cap_spec _NL                             -> write_rule   // SPECIAL
 
-schema: "schema" name "version" INT "compatibility" name _NL _INDENT schema_field+ _DEDENT
+schema: "schema" name "version" INT _NL _INDENT schema_field+ _DEDENT
 ?schema_field: name "as" typeexpr ["added" "in" "version" INT] _NL
              | name "reserved" "removed" "in" "version" INT _NL                -> reserved_field
 migration: "migration" name "from" "version" INT "to" "version" INT "turning" name "into" name _NL _INDENT ensure+ _DEDENT
@@ -150,7 +136,7 @@ migration: "migration" name "from" "version" INT "to" "version" INT "turning" na
 // ---------------------------------------------------------------- statements
 ?stmt: let | var | set | update | return_stmt | fail | do_nothing | if_stmt | for_each
      | repeat_while | invariant | decreases | choose | handle | hold
-     | together | pipeline | stop | skip | trust | elided
+     | together | pipeline | stop | skip | trust | assert_stmt | elided
      | expr_stmt
 
 // SPEC 5.1: a call with several unlabelled arguments stands bare only as a whole
@@ -202,10 +188,10 @@ pipeline: "pipeline" _NL _INDENT pipe_item+ _DEDENT [on_failure]
           | "queue" "of" "at" "most" expr _NL                                   -> queue
 stop: "stop" ["all" "stages"] _NL                                               // "all stages" SPECIAL EX 39
 skip: "skip" _NL
-trust: "trust" STRING _NL
-proof: "proof" _NL _INDENT proof_stmt+ _DEDENT
-?proof_stmt: "use" "lemma" name _NL                              -> use_lemma
-           | "assert" expr _NL                                   -> assert_stmt
+// SPEC 10.5: the checker does not verify a `trust` block, and takes an `assert`
+// inside one as true
+trust: "trust" block
+assert_stmt: "assert" line_condition
 elided: ELIDED _NL
 // SPEC 4.2: every statement starts with a keyword or is a call, so a bare
 // expression (`x + 1`, `count = count + 1`) is not a statement
@@ -272,9 +258,9 @@ inline_group: inline_item ("," inline_item)+
 if_then: _NL _INDENT "if" condition _NL "then" condition _NL _DEDENT
 // what may follow a clause word or `be`: a condition on the line, a group, or
 // an if/then block
-?line_condition: condition [because] _NL
+?line_condition: condition _NL
                | group
-               | [because] if_then
+               | if_then
 
 ?comparison: concat
            | concat (comp_op concat)+                           -> compare
@@ -359,7 +345,6 @@ possessive: (name | atom) ("'s" name)+
      | "nothing"                                                -> nothing
 ?literal: INT | DECIMAL | VERSION | STRING | QUANTITY | DATE | HEX | BINARY
 
-version: VERSION | DECIMAL | INT
 
 // ---------------------------------------------------------------- terminals
 _NL: "⏎"
@@ -383,34 +368,26 @@ NAME: /[A-Za-z][A-Za-z0-9_]*/
 // ---- generated
 name: NAME
     | "anything"
-    | "assert"
-    | "authority"
     | "block"
     | "build"
     | "but"
     | "can"
     | "cannot"
-    | "compatibility"
-    | "components"
     | "consumed"
     | "database"
     | "editable"
     | "else"
     | "entry"
-    | "everything"
     | "files"
-    | "gives"
     | "host"
     | "its"
     | "leaves"
-    | "lemma"
     | "maybe"
     | "needs"
     | "network"
     | "no"
     | "non_empty"
     | "one"
-    | "operations"
     | "own"
     | "port"
     | "positive"
@@ -420,7 +397,6 @@ name: NAME
     | "read"
     | "removed"
     | "reserved"
-    | "root"
     | "rules"
     | "sends"
     | "stage"
@@ -431,13 +407,11 @@ name: NAME
     | "time"
     | "turning"
     | "under"
-    | "use"
     | "value"
     | "varies"
     | "version"
-    | "wiring"
     | "write"
-QUANTITY.4: /\d+(\.\d+)?[ ]+(?!(compatibility|declassifies|attenuated|components|everything|idempotent|operations|authority|component|decreases|decrement|increment|interface|invariant|migration|non_empty|otherwise|anything|consumed|database|deadline|editable|followed|labelled|matching|pipeline|positive|produces|property|protocol|provides|reserved|subtract|succeeds|together|assumes|because|changes|example|failure|implies|limited|network|nothing|removed|through|turning|version|assert|before|cannot|choice|choose|define|ensure|expect|handle|leaves|repeat|result|return|schema|stages|starts|system|varies|wiring|added|after|block|build|entry|every|fails|field|files|given|gives|holds|least|lemma|maybe|model|needs|proof|queue|reach|rules|sends|stage|state|there|trust|under|until|using|value|where|while|write|each|else|fail|from|hold|host|into|less|more|most|none|only|onto|over|port|read|root|skip|some|stop|than|that|then|tier|time|type|uses|when|with|add|all|and|any|but|can|for|its|let|may|mod|not|one|own|set|the|try|use|var|an|as|at|be|by|do|if|in|is|it|no|of|on|or|to|a)(?![A-Za-z0-9_]))[A-Za-z][A-Za-z0-9_]*/
+QUANTITY.4: /\d+(\.\d+)?[ ]+(?!(declassifies|attenuated|idempotent|component|decreases|decrement|increment|interface|invariant|migration|non_empty|otherwise|anything|consumed|database|deadline|editable|followed|labelled|matching|pipeline|positive|produces|property|protocol|provides|reserved|subtract|succeeds|together|changes|example|failure|implies|limited|network|nothing|removed|through|turning|version|assert|before|cannot|choice|choose|define|ensure|expect|handle|leaves|repeat|result|return|schema|stages|starts|system|varies|added|after|block|build|entry|every|fails|field|files|given|holds|least|maybe|model|needs|queue|reach|rules|sends|stage|state|there|trust|under|until|using|value|where|while|write|each|else|fail|from|hold|host|into|less|more|most|none|only|onto|over|port|read|skip|some|stop|than|that|then|time|type|uses|when|with|add|all|and|any|but|can|for|its|let|may|mod|not|one|own|set|the|try|var|an|as|at|be|by|do|if|in|is|it|no|of|on|or|to|a)(?![A-Za-z0-9_]))[A-Za-z][A-Za-z0-9_]*/
 OR_ELSE.9: /,[ ]*or[ ]+else(?![A-Za-z0-9_])/
 COMMA_OR.8: /,[ ]*or(?![A-Za-z0-9_])/
 FOR_EACH.7: /for[ ]+each(?![A-Za-z0-9_])/

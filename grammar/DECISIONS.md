@@ -12,7 +12,7 @@ until the specification says so.
 | 3 | ~~`some` with a call~~ Settled: `some` takes the whole arithmetic expression after it, under the rule that any expression goes wherever a value goes | 3.4 | `some item 0 of items` accepted | Done |
 | 4 | ~~What follows `cost at most`~~ Moot: cost bounds are removed, because they are not instructions | 10.1 | Removed | Done |
 | 5 | ~~`corrects` across two lines~~ Moot: `corrects` is removed, because it describes an earlier program. Every statement and clause is one line | 2.6, 10.6 | Removed | Done |
-| 6 | `assume`, the escape hatch, has no syntax | 10.5 | Not accepted | `assume condition because "..." owner team`, mirroring `trust` |
+| 6 | ~~`assume`, the escape hatch, has no syntax~~ Settled: an `assert` inside a `trust` block is taken as true, so no `assume` is needed | 10.5 | `trust` block | Done |
 | 7 | ~~Keyword count~~ Settled: not a concern. Scribe is written by machines, so a large keyword set costs readers nothing | 2.5 | 102 hard, 80 soft | Done |
 | 8 | ~~Possessive paths~~ Settled: `account's balance` is allowed and chains; a path never mixes possessives with `of` | 5.1 | Accepted; mixed paths rejected | Done |
 | 9 | ~~Failures carrying data~~ Settled: a failure is a value and `fail with` takes any expression; fields are given with record construction (5.3), so the named-field form waits on decision 10 | 6 | `fail with an OutOfRange from clamped` accepted | Type rules in phase 5 (spec open decision 12) |
@@ -64,3 +64,10 @@ Decisions from the review of readability and unambiguous presentation
 | 3 | Audit the specification for other operational concepts, and bring each back as a decision | Approved; list presented |
 | 4 | Only what the running program does, and what is checked about it, is language. Removed: monitoring policies on assumptions, a manifest's `failure` section (retries are written in code), a system's `failure domains`, and `scribe deploy plan` | Approved; done |
 | 5 | Only what describes the program's instructions is language. Removed: `cost at most`, a component's `about` prose, and `corrects` (which described an earlier version of the program) | Approved; done |
+| 6 | Reasons (`because "..."`) are removed everywhere; explanations go in `note` lines | Approved; done |
+| 7 | Informal quoted clauses are removed: a quoted sentence is Text, not a condition, and the checker rejects it | Approved; done |
+| 8 | `assumes` is removed; `trust` is a block the checker does not verify, with no reason string | Approved; done |
+| 9 | Tiers and `proof` blocks are removed: the compiler proves what it can, checks the rest at run time and reports which; `assert` and `trust` are body statements | Approved; done |
+| 10 | Contracts (`expect`, `ensure`, `changes only`, `fails with`, `uses`, `example`, `property`, `idempotent by`, invariants, `decreases`, system rules) stay: they state what the instructions do and are checked against them | Approved |
+| 11 | Version numbers and schema compatibility modes move to the package file; schemas and migrations stay | Approved; done |
+| 12 | A system's `components`, `authority` and `wiring` are removed: they repeated what the entry point does in code. `deadline` stays, as a run-time time limit | Approved; done |

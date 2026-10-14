@@ -17,7 +17,7 @@ Scribe is a language for a world where most code is written by machines and read
 
 1. **Rapid impact assessment.** Every operation and component states what it promises, needs and may do, in a form a tool can compare between two versions. The impact of a proposed change is computed from those statements before it is merged, in time that grows with the change and the components that depend on it, not with the size of the codebase.
 2. **Human readability.** Every token a reviewer sees is understood at reading speed. Every line has exactly one reading, and a reader who knows what the words mean sees it without knowing any rule of precedence beyond school arithmetic: text that can be read two ways is not readable, and needing a manual to read an expression is a failure of design. This holds for the stored text and for every view. When readability and impact assessment conflict, Scribe looks for a spelling that serves both; only when there is none does impact assessment win, and the cost to readability is recorded as a decision. Against every other aim, readability wins.
-3. **Correctness by construction.** No undefined behaviour, no missing-value errors, no data races, no leaked resources, no unhandled failures. Beyond that, contracts are proven to the depth the code deserves.
+3. **Correctness by construction.** No undefined behaviour, no missing-value errors, no data races, no leaked resources, no unhandled failures. Beyond that, contracts are proven wherever the compiler can, and checked at run time where it cannot.
 
 And two constraints:
 
@@ -33,8 +33,8 @@ Principles that follow from these and decide individual rules:
 | What a reviewer must judge is visible before the body | Failures, capabilities, effects and contracts sit in each operation's header |
 | One stored form, many readings | The source has exactly one canonical text; people see it through views, and the formatter chooses the clearest phrasing |
 | Words where words are clearer, symbols where symbols are | School-level maths symbols for arithmetic and comparison; words for logic and structure |
-| A promise is code, not commentary | Contracts are checked against the body on every build. Only quoted informal clauses are unchecked, and they are labelled as such |
-| Never overclaim | Every proof, verdict and report states the assumptions and unchecked parts it rests on |
+| A promise is code, not commentary | Contracts are checked against the body on every build. A contract holds only conditions the compiler can check; explanations go in `note` lines |
+| Never overclaim | Every proof, verdict and report states the unchecked code (`trust` blocks) it rests on |
 | Nothing implicit that matters | No ambient authority, no implicit conversion, no missing value without a `maybe`, no failure without a `fails with` |
 | Any expression wherever a value goes | No position in the grammar is limited to a name or a literal without a stated reason; types, not keywords, decide what fits. A value in a contract or a grant of authority must be a constant expression, because impact analysis compares it without running code |
 
@@ -69,7 +69,7 @@ An update form is used only when the place being set is also the left operand, a
 
 | View | For | What changes |
 | --- | --- | --- |
-| **Review** (default) | Reviewers | `<=`, `>=`, `!=` drawn as `≤`, `≥`, `≠`; display forms applied; underscores in names drawn at about half contrast; proof hints folded; a `pure` tag on operations with no `uses` line |
+| **Review** (default) | Reviewers | `<=`, `>=`, `!=` drawn as `≤`, `≥`, `≠`; display forms applied; underscores in names drawn at about half contrast; a `pure` tag on operations with no `uses` line |
 | **Compact** | Experts | As review, plus logic words drawn as `∧ ∨ ¬ ∈ ∀ ∃ ⇒` |
 | **Localised** | Readers of other languages | Keywords replaced one for one; names, strings and notes untouched |
 
@@ -150,7 +150,7 @@ A record may state invariants. They hold whenever control leaves an operation of
 type Order
     field lines as a List of OrderLine
     field status as an OrderStatus
-    invariant lines is not empty or status is Draft because "only drafts may be empty"
+    invariant lines is not empty or status is Draft
 ```
 
 A `model` line gives the abstract state that contracts talk about, so contracts never mention the representation:
@@ -215,7 +215,7 @@ to withdraw amount from account
     given account is an editable Account
     produces a Receipt
     fails with InsufficientFunds
-    expect account is open because "closed accounts cannot be debited"
+    expect account is open
     ensure if it succeeds, balance of account = balance of account at entry - amount
     ensure if it fails, balance of account = balance of account at entry
     changes only balance of account
@@ -391,7 +391,7 @@ Rules:
 
 A failure is a value. Failures are declared as variants of a `choice`, so a failure can carry fields and two failures with the same name can be told apart, and `fail with` takes any expression whose value is a failure: `fail with an OutOfRange with value as clamped`. Failures that carried no data were the most common gap in translated real code. **Open:** the type rules for failure values (Section 14).
 
-**Open:** whether panics exist at all. The current rule is that a `checked` operation cannot panic, and the compiler proves it; what an unprovable bounds check does at lower tiers is undecided.
+**Open:** whether panics exist at all. The current rule is that an operation cannot panic, and the compiler proves it; what a bounds check it cannot prove does is undecided.
 
 ## 7. Memory, ownership and resources
 
@@ -481,8 +481,8 @@ An operation's effects are what it may do beyond computing its result. They are 
 | --- | --- |
 | Use a capability (files, network, clock, database,    N  another component) | `uses files, clock` |
 | Request memory (**Proposed**) | `allocates` |
-| Block in the operating system | `may block "<when and what for>"` |
-| Turn secret data public | `declassifies secret to public because "..."` |
+| Block in the operating system | `may block` |
+| Turn secret data public | `declassifies secret to public` |
 
 An operation with none of these is pure, and calling an effectful operation from it is a compile error naming the call. Clocks are capabilities, so code that depends on the time says so, and tests pass a fake clock.
 
@@ -557,16 +557,12 @@ A **contract** is what an operation requires and promises. It is the lines betwe
 | `fails with A, B` | Every way it can fail | Compiler, completely |
 | `uses`, `allocates`, `may block` | Its effects and capabilities | Compiler, completely |
 | `expect condition` | What callers must ensure | Proof at call sites, or run-time check |
-| `ensure condition` | What it guarantees. Forms: `ensure if it succeeds, ...`, `ensure if it fails, ...`, `ensure if result is some p, ...` | Proof, or run-time check, by tier |
+| `ensure condition` | What it guarantees. Forms: `ensure if it succeeds, ...`, `ensure if it fails, ...`, `ensure if result is some p, ...` | Proof where the checker can; otherwise a run-time check, and reports say which (10.5) |
 | `changes only x` | Everything else is untouched | Compiler |
 | `example call is value` | An exact result for an exact input | Run on every build |
-| `idempotent by keys` | Repeating it with the same keys has no further effect | Tests; proof at higher tiers |
-| `assumes "..."` | A fact about the outside world it relies on | Not proven. Listed in every report that depends on it |
-| `"a quoted sentence"` in place of a condition | An informal clause | Not checked. Labelled informal everywhere it appears |
+| `idempotent by keys` | Repeating it with the same keys has no further effect | Proof where the checker can; otherwise tests |
 
-Any clause may end with `because "..."`. The sentence becomes the diagnostic text, the documentation and the label in reports. Inside an `ensure`, `x at entry` is the value of `x` when the operation began.
-
-Informal clauses must describe behaviour a caller can observe. A lint rejects informal clauses that describe how the code works ("uses string concatenation"), because they change with every refactoring.
+Every clause is a condition or a declaration the compiler checks. A quoted sentence is Text, not a condition, so it cannot be a clause; an explanation goes in a `note` line. Inside an `ensure`, `x at entry` is the value of `x` when the operation began.
 
 ### 10.2 Examples
 
@@ -590,18 +586,18 @@ Source never names an operating system or a host. Everything that can behave dif
 ```
 interface Files
     varies by host
-        names_ignore_case because "two names that differ only in case name the same file"
-        rename_replaces_target because "renaming onto an existing file replaces it"
+        names_ignore_case
+        rename_replaces_target
 
     to rename source to target in files
         given source is a Path
         given target is a Path
         given files is an editable Self
         fails with NotFound, TargetExists
-        ensure if rename_replaces_target of files, "an existing target is replaced"
+        ensure if rename_replaces_target of files, target is in names of files
 ```
 
-An operation whose contract tests a host-dependent fact holds wherever the fact has the value it tests for; a contract that tests none must hold on every host. Each host binding, the implementation of a capability's interface for one host, gives every fact its value and carries the assumptions it makes about that host. The toolchain supplies the host bindings, and they are the only place a particular operating system is named.
+An operation whose contract tests a host-dependent fact holds wherever the fact has the value it tests for; a contract that tests none must hold on every host. Each host binding, the implementation of a capability's interface for one host, gives every fact its value. The toolchain supplies the host bindings, and they are the only place a particular operating system is named.
 
 A clause can also hold in one build mode only:
 
@@ -621,18 +617,28 @@ Contracts are compared once for each host binding and build mode (Section 12).
 - Types carry `invariant` and `model` lines (Section 3.2).
 - `define` names a predicate so contracts read as sentences: `define items is sorted` with a `holds when` line; then `expect items is sorted`.
 
-### 10.5 Tiers
+### 10.5 How clauses are checked
 
-Each clause has an assurance tier, and every report states the weakest tier it relies on:
+The source does not say how hard to check. On every build the compiler proves that there is no undefined behaviour, no unhandled failure and no run-time error, and checks types, effects, capabilities, units and states. It then proves each `ensure`, `expect` and invariant where it can; a clause it cannot prove is checked at run time instead. `example` and `property` lines run as tests. Every report says, for each clause, which of these held it.
 
-| Tier | Meaning |
-| --- | --- |
-| `informal` | Quoted text. Shown, never trusted |
-| `tested` | Checked by examples and properties |
-| `checked` | The default. No undefined behaviour, no unhandled failure, no run-time error is proven; types, effects, capabilities, units and states are checked |
-| `proven` | Every `ensure` and invariant is proven |
+Two statements belong to the body:
 
-Proof hints go in a `proof` block at the end of the operation, folded by default in the review view. Escape hatches, `trust "..."` and `assume`, state what is taken on trust and why; they are counted per package, and appear in every review and report that depends on them, with their file and line. Who reviews them is a matter for the repository's own ownership rules, not the language.
+```
+to sorted_copy of items using native
+    given items is a List of Int
+    given native is the NativeSort
+    produces a List of Int
+    ensure result is sorted
+    uses native
+    let copy be sort items with native
+    assert count of copy = count of items
+    trust
+        assert copy is sorted
+    return copy
+```
+
+- `assert condition` is a condition the compiler must prove at that point, and may then use. Where it cannot be proven, it is checked at run time.
+- `trust` opens a block the checker does not verify, and an `assert` inside it is taken as true. Trust blocks are counted per package, and every review and report that depends on one names it with its file and line. Who reviews them is a matter for the repository's own rules, not the language.
 
 ### 10.6 Corrections (removed)
 
@@ -653,16 +659,13 @@ Impact analysis is only as good as contracts are complete (Appendix B), so the t
 A **component** is the unit of review, versioning and deployment. Its **manifest** is its contract as a whole, written at the top of the component's source:
 
 ```
-component Checkout version 3.0.0
+component Checkout
 
     needs
-        Payments from 3.1 as payments
+        Payments as payments
             uses charge, refund, total_charged_to
-        Inventory from 2.0 as inventory
+        Inventory as inventory
             uses reserve, release
-
-    assumes
-        "charging with the same key twice charges once"
 
     provides
         to place_order cart for customer with request_id
@@ -680,12 +683,11 @@ component Checkout version 3.0.0
 
 | Section | Says |
 | --- | --- |
-| `needs` | Each component it depends on, from which version, and which of its operations it uses. Impact is judged against exactly these |
+| `needs` | Each component it depends on, and which of its operations it uses. Impact is judged against exactly these |
 | `may` | Authority it holds of its own (usually none: it acts through what it needs) |
-| `assumes` | Facts about the world outside that it relies on |
 | `provides` | The operations other components may call, with their contracts |
 
-Versions are computed from the change to the manifest (Section 12): a person may raise a version but not lower it.
+Version numbers, of the component and of what it needs, are not part of the language: they are kept in the component's package file. The toolchain computes the next version from the change to the manifest (Section 12), and a person may raise it but not lower it.
 
 ### 11.2 Interfaces
 
@@ -699,27 +701,26 @@ interface Reader
         produces a Count
         fails with EndOfData, ReadFailed
         ensure result ≤ count of buffer
-        ensure "a reader that returns 0 without failing will later return data or fail"
 ```
 
 Each implementation is checked against the interface's contract. A change to an interface's contract affects every implementation and every caller.
 
 ### 11.3 Schemas and migrations
 
-Stored and transmitted data has a schema with a declared compatibility mode:
+Stored and transmitted data has a schema. Its version is part of the data, because a running program reads values written by older versions:
 
 ```
-schema Order version 4 compatibility backward_transitive
+schema Order version 4
     id           as an OrderId
     lines        as a List of OrderLine
-    note         as a maybe Text     added in version 4
+    gift_message as a maybe Text     added in version 4
     discount     reserved            removed in version 3
 
 migration Order from version 3 to version 4 turning old into new
-    ensure note of new is nothing
+    ensure gift_message of new is nothing
 ```
 
-A removed field's name is reserved and cannot be reused. A migration is checked against its `ensure` lines over every value of the old version.
+A removed field's name is reserved and cannot be reused. A migration is checked against its `ensure` lines over every value of the old version. A new version is compatible if every value of the old one can be read, directly or through a migration.
 
 ### 11.4 Protocols
 
@@ -739,20 +740,10 @@ A new version of a protocol is accepted only if it refines the old one.
 
 ### 11.5 Systems
 
-A system file lists the components, gives each its authority, wires them together, and states rules about the whole:
+A program is assembled in code: its entry point hands each component its capabilities and calls it (8.1), and each component's `needs` say what it calls. A system file adds only rules about the whole program, which the checker proves against that code:
 
 ```
-system Shop version 12
-    components
-        Storefront 5.1
-        Checkout 2.4
-        Payments 3.1
-    authority
-        root gives Payments network host "payments.example.com" port 443
-        nothing else holds authority
-    wiring
-        Storefront needs Checkout
-        Checkout needs Payments
+system Shop
     rules
         only Payments can reach host "payments.example.com"
         no value labelled card_data leaves Payments
@@ -782,11 +773,11 @@ Each provided operation, each dependent and each system rule gets exactly one ve
 
 | Verdict | Meaning | Must carry |
 | --- | --- | --- |
-| Compatible | The new contract refines the old: preconditions no stronger, guarantees no weaker, no new failure, effect or assumption | A proof, or the solver's reason |
+| Compatible | The new contract refines the old: preconditions no stronger, guarantees no weaker, no new failure or effect | A proof, or the solver's reason |
 | Breaking | Some caller can observe a difference the old contract promised would not happen | A witness: a concrete input or scenario |
-| Needs review | The tool cannot decide: an informal clause or an assumption changed, or a guarantee changed in a way that may or may not matter | The clause and the reason |
+| Needs review | The tool cannot decide: a guarantee changed in a way that may or may not matter, or a `trust` block changed | The clause and the reason |
 | Authority change | The component now holds or uses authority it did not before | The new capability and the path to it |
-| Unchanged, checked | The contract did not change and the new implementation was checked against it at its stated tier, and the contract covers the code that changed | The tier and the coverage |
+| Unchanged, checked | The contract did not change, the new implementation was checked against it, and the contract covers the code that changed | How each clause was checked, and the coverage |
 | Unchanged, unchecked | The contract did not change, but the changed code does something the contract does not speak to, or was not checked | The uncovered lines or behaviours |
 
 "Unchanged, unchecked" is the tool being honest about its blind spot. A green result is only ever as good as the contract behind it, so the report never says a change has no impact when the contract does not cover what changed.
@@ -799,19 +790,16 @@ Each provided operation, each dependent and each system rule gets exactly one ve
 | Stronger precondition | Breaking for any caller that may not meet it, with that caller's input as witness |
 | Weaker or removed guarantee | Breaking for dependents that rely on it; needs review for unknown callers |
 | New way to fail | Breaking for callers that handle every failure by name; needs review otherwise |
-| New or changed `assumes` | Needs review |
-| Changed informal clause | Needs review |
+| New or changed `trust` block | Needs review |
 | New capability or effect for the component | Authority change |
 | Removed or renamed operation | Breaking for every caller the same change leaves untouched; compatible for callers the change updates |
-| Changed schema | As its compatibility mode says; a change that does not meet the mode is breaking |
+| Changed schema | Compatible if every value of the old version can be read, directly or through a migration; breaking otherwise |
 | Changed protocol | Compatible if the new protocol refines the old; breaking otherwise |
 
-Three points of detail:
+Two points of detail:
 
 - **Effects are compared per component.** Moving an existing effect from one operation to another inside the same component is not an authority change. It is reported against the operations concerned under the rules above.
 - **A removed guarantee is reported, even when it was never true.** A change that drops a clause the old code did not meet is still a weaker guarantee: dependents that relied on it are listed, because their code may have depended on the false promise in practice. Saying that the old clause was false belongs in the change's review, not in the source.
-
-- **Informal clauses must describe behaviour, not implementation.** A lint rejects informal clauses that name internal variables, algorithms or data structures, because a clause like `"uses a hash map"` changes with every refactor and turns impact reports into noise.
 
 ### 12.4 Contract coverage
 
@@ -832,13 +820,12 @@ Breaking (1)
         witness: 101 charges in one second from one merchant
 
 Needs review (1)
-    assumes "the card network answers within 30 seconds"
-        changed to 10 seconds
+    capture: trust block changed, lines 41–47
 
 Authority change (0)
 
 Unchanged, checked (6)
-    refund, total_charged_to, capture, void, list_charges, receipt   tier checked, coverage 100%
+    refund, total_charged_to, void, list_charges, receipt   proven, coverage 100%
 
 Unchanged, unchecked (1)
     authorise: changed lines 88–104 add a retry loop that no clause covers
@@ -856,10 +843,10 @@ Removed from the language. Ordering a rollout so that no component runs alongsid
 
 | Command | Does |
 | --- | --- |
-| `scribe check` | Parses, formats to the stored form, type-checks, checks ownership, effects, authority and every contract at its stated tier. This is the build's gate |
+| `scribe check` | Parses, formats to the stored form, type-checks, checks ownership, effects, authority and every contract. This is the build's gate |
 | `scribe build` | Check, then compile to WebAssembly (version 1). `in build` modes select debug or release |
 | `scribe test` | Runs `example` and `property` lines and test blocks |
-| `scribe prove` | Discharges `proven` clauses with the solver and reports any it cannot, with a counterexample where one exists |
+| `scribe prove` | Proves contracts with the solver and reports any it cannot, with a counterexample where one exists |
 | `scribe impact` | Compares two versions (Section 12) |
 | `scribe coverage` | Reports which code each contract clause constrains (12.4) |
 | `scribe draft` | Proposes a contract for an operation from its body and tests. The proposal is marked as a draft until a person accepts it, and never counts as checked on its own |
@@ -900,10 +887,10 @@ These are the decisions this draft does not settle. Each names what blocks it. A
 | 3 | `allocates` as a contract clause, with the allocator passed as context | Proposed | Measuring how many contracts it adds lines to |
 | 4 | A small rule language for system files in place of fixed English templates | Proposed | Keyword count (Appendix A) |
 | 5 | Possessive paths: `account's balance` | Settled | Allowed, never mixed with `of` in one path (5.1) |
-| 6 | Reduce the keyword set (now 109 hard, 55 soft) | Open | Experiment 1, the comprehension test, extended to compare candidate words for the same idea: for example `hold` against `with`, `using` and `lease` |
+| 6 | Reduce the keyword set (now 106 hard, 44 soft) | Open | Experiment 1, the comprehension test, extended to compare candidate words for the same idea: for example `hold` against `with`, `using` and `lease` |
 | 7 | Parser strategy: the grammar is LALR(1) with no conflicts (Appendix A); whether the compiler's parser is generated from it or written by hand | Open | Comparing the error messages each gives on the pilot's real mistakes |
 | 8 | Code generator for WebAssembly, the version 1 target: a back end of our own, or one built on LLVM or Cranelift | Open | A compile-time benchmark on the pilot corpus |
-| 9 | Solver and proof format for `proven` clauses | Open | Choosing a solver that is fast and gives stable results across versions |
+| 9 | Solver for proving contracts | Open | Choosing a solver that is fast and gives stable results across versions |
 | 10 | Localized views beyond English | Open | Round-trip proof for at least one other language |
 | 11 | How host-dependent facts are declared (10.3), and which host bindings impact analysis compares by default | Proposed | Re-expressing the replay's platform-specific breakages with it |
 | 12 | Type rules for failures as values: how a failure `choice` relates to `fails with`, and how impact analysis compares a failure's fields | Open | Roadmap phase 5, with the translation wave that needs them |
@@ -914,7 +901,7 @@ These are the decisions this draft does not settle. Each names what blocks it. A
 
 The reference grammar is `grammar/scribe.lark` (version 0.3) in this project; `scribe-grammar-v0.2.lark` is the version the pilot measured. It is an Earley grammar: it states the language precisely but is not yet a production parser. `tools/check_grammar.py` tests it against a file per construct in this specification, a file per forbidden form, this specification's code blocks and the pilot corpora.
 
-**Vocabulary.** 164 reserved words: 109 hard keywords, which can never be names, and 55 soft keywords, which are names everywhere except in the position that gives them meaning. The articles `a`, `an` and `the` are hard. A few two-word phrases are read by the lexer as one token, so a parser looking one token ahead sees both words: `for each`, `at entry`, `, or else` and `, or`; a comma that ends a line is read with the line's end. None of this changes the text.
+**Vocabulary.** 150 reserved words: 106 hard keywords, which can never be names, and 44 soft keywords, which are names everywhere except in the position that gives them meaning. The articles `a`, `an` and `the` are hard. A few two-word phrases are read by the lexer as one token, so a parser looking one token ahead sees both words: `for each`, `at entry`, `, or else` and `, or`; a comma that ends a line is read with the line's end. None of this changes the text.
 
 **No special rules.** The grammar is unambiguous by construction. Converted to Bison it has no LALR(1) conflicts, which proves that no text has two readings, and `tools/check_lalr.py` fails the build if one appears. `tools/check_grammar.py` also parses every test, every code block in this specification and the pilot corpora with no disambiguation applied. The pilot's rules D1 and D2 are now the grammar's own structure (Section 5.5), mixing `and` with `or` is a condition group (Section 5.2), and a label word belongs to the outermost call on its line because an argument is one term: a labelled call inside an argument is in brackets.
 
@@ -953,7 +940,7 @@ What the replay changed in this specification:
 | Platform-specific breakages were averaged away | Host-dependent facts stated on capabilities, and contracts compared once per host binding (10.3, 12.1) |
 | Interfaces had no contract, so implementations drifted | Interfaces carry contracts that bind every implementation (11.2) |
 | Fixing a false promise was reported as breaking it | `corrects` (12.3); later removed, because it described an old version of the program (10.6) |
-| False alarms on controls | Removal breaking only for callers left untouched; effects compared per component; lint on implementation-detail informal clauses (12.3) |
+| False alarms on controls | Removal breaking only for callers left untouched; effects compared per component; lint on implementation-detail informal clauses (12.3), later removed with informal clauses (10.1) |
 | Contracts were costly to write | `scribe draft` (13.1) |
 
 ### B.3 Decisions from design review
@@ -989,9 +976,9 @@ What the replay changed in this specification:
     - the amount in `add` and `subtract`, and a limit in a type, is one term (3.5, 4.2);
     - an item of a one-line condition group holds no word that covers the rest of the line (5.2), and a pipeline stage is a call (9.3).
 - The language holds only what the running program does and what is checked about it. How a program is monitored, retried by configuration, grouped into failure domains or rolled out belongs to operations tooling: assumption monitors, a manifest's `failure` section, a system's `failure domains` and `scribe deploy plan` are removed (11.1, 11.5, 12.6). A retry is written in code, where it can be seen.
-- The language describes programs, not organisations. Owners and teams are not part of it: `trust`, `assume` and `assumes` say what is unchecked and why, and the repository's own ownership rules say who reviews it (10.5). Durable execution (`workflow`, `runs at most once per`, `survives restarts`) is a platform service, not language (9.4).
+- The language describes programs, not organisations. Owners and teams are not part of it: a `trust` block marks what is unchecked, and the repository's own rules say who reviews it (10.5). Durable execution (`workflow`, `runs at most once per`, `survives restarts`) is a platform service, not language (9.4).
 - Source never names an operating system. A difference between hosts is a fact about a capability, declared in its interface; this replaces clauses scoped `on <platform>` (10.3).
-- Source text describes only the program's instructions and what is checked about them. A cost bound (`cost at most`), a component's `about` prose and a `corrects` line describing an earlier version are removed (10.1, 10.6, 11.1).
+- Source text describes only the program's instructions and what is checked about them. Removed for that reason: cost bounds (`cost at most`); prose, whether a component's `about` section, a `because` reason, an informal quoted clause or an `assumes` fact (explanations go in `note` lines); a `corrects` line, which described an earlier version; assurance tiers and `proof` blocks (the compiler proves what it can and reports how each clause was held; `assert` and `trust` are body statements); version numbers and schema compatibility modes, which belong in the package file; and a system's `components`, `authority` and `wiring`, which repeated what the entry point does in code (10.1, 10.5, 10.6, 11.1, 11.3, 11.5).
 - Scribe is not described as a systems language. Having no garbage collector is a choice about memory management, managed at compile time as in Rust, not about the kind of software Scribe is for (1, 7).
 
 ### B.4 Earlier documents

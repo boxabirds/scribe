@@ -1,3 +1,0 @@
-to f x
-    given x is an Int
-    assumes "the network answers within 30 seconds" monitor checking

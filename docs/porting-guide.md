@@ -112,14 +112,13 @@ make this easier than the list suggests:
 | `schema` | A versioned data schema | Database schemas | `record_schema`, `shape`, `layout` |
 | `migration` | A schema migration | Database migrations | `schema_change`, `upgrade` |
 | `system` | A system file | The operating system, a subsystem | `platform`, `host`, `subsystem` |
-| `component` | A unit of review and deployment | UI components, parts | `part`, `module`, `widget` |
+| `component` | A unit of review and versioning | UI components, parts | `part`, `module`, `widget` |
 | `interface` | An interface's contract | APIs, network interfaces | `api`, `port`, `nic` |
 | `protocol` | A declared conversation | Wire protocols, scheme names | `wire_format`, `scheme`, `proto` |
 | `property` | A generated test | Object properties, attributes | `attribute`, `prop`, `trait_name` |
 | `example` | An exact example in a contract | Samples, fixtures | `sample`, `specimen`, `fixture` |
-| `proof` | Proof hints | Cryptographic proofs | `evidence`, `witness` |
-| `trust` | An escape hatch with an owner | Trust levels, scores | `trust_level`, `confidence` |
-| `tier` | A clause's assurance tier | Pricing or service tiers | `level`, `plan_tier`, `grade` |
+| `assert` | A condition the compiler proves at that point | Test assertions | `check`, `verify` |
+| `trust` | A block the checker does not verify | Trust levels, scores | `trust_level`, `confidence` |
 | `deadline` | A time limit monitored at run time | Due dates | `due`, `due_at`, `cutoff` |
 | `choice` | Declares a choice type | User selections | `selection`, `option`, `pick` |
 | `pipeline` | Stages joined by bounded queues | Build or data pipelines | `stages`, `chain`, `flow` |
@@ -153,10 +152,8 @@ These are rarely names in other languages, so they seldom need renaming.
 | `if`, `otherwise`, `on` | Branches, `on failure` |
 | `be`, `starts` | `let x be`, `var x starts at` |
 | `through` | Ranges that include their end |
-| `because` | The reason attached to a clause |
 | `given`, `produces` | Parameters and results in a contract |
 | `ensure` | A guarantee |
-| `assumes` | A fact about the outside world |
 | `idempotent`, `declassifies` | Contract clauses |
 | `invariant`, `decreases` | Loop and type reasoning |
 | `define` | Names a predicate |
