@@ -17,7 +17,7 @@ import tempfile
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 
-from check_grammar import CORPORA, RENAMES, SPEC, TESTS, scribe_files  # noqa: E402
+from check_grammar import CORPORA, CORPUS, RENAMES, SPEC, TESTS, scribe_files  # noqa: E402
 from pre import LayoutError, preprocess  # noqa: E402
 from run3 import load  # noqa: E402
 from spec_blocks import blocks  # noqa: E402
@@ -95,6 +95,8 @@ def cases(tmp):
     for group in ("accept", "reject"):
         for f in scribe_files(os.path.join(TESTS, group)):
             out.append((f"tests/{group}/{os.path.basename(f)}", f, []))
+    for f in scribe_files(CORPUS):
+        out.append((f"tests/corpus/{os.path.basename(f)}", f, []))
     for line, text in blocks(open(SPEC).read()):
         path = os.path.join(tmp, f"spec-{line:04d}.scribe")
         open(path, "w").write(text)

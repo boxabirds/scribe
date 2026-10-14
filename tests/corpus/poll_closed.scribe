@@ -1,0 +1,42 @@
+note Translated from tokio tokio/src/sync/oneshot.rs, Sender::poll_closed (MIT).
+note The atomic state shared with the receiver needs spec 7.4 (shared state);
+note the `unsafe` blocks become `trust` blocks.
+enum Poll
+    Ready
+    Pending
+
+type Sender
+    inner: SharedState
+
+function poll_closed(sender: editable Sender, context: editable TaskContext, scheduler: Scheduler) -> Poll
+    uses scheduler
+    let budget = try_proceed(context, scheduler)
+    if budget is nothing
+        return Pending
+
+    var state = load_state(sender.inner)
+    if is_closed(state)
+        made_progress(budget)
+        return Ready
+
+    if is_tx_task_set(state)
+        var will_notify = false
+        trust
+            will_notify = will_wake(sender.inner.tx_task, context)
+        if not will_notify
+            state = unset_tx_task(sender.inner)
+            if is_closed(state)
+                set_tx_task(sender.inner)
+                made_progress(budget)
+                return Ready
+            trust
+                drop_task(sender.inner.tx_task)
+
+    if not is_tx_task_set(state)
+        trust
+            set_task(sender.inner.tx_task, context)
+        state = set_tx_task(sender.inner)
+        if is_closed(state)
+            made_progress(budget)
+            return Ready
+    return Pending

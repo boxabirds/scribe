@@ -1,0 +1,33 @@
+note Translated from Go src/encoding/binary/varint.go, ReadUvarint (BSD 3-Clause).
+note Go returns the partial value with the error; here the failure carries it.
+enum VarintFailure
+    EndOfData
+    UnexpectedEnd(partial: U64)
+    Overflow(partial: U64)
+    ReadFailed(partial: U64)
+
+interface ByteReader
+    function read_byte(reader: editable Self) -> U8
+        can fail with EndOfData, ReadFailed
+
+function read_uvarint(reader: editable ByteReader) -> U64
+    can fail with EndOfData, UnexpectedEnd, Overflow, ReadFailed
+
+    var x = to_u64(0)
+    var shift = 0
+    for i in 0 until max_varint_len_64
+        handle
+            let b = try read_byte(reader)
+            if b < 0x80
+                if i == max_varint_len_64 - 1 and b > 1
+                    fail with Overflow(partial: x)
+                return bitwise_or(x, shift_left(to_u64(b), shift))
+            x = bitwise_or(x, shift_left(to_u64(bitwise_and(b, 0x7f)), shift))
+            shift = shift + 7
+        on failure EndOfData
+            if i > 0
+                fail with UnexpectedEnd(partial: x)
+            fail with EndOfData
+        on failure ReadFailed
+            fail with ReadFailed(partial: x)
+    fail with Overflow(partial: x)

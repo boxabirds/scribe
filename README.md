@@ -96,6 +96,7 @@ one reading on its own (spec Section 1).
 | Check | Result |
 | --- | --- |
 | Conformance tests, one per construct (`tests/grammar/accept`) | 30 of 30 parse with one reading |
+| Real code translated into Scribe (`tests/corpus`) | 8 of 8 parse with one reading |
 | Forbidden forms (`tests/grammar/reject`) | 20 of 20 rejected |
 | Spec code blocks | 24 of 26; the other 2 are contract fragments, not whole programs |
 | Bison | **No LALR(1) conflicts** (v0.2: 172 shift/reduce and 20 reduce/reduce), so no text has two readings; `tools/check_lalr.py` keeps it that way |

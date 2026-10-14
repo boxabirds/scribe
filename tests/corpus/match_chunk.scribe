@@ -1,0 +1,65 @@
+note Translated from Go src/path/match.go, matchChunk (BSD 3-Clause).
+note Go returns (rest, ok, err); here a match returns the rest of the text or
+note nothing, and a malformed pattern is a failure. Go's `fallthrough` from the
+note escape case into the default case becomes one `if` in the default case.
+function match_chunk(chunk: Text, text: Text) -> Text or nothing
+    can fail with BadPattern
+
+    var pattern = chunk
+    var rest = text
+    var failed = false
+    while count(pattern) > 0
+        decreases count(pattern)
+        if count(rest) == 0
+            failed = true
+        let next = first_char(pattern)
+        if next == "["
+            var r = 0
+            if not failed
+                let decoded = decode_rune(rest)
+                r = decoded.rune
+                rest = drop(rest, decoded.width)
+            pattern = drop(pattern, 1)
+            var negated = false
+            if all of count(pattern) > 0, first_char(pattern) == "^"
+            then
+                negated = true
+                pattern = drop(pattern, 1)
+            var matched = false
+            var ranges = 0
+            while true
+                if all of count(pattern) > 0, first_char(pattern) == "]", ranges > 0
+                then
+                    pattern = drop(pattern, 1)
+                    break
+                let low = try read_escaped(pattern)
+                pattern = low.rest
+                var high = low.rune
+                if first_char(pattern) == "-"
+                    let upper = try read_escaped(drop(pattern, 1))
+                    high = upper.rune
+                    pattern = upper.rest
+                if low.rune <= r <= high
+                    matched = true
+                ranges = ranges + 1
+            if matched == negated
+                failed = true
+        else if next == "?"
+            if not failed
+                if first_char(rest) == "/"
+                    failed = true
+                rest = drop(rest, decode_rune(rest).width)
+            pattern = drop(pattern, 1)
+        else
+            if next == "\\"
+                pattern = drop(pattern, 1)
+                if count(pattern) == 0
+                    fail with BadPattern
+            if not failed
+                if first_char(pattern) != first_char(rest)
+                    failed = true
+                rest = drop(rest, 1)
+            pattern = drop(pattern, 1)
+    if failed
+        return nothing
+    return rest

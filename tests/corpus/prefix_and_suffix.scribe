@@ -1,0 +1,17 @@
+note Translated from Go src/os/tempfile.go, prefixAndSuffix (BSD 3-Clause).
+note Go returns two strings; Scribe has no tuples, so the pair is a record.
+type Affixes
+    prefix: Text
+    suffix: Text
+
+function prefix_and_suffix(pattern: Text) -> Affixes
+    can fail with PatternHasSeparator
+    ensure on success, result.prefix == pattern or contains(pattern, "*")
+
+    for i in 0 until count(pattern)
+        if is_path_separator(char_at(pattern, i))
+            fail with PatternHasSeparator
+    let star = last_index_of(pattern, "*")
+    if star is nothing
+        return Affixes(prefix: pattern, suffix: "")
+    return Affixes(prefix: take(pattern, star), suffix: drop(pattern, star + 1))

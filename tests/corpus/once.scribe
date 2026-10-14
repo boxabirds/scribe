@@ -1,0 +1,14 @@
+note Translated from Go src/sync/once.go, Once.Do (BSD 3-Clause).
+note Go's Once runs a function value once across goroutines. Scribe has no function
+note types (spec 4.3) and no shared mutable state (spec 7.4) yet, so this is the
+note closest single-task form: a typestate that makes "run at most once" a compile
+note error instead of a run-time check. The concurrent version needs 7.4.
+type Once
+    states Pending, Done
+
+interface Action
+    function run(action: editable Self)
+
+function do_once(once: consumed Pending Once, action: editable Action) -> Done Once
+    run(action)
+    return mark_done(once)

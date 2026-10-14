@@ -1,0 +1,41 @@
+note Translated from Go src/net/textproto/reader.go, readContinuedLineSlice (BSD 3-Clause).
+note Go takes the first-line check as a function parameter; Scribe has no function
+note types yet (spec 4.3), so the check is an interface the caller implements.
+interface LineValidator
+    function validate(line: Bytes, validator: Self)
+        can fail with InvalidLine
+
+type TextReader
+    input: BufferedReader
+    buffer: Bytes
+
+function read_continued_line(reader: editable TextReader, limit: Int or nothing, validator: LineValidator) -> Bytes
+    can fail with InvalidLine, MessageTooLarge, ReadFailed
+
+    let line = try read_line(reader, limit)
+    if count(line) == 0
+        return line
+    try validate(line, validator)
+
+    if buffered(reader.input) > 1
+        let peek = peek_bytes(reader.input, 2)
+        if any of
+            all of count(peek) > 0, is_ascii_letter(peek[0])
+            all of count(peek) > 0, peek[0] == newline
+            all of count(peek) == 2, peek[0] == carriage_return, peek[1] == newline
+        then
+            return trim(line)
+
+    reader.buffer = trim(line)
+    var remaining = max_int_64
+    if limit is not nothing
+        remaining = limit
+    remaining = remaining - count(reader.buffer)
+
+    while skip_space(reader) > 0
+        reader.buffer = append(reader.buffer, space)
+        if count(reader.buffer) >= remaining
+            fail with MessageTooLarge
+        let next = try read_line(reader, remaining - count(reader.buffer))
+        reader.buffer = concat(reader.buffer, trim(next))
+    return reader.buffer
