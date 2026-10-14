@@ -21,7 +21,7 @@ import sys
 HARD = set("""
 to given produces fails expect ensure changes uses tier idempotent declassifies
 deadline runs survives holds because assumes may
-let be var starts set give back fail try handle on failure if otherwise for each
+let be var starts set return fail try handle on failure if otherwise for each
 from until through repeat while invariant decreases stop skip choose when hold
 together pipeline trust proof
 type choice define component system protocol schema migration workflow example

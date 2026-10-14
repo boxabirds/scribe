@@ -3,7 +3,7 @@ to f x
     produces an Int
     tier proven
     trust "the platform clock is monotonic" owner os_team
-    give back x
+    return x
     proof
         use lemma add_commutes
         assert x = x

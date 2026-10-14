@@ -2,11 +2,11 @@ to classify x
     given x is an Int
     produces Text
     if x is less than 0
-        give back "negative"
+        return "negative"
     otherwise if x is more than 100
-        give back "large"
+        return "large"
     otherwise if x is at most 10 and x is at least 1
-        give back "small"
+        return "small"
     otherwise if x is not 50
-        give back "other"
-    give back "fifty"
+        return "other"
+    return "fifty"

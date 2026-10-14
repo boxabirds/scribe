@@ -3,4 +3,4 @@ to f x
     given x is an Int
     produces an Int
     note a comment in a body
-    give back x
+    return x

@@ -18,4 +18,5 @@ until the specification says so.
 | 9 | Failures carrying data: `fail with OutOfRange with value clamped` | 6, Proposed | Not accepted | Adopt the syntax now; the type rules come in phase 5 |
 | 10 | Naming fields when constructing: `a Point with x as 1, y as 2` | 5.3, Proposed | Not accepted | Adopt |
 | 11 | Setting one element: `set item i of heap to x` | 4.2, Proposed | Rejected | Adopt |
-| 12 | A statement that does nothing, for an empty `when` branch | 4.2, Proposed | Not accepted | Adopt, spelled `do nothing` |
+| 12 | A statement that does nothing, for a `when` branch with nothing to do. `choose` must name every variant, so adding a variant breaks every `choose` that misses it, and a block needs at least one line | 4.2, Proposed | Not accepted | Adopt, spelled `do nothing`, rather than a catch-all branch that would hide new variants |
+| 13 | What names a platform in `on <platform>`. `on` is the keyword; the platform is an ordinary name, so there is no keyword per platform. With WebAssembly as the only target, the platforms that can differ are hosts (Wasmtime, a browser, a Worker) and the operating system beneath WASI | 10.3, Open 11 | Any name | A fixed list kept by the toolchain, so a misspelt platform is an error; settle it with open decision 11 |

@@ -2,4 +2,4 @@ to f p with q
     given p is a Bool
     given q is a Bool
     produces Bool
-    give back p and q or p
+    return p and q or p

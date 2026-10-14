@@ -6,4 +6,4 @@ to both p with q
     ensure (p && q) implies result
     ensure ¬ result implies (¬ p ∨ ¬ q)
     ensure !result ⇒ (!p || !q)
-    give back p and q
+    return p and q

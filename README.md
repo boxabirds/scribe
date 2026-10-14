@@ -70,6 +70,9 @@ order), and the pre-lexer reports a tab at the start of a line as a tab.
 [grammar/DECISIONS.md](grammar/DECISIONS.md) lists the open questions the
 production parser needs settled.
 
+The pilot corpora are parsed as they would be written today: the check renames
+`give back` to `return` in a temporary copy, and never edits `research/`.
+
 ## The pilot
 
 `research/` is `scribe-pilot-wave1.zip`; its README lists the commands to

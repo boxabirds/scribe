@@ -2,4 +2,4 @@ to describe found
     given found is a maybe Price
     produces Bool
     ensure if result is some p, p > 0
-    give back found is nothing or status is Paid or items is sorted or x is in items
+    return found is nothing or status is Paid or items is sorted or x is in items

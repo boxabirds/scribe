@@ -15,4 +15,4 @@ to run_all of items
         invariant n ≥ 0
         decreases n
         set n to n - 1
-    give back total * rate
+    return total * rate

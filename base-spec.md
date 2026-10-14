@@ -211,7 +211,7 @@ to withdraw amount from account
     if amount > balance of account
         fail with InsufficientFunds
     subtract amount from balance of account
-    give back receipt_for amount
+    return receipt_for amount
 ```
 
 The header line names the operation, its first parameter, and further parameters introduced by label words: `to withdraw amount from account`. The label words are a fixed set of single words: `from`, `to`, `in`, `into`, `onto`, `over`, `for`, `with`, `by`, `as`, `using`, `of`. A call uses the same shape: `withdraw 50 from savings`.
@@ -229,7 +229,7 @@ Every statement starts with a keyword, or is a call.
 | Fixed binding | `let rate be 0.2` |
 | Variable | `var count starts at 0` |
 | Change a variable or field | `set price of item to 10`. Updates of a value from itself are shown as `increment count`, `add price to total` or `subtract amount from balance of account` (Display forms, Section 2) |
-| Return | `give back total` |
+| Return | `return total` |
 | Fail | `fail with OutOfRange` |
 | Pass a failure up | `try parse_port text` (also inside expressions: `let n be try parse_int text`) |
 | Handle failures | `handle` block, then `on failure Name` blocks (Section 6) |
@@ -271,7 +271,7 @@ From loosest to tightest: `implies`; a chain of `and` or a chain of `or` (never 
 
 ```
 let order be an Order from cart, receipt with status Paid
-give back a Dashboard from profile, orders, alerts
+return a Dashboard from profile, orders, alerts
 ```
 
 Parts are separated by commas. **Proposed:** naming fields during construction, `a Point with x as 1, y as 2`.
@@ -320,22 +320,22 @@ to parse_port text
     let number be try parse_int text
     if number < 1 or number > 65535
         fail with OutOfRange
-    give back number
+    return number
 
 to port_or_default text
     given text is Text
     produces a Port
 
     handle
-        give back try parse_port text
+        return try parse_port text
     on failure NotANumber or OutOfRange
-        give back 8080
+        return 8080
 ```
 
 Rules:
 
 - `try` passes a failure up to the caller, or to the enclosing `handle` block.
-- Each `on failure` names the failures it handles and must do something: give back a value, fail, or call something. There is no catch-all that swallows failures.
+- Each `on failure` names the failures it handles and must do something: return a value, fail, or call something. There is no catch-all that swallows failures.
 - `on failure A or B as problem` binds the failure so it can be passed on: `fail with problem`.
 - Adding a way to fail is a change to the contract (Section 12).
 
@@ -377,7 +377,7 @@ Files, sockets and locks are linear: they must be released exactly once. `hold` 
 
 ```
 hold input as open path for reading using files
-    give back try read_line from input
+    return try read_line from input
 ```
 
 A linear value bound with `let` and not released on some path is a compile error naming that path.
@@ -459,7 +459,7 @@ to load_dashboard user using services
         let profile be fetch profile of user from services
         let orders be fetch orders of user from services
         let alerts be fetch alerts of user from services, or else none
-    give back a Dashboard from profile, orders, alerts
+    return a Dashboard from profile, orders, alerts
 ```
 
 Everything inside `together` starts at once, and the block ends when every line has finished. If a required line fails, the others are cancelled and the failure goes up; `or else` marks a line whose failure is acceptable. Cancellation unwinds through `hold`, so resources are still released. A `deadline` is monitored at run time, not proven.
@@ -874,7 +874,7 @@ These are the decisions this draft does not settle. Each names what blocks it. A
 | 3 | `allocates` as a contract clause, with the allocator passed as context | Proposed | Measuring how many contracts it adds lines to |
 | 4 | A small rule language for system files in place of fixed English templates | Proposed | Keyword count (Appendix A) |
 | 5 | Possessive paths: accept `account's balance` as a form of `balance of account` | Proposed | A grammar run. `'s` would bind tighter than any call, so `total of cart's lines` means `total of (lines of cart)`. Bare `account balance` is not possible: it already reads as a call of `account`, and it would look almost the same as the name `account_balance` in the review view |
-| 6 | Reduce the keyword set (now 96 hard, 77 soft) | Open | Experiment 1, the comprehension test, extended to compare candidate words for the same idea: for example `hold` against `with`, `using` and `lease` |
+| 6 | Reduce the keyword set (now 98 hard, 79 soft) | Open | Experiment 1, the comprehension test, extended to compare candidate words for the same idea: for example `hold` against `with`, `using` and `lease` |
 | 7 | Parser strategy: the grammar is not LALR(1) | Open | Deciding between a hand-written parser that follows the grammar, and changing the grammar until a generator accepts it |
 | 8 | Code generator for WebAssembly, the version 1 target: a back end of our own, or one built on LLVM or Cranelift | Open | A compile-time benchmark on the pilot corpus |
 | 9 | Solver and proof format for `proven` clauses | Open | Choosing a solver that is fast and gives stable results across versions |
@@ -883,9 +883,9 @@ These are the decisions this draft does not settle. Each names what blocks it. A
 
 ## Appendix A: grammar notes
 
-The reference grammar is `scribe-grammar-v0.2.lark` in this project. It is an Earley grammar: it states the language precisely but is not yet a production parser.
+The reference grammar is `grammar/scribe.lark` (version 0.3) in this project; `scribe-grammar-v0.2.lark` is the version the pilot measured. It is an Earley grammar: it states the language precisely but is not yet a production parser. `tools/check_grammar.py` tests it against a file per construct in this specification, a file per forbidden form, this specification's code blocks and the pilot corpora.
 
-**Vocabulary.** 173 reserved words: 96 hard keywords, which can never be names, and 77 soft keywords, which are names everywhere except in the position that gives them meaning. The articles `a`, `an` and `the` are hard. Reducing this count is open decision 6.
+**Vocabulary.** 177 reserved words: 98 hard keywords, which can never be names, and 79 soft keywords, which are names everywhere except in the position that gives them meaning. The articles `a`, `an` and `the` are hard. Reducing this count is open decision 6.
 
 **Special rules.** Twelve rules resolve what the grammar alone leaves ambiguous. The four that most affect readers:
 
@@ -898,7 +898,7 @@ The reference grammar is `scribe-grammar-v0.2.lark` in this project. It is an Ea
 
 Constructions list their parts with commas, never `and`, so `and` is always logical.
 
-**Parser class.** Converted to Bison, the grammar has 172 shift/reduce and 20 reduce/reduce conflicts, so it is not LALR(1). One ambiguity is real, not an artefact of the conversion. Open decision 7 settles the parser strategy; the requirement whichever way it goes is that every accepted text has exactly one tree, and that `scribe check --explain` shows it.
+**Parser class.** Converted to Bison, the grammar has 183 shift/reduce and 20 reduce/reduce conflicts (version 0.2: 172 and 20), so it is not LALR(1). One ambiguity is real, not an artefact of the conversion. Open decision 7 settles the parser strategy; the requirement whichever way it goes is that every accepted text has exactly one tree, and that `scribe check --explain` shows it.
 
 ## Appendix B: evidence and history
 
@@ -946,6 +946,7 @@ What the replay changed in this specification:
 - Update forms such as `subtract amount from balance of account` (2).
 - The aims are reordered: rapid impact assessment first, human readability second, correctness by construction third. Impact assessment is the problem Scribe exists to solve; readability is how it must be solved (1).
 - Version 1 emits WebAssembly only (1, 13).
+- `return` replaces `give back` as the statement that ends an operation with its result (4.2).
 - Scribe is not described as a systems language. Having no garbage collector is a choice about memory management, managed at compile time as in Rust, not about the kind of software Scribe is for (1, 7).
 
 ### B.4 Earlier documents

@@ -5,4 +5,4 @@ to find_user name in database
     fails with InvalidName
     uses database
     let checked be try check name as UserName
-    give back lookup checked in database
+    return lookup checked in database

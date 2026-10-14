@@ -10,11 +10,16 @@ Checks, in order:
   4. the code blocks of base-spec.md and the pilot corpora in research/corpus
      give the results recorded in tests/grammar/expected.json.
 
+The pilot corpora are a record and are never edited. Where the language has
+renamed something since the pilot, the rename is applied to a temporary copy
+before parsing (RENAMES below), so the corpora still test the grammar.
+
 A change to the recorded results is a decision, so --update only rewrites
 expected.json; review its diff before committing it.
 """
 import json
 import os
+import re
 import sys
 import tempfile
 
@@ -32,6 +37,11 @@ EXPECTED = os.path.join(TESTS, "expected.json")
 SPEC = os.path.join(ROOT, "base-spec.md")
 CORPORA = ["doc", "doc-repaired", "exp7/scribe-A", "exp7/scribe-B"]
 
+# Spellings changed since the pilot: (pattern, replacement, specification change)
+RENAMES = [
+    (r"\bgive back\b", "return", "draft 0.4: `return` replaces `give back`"),
+]
+
 
 def scribe_files(directory):
     return sorted(os.path.join(directory, f) for f in os.listdir(directory) if f.endswith(".scribe"))
@@ -39,6 +49,20 @@ def scribe_files(directory):
 
 def statuses(parser, expr_parser, files):
     return {os.path.basename(f): parse_file(parser, expr_parser, f)["status"] for f in files}
+
+
+def corpus_statuses(parser, expr_parser, directory):
+    """Parse a pilot corpus as it would be written today, without touching it."""
+    with tempfile.TemporaryDirectory() as tmp:
+        copies = []
+        for f in scribe_files(directory):
+            text = open(f).read()
+            for pattern, replacement, _ in RENAMES:
+                text = re.sub(pattern, replacement, text)
+            copy = os.path.join(tmp, os.path.basename(f))
+            open(copy, "w").write(text)
+            copies.append(copy)
+        return statuses(parser, expr_parser, copies)
 
 
 def spec_statuses(parser, expr_parser):
@@ -78,8 +102,8 @@ def main():
 
     results = {"spec": spec_statuses(parser, expr_parser)}
     for corpus in CORPORA:
-        results[corpus] = statuses(parser, expr_parser,
-                                   scribe_files(os.path.join(ROOT, "research", "corpus", corpus)))
+        results[corpus] = corpus_statuses(parser, expr_parser,
+                                          os.path.join(ROOT, "research", "corpus", corpus))
 
     if update:
         json.dump(results, open(EXPECTED, "w"), indent=1, ensure_ascii=False, sort_keys=True)

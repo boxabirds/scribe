@@ -36,6 +36,7 @@ with one reading, the negative cases fail, and the pilot corpora still pass.
 | Hand-written parser producing a syntax tree, tested against the Earley grammar on every build: same accept or reject, same tree | |
 | Formatter that writes the stored form, with display forms; formatting twice changes nothing, and every view round-trips | |
 | Diagnostics as Section 13.2 describes, and `scribe check --explain` | |
+| Diagnostics for spellings the language has dropped: `give back x` parses as a call to `give`, so name resolution should suggest `return` | |
 
 Done when: the parser and the oracle agree on every corpus file, and the
 formatter is idempotent on all of them.

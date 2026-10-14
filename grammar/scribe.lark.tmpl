@@ -155,7 +155,7 @@ schema: "schema" name "version" INT "compatibility" name _NL _INDENT schema_fiel
 migration: "migration" name "from" "version" INT "to" "version" INT "turning" name "into" name _NL _INDENT ensure+ _DEDENT
 
 // ---------------------------------------------------------------- statements
-?stmt: let | var | set | give_back | fail | if_stmt | for_each
+?stmt: let | var | set | return_stmt | fail | if_stmt | for_each
      | repeat_while | invariant | decreases | choose | handle | hold
      | together | pipeline | stop | skip | trust | elided
      | expr_stmt
@@ -164,7 +164,7 @@ let: "let" name "be" expr ["," "or" "else" expr] _NL
 var: "var" name "starts" "at" expr _NL
 set: "set" place "to" expr _NL
 place: name ["of" place]                                                      // FIX-7 a settable place is a name or an of-path
-give_back: "give" "back" expr _NL
+return_stmt: "return" expr _NL
 fail: "fail" "with" name _NL
 if_stmt: "if" expr block ("otherwise" "if" expr block)* ["otherwise" block]
 for_each: "for" "each" name "from" expr range_word expr block
