@@ -1,0 +1,18 @@
+to run_all of items
+    given items is a List of Int
+    produces an Int
+    let rate be 2
+    var total starts at 0
+    for each i from 0 until count of items
+        set total to total + item i of items
+    for each x in items
+        if x < 0
+            stop
+        otherwise
+            skip
+    var n starts at count of items
+    repeat while n > 0
+        invariant n ≥ 0
+        decreases n
+        set n to n - 1
+    give back total * rate

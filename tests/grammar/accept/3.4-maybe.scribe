@@ -1,0 +1,6 @@
+to first_of items
+    given items is a List of Int
+    produces a maybe Int
+    if items is empty
+        give back nothing
+    give back some (item 0 of items)

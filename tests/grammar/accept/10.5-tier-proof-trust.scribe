@@ -1,0 +1,9 @@
+to f x
+    given x is an Int
+    produces an Int
+    tier proven
+    trust "the platform clock is monotonic" owner os_team
+    give back x
+    proof
+        use lemma add_commutes
+        assert x = x

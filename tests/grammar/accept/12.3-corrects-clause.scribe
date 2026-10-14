@@ -1,0 +1,5 @@
+to names_in directory
+    given directory is a Directory
+    produces a List of Text
+    corrects ensure "names are returned in sorted order"
+        because "the order was never sorted on Plan 9; see issue 4417"

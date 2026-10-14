@@ -1,0 +1,3 @@
+to f orders
+    given orders is a List of Order
+    let paid be total_of order for each order in orders

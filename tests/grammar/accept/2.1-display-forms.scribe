@@ -1,0 +1,8 @@
+to settle amount from account into total
+    given amount is a Money
+    given account is an editable Account
+    given total is an editable Money
+    increment count of account
+    decrement retries of account
+    add amount to total
+    subtract amount from balance of account

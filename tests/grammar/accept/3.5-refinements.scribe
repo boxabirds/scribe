@@ -1,0 +1,2 @@
+type Percent is an Int with value 0 through 100
+type Email is Text matching email_format

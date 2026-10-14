@@ -20,12 +20,12 @@ import sys
 
 HARD = set("""
 to given produces fails expect ensure changes uses tier idempotent declassifies
-deadline runs survives holds because
+deadline runs survives holds because assumes may
 let be var starts set give back fail try handle on failure if otherwise for each
 from until through repeat while invariant decreases stop skip choose when hold
 together pipeline trust proof
 type choice define component system protocol schema migration workflow example
-property field model
+property field model interface
 is not and or implies mod of every there where result it some nothing at
 less more than most least after before followed attenuated
 with in into onto over using by as

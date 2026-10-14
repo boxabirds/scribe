@@ -27,7 +27,7 @@ class LayoutError(Exception):
 
 def indent_of(line):
     stripped = line.lstrip(" ")
-    if "\t" in line[: len(line) - len(stripped)]:
+    if line[len(line) - len(stripped):].startswith("\t") or "\t" in line[: len(line) - len(stripped)]:
         raise LayoutError("tab in indentation")
     n = len(line) - len(stripped)
     return n

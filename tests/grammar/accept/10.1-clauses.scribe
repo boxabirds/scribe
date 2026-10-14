@@ -1,0 +1,15 @@
+to charge customer for amount
+    given customer is a CustomerId
+    given amount is a positive Money
+    produces a Receipt
+    fails with Declined
+    uses payments
+    expect amount ≤ limit of customer because "limits are enforced upstream"
+    ensure if it succeeds, total_charged_to customer = total_charged_to customer at entry + amount
+    ensure if it fails, total_charged_to customer = total_charged_to customer at entry
+    ensure "the customer is charged at most once" because "payments are idempotent"
+    changes only balance of customer
+    example charge alice for 10 is receipt_for 10
+    cost at most 50 milliseconds
+    idempotent by customer, amount
+    assumes "the card network answers within 30 seconds" assumed owner payments_team

@@ -1,0 +1,6 @@
+to place cart with receipt
+    given cart is a Cart
+    given receipt is a Receipt
+    produces an Order
+    let order be an Order from cart, receipt with status Paid
+    give back order

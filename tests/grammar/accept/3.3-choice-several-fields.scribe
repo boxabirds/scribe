@@ -1,0 +1,3 @@
+choice Shape
+    Circle with radius as a Length
+    Rectangle with width as a Length, height as a Length

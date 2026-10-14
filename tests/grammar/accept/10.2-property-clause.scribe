@@ -1,0 +1,4 @@
+to largest of items
+    given items is a non_empty List of Int
+    produces an Int
+    property for every items that is a non_empty List of Int, largest of items is in items

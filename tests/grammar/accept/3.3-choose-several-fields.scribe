@@ -1,0 +1,8 @@
+to area of shape
+    given shape is a Shape
+    produces an Area
+    choose shape
+        when Circle with radius
+            give back radius * radius * 3
+        when Rectangle with width, height
+            give back width * height

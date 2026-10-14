@@ -1,0 +1,3 @@
+to f rows
+    given rows is a List of Row
+    ensure every row read is either saved or listed in rejects of result

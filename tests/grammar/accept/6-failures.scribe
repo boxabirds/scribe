@@ -1,0 +1,9 @@
+to port_or_default text
+    given text is Text
+    produces a Port
+    fails with Unexpected
+    handle
+        give back try parse_port text
+    on failure NotANumber or OutOfRange as problem
+        log problem
+        fail with Unexpected

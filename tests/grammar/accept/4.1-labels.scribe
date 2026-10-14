@@ -1,0 +1,12 @@
+to move item from source into target onto stack over network for owner with key by rate as kind using files
+    given item is an Item
+    given source is a Place
+    given target is a Place
+    given stack is a Stack
+    given network is a Network
+    given owner is a User
+    given key is a Key
+    given rate is a Rate
+    given kind is a Kind
+    given files is the Files
+    uses files

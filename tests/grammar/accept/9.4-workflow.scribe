@@ -1,0 +1,8 @@
+workflow nightly_billing for date
+    given date is a CalendarDate
+    runs at most once per date
+    survives restarts
+    uses billing
+    for each account in list_billable_accounts for date in billing
+        remember progress by account
+        try bill account for date in billing

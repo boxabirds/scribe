@@ -26,39 +26,49 @@ Version 1 compiles to WebAssembly. The specification is
 
 ## Reference grammar
 
-`grammar/scribe.lark` is the Earley grammar of spec Appendix A, built from
-`grammar/scribe.lark.tmpl`. It states the language precisely and is the oracle
-a production parser will be tested against; it is not a production parser.
+`grammar/scribe.lark` is the Earley grammar of spec Appendix A, version 0.3,
+built from `grammar/scribe.lark.tmpl`. It states the language precisely and is
+the oracle a production parser will be tested against; it is not a production
+parser. `scribe-grammar-v0.2.lark` is the pilot's version, as the
+specification cites it.
 
     pip install -r requirements.txt
+    python3 tools/check_grammar.py
+
+`check_grammar.py` rebuilds nothing and changes nothing: it fails if the built
+grammar is stale, if any file in `tests/grammar/accept` does not parse with
+exactly one reading, if any file in `tests/grammar/reject` is accepted, or if
+the spec's code blocks or the pilot corpora give results other than those in
+`tests/grammar/expected.json`. After a deliberate change, `--update` rewrites
+that file; review its diff.
+
+To work on the grammar:
+
     python3 tools/build_grammar.py grammar/scribe.lark.tmpl grammar/scribe.lark
     python3 tools/run3.py grammar/scribe.lark FILE_OR_DIR...
 
 `tools/pre.py` turns layout into tokens (`⏎` end of line, `⇥` indent, `⇤`
 dedent, `⟪…⟫` prose) and `tools/run3.py` parses with every reading kept, then
-applies rules D1 and D2. To parse the code in the specification:
+applies rules D1 and D2. `tools/to_bison.py` converts the grammar for Bison's
+conflict and counterexample reports.
 
-    python3 tools/spec_blocks.py base-spec.md /tmp/spec
-    python3 tools/run3.py grammar/scribe.lark /tmp/spec
+These tools started as copies of the pilot's. Since then: the grammar build is
+deterministic (the pilot ordered keywords of equal length by Python's set
+order), and the pre-lexer reports a tab at the start of a line as a tab.
 
-These started as copies of the pilot's tools. One change since: the pilot's
-`build_grammar.py` ordered keywords of equal length by Python's set order, so
-the built grammar's bytes changed from run to run (the language it accepts did
-not). Ties are now broken by spelling, so `grammar/scribe.lark` differs from
-`scribe-grammar-v0.2.lark` in the order of that one list and nowhere else.
+### Version 0.3 against spec 0.4
 
-### The grammar against spec 0.3
-
-21 of the 26 Scribe code blocks in the specification parse with exactly one
-reading; one of them (5.4) needs rule D1. The other 5 use what draft 0.3 added
-after the v0.2 grammar:
-
-| Section | Construct |
+| Check | Result |
 | --- | --- |
-| 10.2 | `example` as a contract clause (v0.2 allows it only at top level) |
-| 10.3 | `on <platform>` and `in build` scoping |
-| 10.6, 12.3 | `corrects` |
-| 11.2 | `interface` |
+| Conformance tests, one per construct (`tests/grammar/accept`) | 34 of 34 parse with one reading |
+| Forbidden forms (`tests/grammar/reject`) | 12 of 12 rejected |
+| Spec code blocks | 23 of 26; the other 3 are fragments, not whole programs |
+| Pilot doc examples, repaired | 41 of 42; example 05 separates fields with `and`, which spec 3.3 forbids |
+| Pilot doc examples, as written | 31 of 42; example 22's `run ReportExporter with reports and partner`, one of the pilot's silent misreadings, is now an error |
+| Bison | 183 shift/reduce and 20 reduce/reduce conflicts (v0.2: 172 and 20); the one proven ambiguity is still quantifier scope, which rule D2 resolves |
+
+[grammar/DECISIONS.md](grammar/DECISIONS.md) lists the open questions the
+production parser needs settled.
 
 ## The pilot
 

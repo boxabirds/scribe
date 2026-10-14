@@ -1,0 +1,11 @@
+to load_dashboard user using services
+    given user is a UserId
+    given services is the DashboardServices
+    produces a Dashboard
+    fails with DashboardUnavailable
+    deadline 800 milliseconds
+    uses services
+    together
+        let profile be fetch profile of user from services
+        let alerts be fetch alerts of user from services, or else none
+    give back a Dashboard from profile, alerts

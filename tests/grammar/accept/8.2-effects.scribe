@@ -1,0 +1,6 @@
+to wait_for_lock of file using locks
+    given file is a File
+    given locks is the Locks
+    uses locks, clock
+    may block "until another process releases the lock"
+    declassifies digest to public because "a hash of the card is not the card"

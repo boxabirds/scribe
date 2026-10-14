@@ -1,0 +1,8 @@
+to find_user name in database
+    given name is Text labelled untrusted
+    given database is the Database
+    produces a User
+    fails with InvalidName
+    uses database
+    let checked be try check name as UserName
+    give back lookup checked in database

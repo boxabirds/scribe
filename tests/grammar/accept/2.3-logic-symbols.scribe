@@ -1,0 +1,9 @@
+to both p with q
+    given p is a Bool
+    given q is a Bool
+    produces Bool
+    ensure result = (p ∧ q)
+    ensure (p && q) implies result
+    ensure ¬ result implies (¬ p ∨ ¬ q)
+    ensure !result ⇒ (!p || !q)
+    give back p and q

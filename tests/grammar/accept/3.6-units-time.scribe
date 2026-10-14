@@ -1,0 +1,7 @@
+to closing_time of due
+    given due is an Instant
+    produces a CalendarDate
+    let wait be 30 seconds
+    let london be time_zone "Europe/London"
+    let closes be start_of due in london
+    give back closes
