@@ -1,0 +1,163 @@
+AMBIGUOUS  00_notation-aliases-and-renderers.scribe
+    line 1: invariant 0 <= low <= high <= count of sorted_items
+        readings: ['of_access', Token('RULE', 'call')]
+ok         01_1-a-pure-function-with-a-refined-input.scribe
+AMBIGUOUS  02_2-a-loop-with-its-reasoning-attached.scribe
+    line 11: invariant for every j from 0 through i - 1, item j of items is at most best
+        readings: [Token('RULE', 'call'), Token('RULE', 'call')]
+    line 13: set best to item i of items
+        readings: [Token('RULE', 'call'), Token('RULE', 'call')]
+    line 12: if item i of items is more than best
+        readings: [Token('RULE', 'call'), Token('RULE', 'call')]
+    line 3: expect count of items is at least 1
+        readings: ['of_access', Token('RULE', 'call')]
+    line 8: var best starts at item 0 of items
+        readings: [Token('RULE', 'call'), Token('RULE', 'call')]
+    line 9: for each i from 1 until count of items
+        readings: ['of_access', Token('RULE', 'call')]
+ok         03_3-ranges-that-cannot-be-misread.scribe
+AMBIGUOUS  04_4-optional-results.scribe
+    line 9: invariant for every j from 0 until i, item j of items is not target
+        readings: [Token('RULE', 'call'), Token('RULE', 'call')]
+    line 10: if item i of items is target
+        readings: [Token('RULE', 'call'), Token('RULE', 'call')]
+    line 5: ensure if result is some p, item p of items is target
+        readings: [Token('RULE', 'call'), Token('RULE', 'call')]
+    line 5: ensure if result is some p, item p of items is target
+        readings: ['compare', 'is_some']
+    line 8: for each i from 0 until count of items
+        readings: ['of_access', Token('RULE', 'call')]
+    line 19: choose find target in items
+        readings: [Token('RULE', 'call'), 'compare']
+ok         05_5-choices-with-exhaustive-matching-and-u.scribe
+FAIL       06_6-failure-is-visible-propagated-or-handl.scribe: {'line': 6, 'column': 15, 'token': 'try', 'source': 'let number be try parse_int text'}
+ok         07_7-binding-versus-mutation.scribe
+AMBIGUOUS  08_8-a-full-contract-with-success-and-failu.scribe
+    line 7: ensure if it succeeds, balance of account is balance of account at entry - amount
+        readings: ['of_access', Token('RULE', 'call')]
+    line 8: ensure if it fails, balance of account is balance of account at entry
+        readings: ['of_access', Token('RULE', 'call')]
+    line 7: ensure if it succeeds, balance of account is balance of account at entry - amount
+        readings: ['compare', 'predicate_of']
+    line 8: ensure if it fails, balance of account is balance of account at entry
+        readings: ['compare', 'predicate_of']
+    line 11: if amount is more than balance of account
+        readings: ['of_access', Token('RULE', 'call')]
+    line 13: set balance of account to balance of account - amount
+        readings: ['of_access', Token('RULE', 'call')]
+    line 9: changes only balance of account
+        readings: ['of_access', Token('RULE', 'call')]
+FAIL       09_9-a-type-with-an-invariant-and-a-model.scribe: {'line': 7, 'column': 10, 'token': 'value', 'source': 'to push value onto queue'}
+AMBIGUOUS  10_10-a-repeat-while-loop-with-a-variant.scribe
+    line 13: invariant for every j from 0 until low, item j of sorted_items is less than target
+        readings: [Token('RULE', 'call'), Token('RULE', 'call')]
+    line 14: invariant for every j from high until count of sorted_items, item j of sorted_items is more than target
+        readings: [Token('RULE', 'call'), Token('RULE', 'call')]
+    line 12: invariant 0 is at most low and low is at most high and high is at most count of sorted_items
+        readings: ['of_access', Token('RULE', 'call')]
+    line 14: invariant for every j from high until count of sorted_items, item j of sorted_items is more than target
+        readings: ['of_access', Token('RULE', 'call')]
+    line 17: if item middle of sorted_items is target
+        readings: [Token('RULE', 'call'), Token('RULE', 'call')]
+    line 19: otherwise if item middle of sorted_items is less than target
+        readings: [Token('RULE', 'call'), Token('RULE', 'call')]
+    line 6: ensure if result is some p, item p of sorted_items is target
+        readings: [Token('RULE', 'call'), Token('RULE', 'call')]
+    line 6: ensure if result is some p, item p of sorted_items is target
+        readings: ['compare', 'is_some']
+    line 10: var high starts at count of sorted_items
+        readings: ['of_access', Token('RULE', 'call')]
+AMBIGUOUS  11_11-named-predicates-keep-specs-readable.scribe
+    line 8: holds when for every x, occurrences of x in items is occurrences of x in others
+        readings: ['of_access', Token('RULE', 'call')]
+    line 3: holds when for every i from 0 until count of items - 1, item i of items is at most item (i + 1) of items
+        readings: [Token('RULE', 'call'), Token('RULE', 'call')]
+    line 3: holds when for every i from 0 until count of items - 1, item i of items is at most item (i + 1) of items
+        readings: ['of_access', Token('RULE', 'call')]
+    line 8: holds when for every x, occurrences of x in items is occurrences of x in others
+        readings: ['compare', 'compare', 'compare', 'compare', 'predicate_of']
+FAIL       12_12-refinement-types.scribe: {'line': 1, 'column': 29, 'token': 'value', 'source': 'type Percent is an Int with value 0 through 100'}
+AMBIGUOUS  13_13-proof-hints-are-separate-foldable-and.scribe
+    line 5: ensure for every i from 0 until count of items, item i of result is item (count of items - 1 - i) of items
+        readings: ['of_access', Token('RULE', 'call')]
+    line 5: ensure for every i from 0 until count of items, item i of result is item (count of items - 1 - i) of items
+        readings: [Token('RULE', 'call'), Token('RULE', 'call')]
+    line 4: ensure count of result is count of items
+        readings: ['of_access', Token('RULE', 'call')]
+    line 12: assert count of result is count of items
+        readings: ['of_access', Token('RULE', 'call')]
+    line 4: ensure count of result is count of items
+        readings: ['compare', 'predicate_of']
+    line 12: assert count of result is count of items
+        readings: ['compare', 'predicate_of']
+FAIL       14_14-tiers-and-escape-hatches-are-explicit.scribe: {'line': 3, 'column': 22, 'token': 'value', 'source': 'produces an Int with value 1 through 6'}
+FAIL       15_15-examples-and-properties-run-as-tests.scribe: {'line': 4, 'column': 39, 'token': '-', 'source': 'property for every items that is a non-empty List of Int, largest items is in items'}
+FAIL       16_16-records-and-choices.scribe: {'line': 11, 'column': 30, 'token': 'Int', 'source': 'field quantity as a Positive Int'}
+ok         17_17-units-and-time-are-types.scribe
+AMBIGUOUS  18_18-collections-in-words.scribe
+    line 4: ensure result is sum of total_of order for each order in orders where status of order is Paid
+        readings: ['of_access', Token('RULE', 'call')]
+    line 4: ensure result is sum of total_of order for each order in orders where status of order is Paid
+        readings: [Token('RULE', 'comprehension'), Token('RULE', 'comprehension')]
+    line 4: ensure result is sum of total_of order for each order in orders where status of order is Paid
+        readings: ['of_access', Token('RULE', 'comprehension'), Token('RULE', 'comprehension')]
+    line 8: if status of order is Paid
+        readings: ['of_access', Token('RULE', 'call')]
+    line 4: ensure result is sum of total_of order for each order in orders where status of order is Paid
+        readings: ['compare', 'compare', 'predicate_of']
+FAIL       19_19-a-resource-that-must-be-released.scribe: {'line': 9, 'column': 12, 'token': 'try', 'source': 'give back try read_line from input'}
+FAIL       20_20-a-protocol-the-compiler-enforces.scribe: {'line': 3, 'column': 34, 'token': 'network', 'source': 'to open_connection address using network'}
+FAIL       21_21-allocation-is-visible.scribe: {'line': 8, 'column': 15, 'token': 'try', 'source': 'let lines be try split_lines text using memory'}
+FAIL       22_22-authority-enters-at-one-place-and-is-.scribe: {'line': 1, 'column': 9, 'token': 'root', 'source': 'to main root'}
+FAIL       24_24-untrusted-data-cannot-reach-a-sink.scribe: {'line': 1, 'column': 25, 'token': 'database', 'source': 'to find_user name using database'}
+FAIL       25_24-untrusted-data-cannot-reach-a-sink.scribe: {'line': 1, 'column': 19, 'token': 'try', 'source': 'let valid_name be try check name as UserName'}
+ok         26_25-declassification-is-named-justified-a.scribe
+    interpolation line 6 {last 4 digits of card}: ambiguous
+FAIL       27_26-pure-means-pure.scribe: {'line': 5, 'column': 13, 'token': 'try', 'source': 'let rate be try fetch_tax_rate'}
+FAIL       28_27-a-protocol-declared-once-checked-on-b.scribe: {'line': 12, 'column': 49, 'token': 'every', 'source': 'ensure if it succeeds, checksum sent is hash of every Chunk data received'}
+FAIL       29_28-the-manifest.scribe: {'line': 19, 'column': 15, 'token': 'the', 'source': 'charging with the same key twice charges once               assumed owner payments_team monitor checking'}
+FAIL       30_29-the-implementation-below-it.scribe: {'line': 4, 'column': 21, 'token': 'try', 'source': 'let reservation be try reserve lines of cart in inventory'}
+FAIL       31_30-a-versioned-schema-and-a-checked-migr.scribe: {'line': 11, 'column': 18, 'token': 'field', 'source': 'ensure for every field other than note, that field of new is that field of old'}
+ok         33_32-the-system-file.scribe
+ok         35_34-a-rule-that-catches-a-quiet-mistake.scribe
+FAIL       38_36-the-fix-and-the-order-to-deploy-in.scribe: {'line': 16, 'column': 15, 'token': 'try', 'source': 'let order be try place_order cart for customer with request_id in checkout'}
+FAIL       40_37-doing-several-things-at-once.scribe: {'line': 13, 'column': 12, 'token': 'a', 'source': 'give back a Dashboard from profile and orders and alerts'}
+FAIL       41_38-the-race-that-cannot-be-written.scribe: {'line': 3, 'column': 11, 'token': 'a', 'source': 'for each a in first_half'}
+AMBIGUOUS  42_38-the-race-that-cannot-be-written.scribe
+    line 2: let first be sum of first_half
+        readings: ['of_access', Token('RULE', 'call')]
+    line 3: let second be sum of second_half
+        readings: ['of_access', Token('RULE', 'call')]
+FAIL       43_39-a-pipeline-with-a-bounded-queue.scribe: {'line': 7, 'column': 8, 'token': 'every', 'source': 'ensure every row read is either saved or listed in rejects of result'}
+FAIL       44_40-work-that-survives-a-restart.scribe: {'line': 1, 'column': 30, 'token': 'date', 'source': 'workflow nightly_billing for date'}
+FAIL       46_41-time-and-ordering-are-written-down.scribe: {'line': 7, 'column': 8, 'token': 'every', 'source': 'remove every s from sessions where expires_at of s is not after now using clock'}
+AMBIGUOUS  47_review-view-canonical.scribe
+    line 11: invariant for every j from 0 through i - 1, item j of items is at most best
+        readings: [Token('RULE', 'call'), Token('RULE', 'call')]
+    line 13: set best to item i of items
+        readings: [Token('RULE', 'call'), Token('RULE', 'call')]
+    line 12: if item i of items is more than best
+        readings: [Token('RULE', 'call'), Token('RULE', 'call')]
+    line 3: expect count of items is at least 1
+        readings: ['of_access', Token('RULE', 'call')]
+    line 8: var best starts at item 0 of items
+        readings: [Token('RULE', 'call'), Token('RULE', 'call')]
+    line 9: for each i from 1 until count of items
+        readings: ['of_access', Token('RULE', 'call')]
+AMBIGUOUS  48_compact-view.scribe
+    line 11: invariant for every j from 0 through i - 1, item j of items <= best
+        readings: [Token('RULE', 'call'), Token('RULE', 'call')]
+    line 13: set best to item i of items
+        readings: [Token('RULE', 'call'), Token('RULE', 'call')]
+    line 12: if item i of items > best
+        readings: [Token('RULE', 'call'), Token('RULE', 'call')]
+    line 10: invariant best in items
+        readings: [Token('RULE', 'call'), 'compare']
+    line 3: expect count of items >= 1
+        readings: ['of_access', Token('RULE', 'call')]
+    line 8: var best starts at item 0 of items
+        readings: [Token('RULE', 'call'), Token('RULE', 'call')]
+    line 9: for each i from 1 until count of items
+        readings: ['of_access', Token('RULE', 'call')]
+
+{'ambiguous': 11, 'ok': 8, 'fail': 23} of 42

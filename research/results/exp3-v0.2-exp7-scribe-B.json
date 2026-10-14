@@ -1,0 +1,110 @@
+[
+ {
+  "file": "corpus/exp7/scribe-B/F01.scribe",
+  "status": "fail",
+  "ambiguities": [],
+  "error": {
+   "line": 5,
+   "column": 22,
+   "token": "a",
+   "source": "to bisect_right x in a from lo below hi with key"
+  },
+  "interpolations": []
+ },
+ {
+  "file": "corpus/exp7/scribe-B/F15.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": [],
+  "resolved": {}
+ },
+ {
+  "file": "corpus/exp7/scribe-B/F21.scribe",
+  "status": "fail",
+  "ambiguities": [],
+  "error": {
+   "line": 67,
+   "column": 48,
+   "token": "\u23ce",
+   "source": "repeat while byte_at p in line is a space_byte"
+  },
+  "interpolations": []
+ },
+ {
+  "file": "corpus/exp7/scribe-B/F25.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": [],
+  "resolved": {}
+ },
+ {
+  "file": "corpus/exp7/scribe-B/F26.scribe",
+  "status": "fail",
+  "ambiguities": [],
+  "error": {
+   "line": 19,
+   "column": 23,
+   "token": "and",
+   "source": "to new_datetime year and month and day and hour and minute and second and microsecond and tzinfo and fold"
+  },
+  "interpolations": []
+ },
+ {
+  "file": "corpus/exp7/scribe-B/F31.scribe",
+  "status": "fail",
+  "ambiguities": [],
+  "error": {
+   "line": 5,
+   "column": 12,
+   "token": "of",
+   "source": "choice Map of K and V"
+  },
+  "interpolations": []
+ },
+ {
+  "file": "corpus/exp7/scribe-B/F35.scribe",
+  "status": "fail",
+  "ambiguities": [],
+  "error": {
+   "line": 9,
+   "column": 32,
+   "token": "producing",
+   "source": "field timefunc as an Operation producing a Number"
+  },
+  "interpolations": []
+ },
+ {
+  "file": "corpus/exp7/scribe-B/F38.scribe",
+  "status": "fail",
+  "ambiguities": [],
+  "error": {
+   "line": 14,
+   "column": 7,
+   "token": "result",
+   "source": "field result as a maybe Value"
+  },
+  "interpolations": []
+ },
+ {
+  "file": "corpus/exp7/scribe-B/F41.scribe",
+  "status": "fail",
+  "ambiguities": [],
+  "error": {
+   "line": 30,
+   "column": 19,
+   "token": "bytes",
+   "source": "to rio_read size bytes from rdb into buffer"
+  },
+  "interpolations": []
+ },
+ {
+  "file": "corpus/exp7/scribe-B/F47.scribe",
+  "status": "ok",
+  "ambiguities": [],
+  "error": null,
+  "interpolations": [],
+  "resolved": {}
+ }
+]

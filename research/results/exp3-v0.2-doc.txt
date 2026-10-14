@@ -1,0 +1,44 @@
+ok         00_notation-aliases-and-renderers.scribe
+ok         01_1-a-pure-function-with-a-refined-input.scribe
+ok         02_2-a-loop-with-its-reasoning-attached.scribe
+ok         03_3-ranges-that-cannot-be-misread.scribe
+ok         04_4-optional-results.scribe
+ok         05_5-choices-with-exhaustive-matching-and-u.scribe
+ok         06_6-failure-is-visible-propagated-or-handl.scribe
+ok         07_7-binding-versus-mutation.scribe
+ok         08_8-a-full-contract-with-success-and-failu.scribe
+ok         09_9-a-type-with-an-invariant-and-a-model.scribe
+ok         10_10-a-repeat-while-loop-with-a-variant.scribe
+ok         11_11-named-predicates-keep-specs-readable.scribe
+ok         12_12-refinement-types.scribe
+ok         13_13-proof-hints-are-separate-foldable-and.scribe
+ok         14_14-tiers-and-escape-hatches-are-explicit.scribe
+FAIL       15_15-examples-and-properties-run-as-tests.scribe: {'line': 4, 'column': 39, 'token': '-', 'source': 'property for every items that is a non-empty List of Int, largest items is in items'}
+FAIL       16_16-records-and-choices.scribe: {'line': 11, 'column': 30, 'token': 'Int', 'source': 'field quantity as a Positive Int'}
+ok         17_17-units-and-time-are-types.scribe
+ok         18_18-collections-in-words.scribe   (resolved by rule: {'D1': 1})
+ok         19_19-a-resource-that-must-be-released.scribe
+ok         20_20-a-protocol-the-compiler-enforces.scribe
+ok         21_21-allocation-is-visible.scribe
+ok         22_22-authority-enters-at-one-place-and-is-.scribe
+ok         24_24-untrusted-data-cannot-reach-a-sink.scribe
+ok         25_24-untrusted-data-cannot-reach-a-sink.scribe   (resolved by rule: {'D1': 1})
+ok         26_25-declassification-is-named-justified-a.scribe
+ok         27_26-pure-means-pure.scribe
+FAIL       28_27-a-protocol-declared-once-checked-on-b.scribe: {'line': 12, 'column': 49, 'token': 'every', 'source': 'ensure if it succeeds, checksum sent is hash of every Chunk data received'}
+FAIL       29_28-the-manifest.scribe: {'line': 18, 'column': 51, 'token': 'of', 'source': 'payments answers within 2 seconds for 99 percent of calls    assumed owner payments_team monitor sampling 1 percent'}
+ok         30_29-the-implementation-below-it.scribe
+FAIL       31_30-a-versioned-schema-and-a-checked-migr.scribe: {'line': 11, 'column': 18, 'token': 'field', 'source': 'ensure for every field other than note, that field of new is that field of old'}
+ok         33_32-the-system-file.scribe
+ok         35_34-a-rule-that-catches-a-quiet-mistake.scribe
+ok         38_36-the-fix-and-the-order-to-deploy-in.scribe
+ok         40_37-doing-several-things-at-once.scribe
+FAIL       41_38-the-race-that-cannot-be-written.scribe: {'line': 3, 'column': 11, 'token': 'a', 'source': 'for each a in first_half'}
+ok         42_38-the-race-that-cannot-be-written.scribe
+FAIL       43_39-a-pipeline-with-a-bounded-queue.scribe: {'line': 7, 'column': 8, 'token': 'every', 'source': 'ensure every row read is either saved or listed in rejects of result'}
+ok         44_40-work-that-survives-a-restart.scribe
+FAIL       46_41-time-and-ordering-are-written-down.scribe: {'line': 7, 'column': 8, 'token': 'every', 'source': 'remove every s from sessions where expires_at of s is not after now using clock'}
+ok         47_review-view-canonical.scribe
+FAIL       48_compact-view.scribe: {'line': 5, 'column': 15, 'token': 'in', 'source': 'ensure result in items'}
+
+{'ok': 33, 'fail': 9} of 42

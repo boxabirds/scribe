@@ -1,0 +1,175 @@
+{
+ "A|name collides with a reserved word": [
+  "F01:6 to bisect_right x in a from lo to hi by key",
+  "F22:114 set item i of partials to a Partial with denominator denominator and numerator numerator of entry + ",
+  "F31:13 given f is an operation taking a Key and a T",
+  "F33:11 type EncoderFunc is an Operation from an editable EncodeState and a ReflectedValue and an EncodeOpti",
+  "F34:52 to listeners_of target for type unwrapped unwrap using memory",
+  "F36:30 field stop as an Int",
+  "F38:16 field result as a maybe T",
+  "F38:33 to set_result result on future",
+  "F46:12 to byte_eq a and b"
+ ],
+ "A|operation signature: several parameters or new label words": [
+  "F02:3 to search n f",
+  "F03:13 to adjacent_difference a into b",
+  "F05:30 to match_chunk chunk against s using memory",
+  "F06:8 to ufmerge2_1 l1 against h2 by fun then t2 onto m after h2m using memory",
+  "F06:31 to ufmerge2_2 h1 then t1 by fun against l2 onto m using memory",
+  "F08:5 to siftdown heap startpos pos",
+  "F09:14 to lemma_new_first_element_still_sorted_by x and items with order",
+  "F09:20 to merge_sorted_with left and right by less_than_or_eq",
+  "F14:32 to sanitize_params prefix suffix dir using files",
+  "F14:48 to mkstemp_inner dir prefix suffix flags output_type using files",
+  "F14:70 to open_stream fd with mode and buffering and newline and encoding and errors using memory",
+  "F16:21 to set_err err on scanner",
+  "F17:22 to ignore_patterns_for path and names with patterns using memory",
+  "F18:18 to validate_boolean value named name",
+  "F22:53 to coerce first and second",
+  "F23:21 to sqlite3_strnicmp z_left and z_right up_to n",
+  "F26:21 to make_datetime year month day hour minute second microsecond tzinfo fold",
+  "F26:36 to replace self year month day hour minute second microsecond tzinfo fold",
+  "F27:13 to offset_string_adjustment time and unit for tz",
+  "F28:17 to read_line_slice from reader within lim",
+  "F28:47 to read_continued_line_slice from reader within lim checked by validate_first_line using memory",
+  "F33:37 to new_type_encoder type_key allowing_address using encoder_cache",
+  "F35:26 to new_scheduler with timefunc and delayfunc using memory",
+  "F41:149 to allocate size bytes using memory",
+  "F45:34 to rewrite_config_rewrite_line state for option with line forced",
+  "F46:18 to constant_time_compare x and y",
+  "F48:9 to range_end_overflows start and size against max"
+ ],
+ "A|predicate definitions with parameters": [
+  "F03:7 define x minus y stays in range",
+  "F09:6 define items is sorted_by order"
+ ],
+ "A|slices and ranges as arguments": [
+  "F04:43 let t1 be part of l1 from 1 until count of l1",
+  "F04:44 let t2 be part of l2 from 1 until count of l2",
+  "F10:45 set digits to part of text from 1 until count of text",
+  "F10:47 set digits to part of text from 1 until count of text",
+  "F11:76 let ordered be item (count of ext - 1 - k) of ext for each k from 0 until count of ext",
+  "F20:44 set name to characters 1 until (length of name - 1) of name",
+  "F25:24 let rest be slice of value from 1 until count of value"
+ ],
+ "A|references, sharing and atomics": [
+  "F07:6 field prev as a maybe reference to Adlist_node",
+  "F07:7 field next as a maybe reference to Adlist_node",
+  "F07:12 field head as a maybe reference to Adlist_node",
+  "F07:13 field tail as a maybe reference to Adlist_node",
+  "F07:23 field next as a maybe reference to Adlist_node",
+  "F30:17 produces a maybe borrowed GetKeysResult from pcmd",
+  "F37:5 field done as an Atomic Bool",
+  "F37:13 given o is a shared Once",
+  "F37:27 given o is a shared Once",
+  "F38:18 field waiters as a List of shared Waiter",
+  "F38:24 given waiter is an editable shared Waiter",
+  "F44:4 type Int64Value is a reference to an Int64",
+  "F44:10 given p is a shared Reference to an Int64"
+ ],
+ "A|operation types, lambdas and callbacks": [
+  "F09:12 given order is an Operation from T and T to Bool",
+  "F33:61 let placeholder be operation given state, value and options doing",
+  "F36:32 field beforesleep as a maybe Operation from EventLoop to nothing",
+  "F36:33 field aftersleep as a maybe Operation from EventLoop to nothing"
+ ],
+ "A|other": [
+  "F10:67 let cutoff be 2 to the power (size - 1)",
+  "F11:77 give back some try text_from ordered using memory",
+  "F14:83 module var o_tmpfile_works starts at true",
+  "F28:27 uses r of reader",
+  "F30:28 give back some keys_result of command"
+ ],
+ "A|failures carrying data or a reason": [
+  "F10:69 fail with RangeError with nearest_value int_from (cutoff - 1)",
+  "F10:74 fail with RangeError with nearest_value 0 - int_from cutoff",
+  "F12:60 fail with JSONDecodeError with msg \"Extra data\" and doc s and pos end",
+  "F21:97 fail with BadQuoting because \"closing quote must be followed by a space or nothing at all\"",
+  "F21:100 fail with BadQuoting because \"unterminated quotes\"",
+  "F21:109 fail with BadQuoting because \"closing quote must be followed by a space or nothing at all\"",
+  "F21:112 fail with BadQuoting because \"unterminated quotes\"",
+  "F43:65 fail with MissingSectionHeaderError with file as fpname and lineno as lineno of st and line as line"
+ ],
+ "A|record construction with named fields": [
+  "F13:29 give back a Prefix_and_suffix with prefix as slice of pattern from 0 until pos and suffix as slice o",
+  "F13:31 give back a Prefix_and_suffix with prefix as pattern and suffix as \"\"",
+  "F20:56 give back a SourcedFile with name name and stream stream",
+  "F22:118 append a Partial with denominator denominator and numerator numerator to partials",
+  "F22:148 give back a SumResult with kind result_kind and total total and count count"
+ ],
+ "A|several capabilities in a signature": [
+  "F14:86 to temporary_file mode buffering encoding newline suffix prefix dir errors using files and memory",
+  "F18:35 to init emitter with opts using defaults and memory",
+  "F36:43 to ae_api_create for event_loop using system and memory",
+  "F36:55 to ae_create_event_loop setsize using clock and system and memory",
+  "F41:85 to allocate_logged size bytes using memory and log",
+  "F41:101 to rdb_load_lzf_string_object from rdb as form using memory and log",
+  "F41:163 to sds_new_uninitialised size using memory and log",
+  "F45:41 to rewrite_config_user_option state using server and users and memory"
+ ],
+ "A|generic and multi-parameter types": [
+  "F18:7 field events as a maybe Map from EventKey to Listeners",
+  "F31:5 choice Tree of T",
+  "F32:8 interface Captures",
+  "F34:25 field events as a maybe Map of EventName to EventSlot",
+  "F34:29 given table is a Map of EventName to EventSlot",
+  "F40:9 field index as a maybe Map of Key to Position",
+  "F40:18 given index is a Map of Key to Position"
+ ],
+ "A|empty branch or bare give back": [
+  "F20:50 when Unnamed",
+  "F31:21 give back",
+  "F33:54 when nothing",
+  "F33:66 when nothing",
+  "F39:97 when Ready"
+ ],
+ "A|assertion inside a body": [
+  "F22:135 expect not is_finite value",
+  "F30:25 expect preprocessed of command because \"serverAssert(pcmd->flags & PENDING_CMD_FLAG_PREPROCESSED)\""
+ ],
+ "A|bit operations": [
+  "F24:20 let swapped_bytes be ((x shifted right by 8) bitand m3) bitor ((x bitand m3) shifted left by 8 wrapp",
+  "F24:21 let swapped_halves be ((swapped_bytes shifted right by 16) bitand m4) bitor ((swapped_bytes bitand m",
+  "F24:22 give back (swapped_halves shifted right by 32) bitor (swapped_halves shifted left by 32 wrapping)",
+  "F42:43 give back x bitor ((b as a UInt64) shifted left by s)",
+  "F42:44 set x to x bitor (((b bitand 127) as a UInt64) shifted left by s)"
+ ],
+ "B|name collides with a reserved word": [
+  "F01:5 to bisect_right x in a from lo below hi with key",
+  "F31:11 given f is an Operation taking a K and a V",
+  "F38:14 field result as a maybe Value",
+  "F38:31 to set_result result on future"
+ ],
+ "B|other": [
+  "F21:67 repeat while byte_at p in line is a space_byte",
+  "F21:85 if here is byte \"\\\\\" and next is byte \"x\" and third is a hex_digit and fourth is a hex_digit",
+  "F21:90 otherwise if here is byte \"\\\\\" and next is not byte \"\\0\"",
+  "F21:105 otherwise if here is byte \"\\\"\"",
+  "F21:111 otherwise if here is byte \"\\0\"",
+  "F21:114 otherwise",
+  "F21:123 if next is not byte \"\\0\" and not (next is a space_byte)",
+  "F31:20 when Node with l and v and d and r",
+  "F38:29 uses callbacks of future"
+ ],
+ "B|operation signature: several parameters or new label words": [
+  "F26:19 to new_datetime year and month and day and hour and minute and second and microsecond and tzinfo and",
+  "F26:39 to replace self with year and month and day and hour and minute and second and microsecond and tzinf",
+  "F35:14 to new_scheduler with timefunc and delayfunc using memory",
+  "F41:30 to rio_read size bytes from rdb into buffer",
+  "F41:88 to server_log level message using log",
+  "F41:95 to report_corrupt_rdb message using log, server_state",
+  "F41:112 to rdb_load_lzf_string_object from rdb with flags using memory, log, server_state"
+ ],
+ "B|generic and multi-parameter types": [
+  "F31:5 choice Map of K and V",
+  "F31:12 given m is a Map of K and V"
+ ],
+ "B|empty branch or bare give back": [
+  "F31:17 when Empty"
+ ],
+ "B|operation types, lambdas and callbacks": [
+  "F35:9 field timefunc as an Operation producing a Number",
+  "F35:10 field delayfunc as an Operation taking a Number",
+  "F38:20 field done_callbacks as a List of Operation taking a Future"
+ ]
+}

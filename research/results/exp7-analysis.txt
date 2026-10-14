@@ -1,0 +1,59 @@
+functions: 48
+behaviour preserved: Counter({'approximate': 37, 'not possible': 6, 'exact': 5})
+translated with no gap: 3/48; non-adversarial: 3/36; adversarial: 0/12
+total gaps / workarounds / unclear: 125 125 98
+invented phrases: 188 | doc rules contradicted: 18
+median body token ratio (Scribe/original): 0.97 over 48
+   ada-spark   median 0.81  (n=1)
+   c           median 0.73  (n=9)
+   dafny       median 0.69  (n=1)
+   erlang      median 1.28  (n=2)
+   go          median 0.97  (n=14)
+   javascript  median 1.32  (n=2)
+   ocaml       median 1.44  (n=2)
+   python      median 1.05  (n=14)
+   rust        median 0.77  (n=3)
+median header lines per function: 12.0
+
+gap and workaround categories (functions affected / total mentions):
+   19 /  24  error types and exceptions
+   18 /  19  objects, methods and self
+   17 /  19  missing values
+   16 /  17  closures and stored callbacks
+   15 /  21  collections and iteration
+   13 /  18  characters, bytes and strings
+   12 /  13  interfaces and dynamic dispatch
+   10 /  10  bit operations
+   10 /  12  pointers and shared mutable references
+    9 /  10  unsafe and raw memory
+    8 /   8  default, optional and keyword arguments
+    8 /   9  contracts and specifications
+    8 /   8  pattern matching
+    8 /   9  numeric types and conversions
+    7 /   8  generics and type parameters
+    7 /   7  resource lifetime
+    7 /   7  global or module state
+    6 /   6  reflection
+    5 /   9  concurrency, threads and locks
+    3 /   3  loop forms
+    3 /   3  macros
+    2 /   2  integer overflow and wrapping
+    2 /   2  i/o primitives
+    2 /   2  effect polymorphism
+    1 /   1  multiple return values
+    1 /   1  variadic arguments
+    1 /   1  time and clocks
+    1 /   1  async and futures
+
+independent second translations:
+  F01: gaps A=3 B=4, category overlap 1.00, behaviour A=approximate B=approximate
+  F15: gaps A=0 B=1, category overlap 0.00, behaviour A=exact B=exact
+  F21: gaps A=1 B=3, category overlap 0.30, behaviour A=approximate B=approximate
+  F25: gaps A=1 B=0, category overlap 1.00, behaviour A=approximate B=approximate
+  F26: gaps A=2 B=3, category overlap 0.60, behaviour A=approximate B=approximate
+  F31: gaps A=3 B=4, category overlap 0.40, behaviour A=approximate B=exact
+  F35: gaps A=2 B=4, category overlap 0.67, behaviour A=not possible B=approximate
+  F38: gaps A=6 B=6, category overlap 0.75, behaviour A=not possible B=not possible
+  F41: gaps A=2 B=2, category overlap 0.56, behaviour A=approximate B=approximate
+  F47: gaps A=1 B=1, category overlap 0.50, behaviour A=approximate B=approximate
+  mean category overlap 0.58; behaviour verdict agreement 8/10

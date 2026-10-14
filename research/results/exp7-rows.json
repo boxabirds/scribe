@@ -1,0 +1,3450 @@
+[
+ {
+  "id": "F01",
+  "category": "control flow and loops",
+  "language": "python",
+  "adversarial": false,
+  "src_body_lines": 19,
+  "src_body_tokens": 99,
+  "scribe_body_lines": 27,
+  "scribe_body_tokens": 133,
+  "scribe_header_lines": 11,
+  "scribe_decl_lines": 0,
+  "ratio_tokens": 1.3434343434343434,
+  "behaviour": "approximate",
+  "gaps": [
+   {
+    "category": "generics and type parameters",
+    "construct": "a and x are any comparable type; with key, items are T and x is K",
+    "description": "The doc uses `of T` only inside a type declaration and never shows an operation introducing type parameters or bounding them by an ordering (`K supports is less than`).",
+    "kind": "gap"
+   },
+   {
+    "category": "closures and stored callbacks",
+    "construct": "key=None parameter holding a function, called as key(a[mid])",
+    "description": "There is no type for an operation value and no syntax for calling an operation held in a variable; `maybe operation taking a T producing a K` and `key_function (item mid of a)` are invented.",
+    "kind": "gap"
+   },
+   {
+    "category": "generics and type parameters",
+    "construct": "when key is None, x is compared directly with items of a",
+    "description": "The no-key branch needs T and K to be the same type, which depends on a runtime value; nothing in the doc can relate a type parameter to whether an optional argument is present.",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [
+   {
+    "category": "default, optional and keyword arguments",
+    "construct": "lo=0, hi=None, *, key=None (defaults and a keyword-only argument)",
+    "description": "No defaults or keyword arguments, so every caller must pass all four, using `nothing` for absent ones and a label word in place of the keyword name.",
+    "kind": "workaround"
+   },
+   {
+    "category": "objects, methods and self",
+    "construct": "rebinding the parameters lo and hi inside the loop",
+    "description": "Parameters are not shown as mutable, so they are copied into `var low` and `var high`; `choose` is a statement, so `high` needs a dummy start value before the `choose` sets it.",
+    "kind": "workaround"
+   },
+   {
+    "category": "missing values",
+    "construct": "if hi is None: hi = len(a)",
+    "description": "Unwrapping a maybe with a fallback takes a full five-line `choose` because there is no expression form like `hi or else count of a`.",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [
+   {
+    "category": "numeric types and conversions",
+    "construct": "mid = (lo + hi) // 2 (floor division)",
+    "description": "The doc never says whether `/` on Int truncates, floors or produces a fraction.",
+    "kind": "unclear"
+   },
+   {
+    "category": "collections and iteration",
+    "construct": "a[mid] raising IndexError when hi exceeds len(a)",
+    "description": "The doc does not say what `item i of items` does out of range (failure, precondition, or compile-time proof obligation), so the failure behaviour for a too-large hi is unspecified.",
+    "kind": "unclear"
+   },
+   {
+    "category": "contracts and specifications",
+    "construct": "docstring guarantee in terms of the defaulted hi; 'a is sorted' by key",
+    "description": "The `sorted` predicate is defined only for List of Int and not for sorting by a key; the postcondition depends on the resolved hi, which exists only in the body, so the ensure is limited to the default case.",
+    "kind": "unclear"
+   },
+   {
+    "category": "error types and exceptions",
+    "construct": "raise ValueError('lo must be non-negative') with a message",
+    "description": "`because` is shown only on header clauses; it is unclear whether a `fail with` statement can carry a message. Python's key() and __lt__ can also raise arbitrary exceptions, which a `fails with` list cannot state without knowing them.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [
+   "maybe operation taking a T producing a K",
+   "key_function (item mid of a)",
+   "fail with ValueError because \"lo must be non-negative\""
+  ],
+  "contradicted": [],
+  "gap_notes": 4
+ },
+ {
+  "id": "F02",
+  "category": "control flow and loops",
+  "language": "go",
+  "adversarial": false,
+  "src_body_lines": 11,
+  "src_body_tokens": 51,
+  "scribe_body_lines": 12,
+  "scribe_body_tokens": 70,
+  "scribe_header_lines": 4,
+  "scribe_decl_lines": 0,
+  "ratio_tokens": 1.3725490196078431,
+  "behaviour": "approximate",
+  "gaps": [
+   {
+    "category": "closures and stored callbacks",
+    "construct": "parameter f of type func(int) bool, called inside the loop",
+    "description": "The doc has no type for an operation value and no form for calling one held in a variable; 'an Operation from Int to Bool' and the call 'f h' are guesses.",
+    "kind": "gap"
+   },
+   {
+    "category": "contracts and specifications",
+    "construct": "effects of a passed-in function",
+    "description": "No uses line means pure, but Go's f may have effects; the doc has no effect-polymorphic header ('uses whatever f uses'), so either every effectful f is rejected or the header lies.",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [
+   {
+    "category": "bit operations",
+    "construct": "int(uint(i+j) >> 1) to compute the midpoint without overflow",
+    "description": "No shift and no unsigned reinterpretation; replaced by i + (j - i) / 2, which is equivalent for 0 <= i <= j.",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [
+   {
+    "category": "contracts and specifications",
+    "construct": "invariants f(i-1) == false and f(j) == true with the virtual values f(-1) == false and f(n) == true",
+    "description": "The doc has no way to define a value at a virtual index for spec purposes; written as 'i is 0 or not f (i - 1)', and calling a possibly impure f inside an invariant is not settled by the doc.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [
+   "given f is an Operation from Int to Bool",
+   "f h (calling a parameter as an operation)",
+   "not f (i - 1) (precedence of not over a call)"
+  ],
+  "contradicted": [],
+  "gap_notes": 1
+ },
+ {
+  "id": "F03",
+  "category": "control flow and loops",
+  "language": "ada-spark",
+  "adversarial": false,
+  "src_body_lines": 16,
+  "src_body_tokens": 133,
+  "scribe_body_lines": 9,
+  "scribe_body_tokens": 108,
+  "scribe_header_lines": 6,
+  "scribe_decl_lines": 5,
+  "ratio_tokens": 0.8120300751879699,
+  "behaviour": "approximate",
+  "gaps": [
+   {
+    "category": "collections and iteration",
+    "construct": "Ada unconstrained array T_Arr with arbitrary index bounds (A'First, B'First), and index arithmetic B'First + J - A'First",
+    "description": "Scribe lists are always indexed from 0; there is no array type whose first index is part of the value, so the offset arithmetic that is the subtle part of the SPARK contract disappears and the translation is only correct for 0-based arrays.",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [],
+  "unclear": [
+   {
+    "category": "integer overflow and wrapping",
+    "construct": "Minus_No_Overflow precondition over a bounded integer type T",
+    "description": "The doc says arithmetic is checked but names no fixed-width integer type, and does not say whether arithmetic inside a spec is mathematical or checked, so the no-overflow precondition cannot be stated with confidence.",
+    "kind": "unclear"
+   },
+   {
+    "category": "collections and iteration",
+    "construct": "B (J) := ... (assignment to an array element)",
+    "description": "The doc shows `set` only on variables and fields; `set item j of b to ...` is assumed.",
+    "kind": "unclear"
+   },
+   {
+    "category": "early exit from loops",
+    "construct": "return; from a procedure with no result",
+    "description": "Only `give back <value>` exists; a bare `give back` for an operation with no `produces` line is assumed.",
+    "kind": "unclear"
+   },
+   {
+    "category": "contracts and specifications",
+    "construct": "pragma Loop_Invariant placed at the end of the loop body",
+    "description": "The doc shows invariants only at the top of the body, so the quantifier range had to be rewritten (A'First+1 .. J becomes 1 until j); invariant position is not specified.",
+    "kind": "unclear"
+   },
+   {
+    "category": "contracts and specifications",
+    "construct": "pragma Assert inside a loop body",
+    "description": "`assert` appears only inside a trailing `proof` block; an inline mid-body assertion has no documented place.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [
+   "give back (with no value)",
+   "set item 0 of b to ...",
+   "assert ... (outside a proof block)"
+  ],
+  "contradicted": [],
+  "gap_notes": 1
+ },
+ {
+  "id": "F04",
+  "category": "recursion",
+  "language": "ocaml",
+  "adversarial": false,
+  "src_body_lines": 8,
+  "src_body_tokens": 65,
+  "scribe_body_lines": 12,
+  "scribe_body_tokens": 118,
+  "scribe_header_lines": 16,
+  "scribe_decl_lines": 0,
+  "ratio_tokens": 1.8153846153846154,
+  "behaviour": "approximate",
+  "gaps": [
+   {
+    "category": "closures and stored callbacks",
+    "construct": "cmp is a comparison closure captured from the enclosing stable_sort and called on each pair",
+    "description": "The doc has no nested operations, no closures and no function-typed parameter, so cmp is passed explicitly with an invented type `Comparison of T` and called like an operation.",
+    "kind": "gap"
+   },
+   {
+    "category": "collections and iteration",
+    "construct": "taking the tail t1 of a list h1 :: t1 in O(1)",
+    "description": "The doc has `item i of items` and `count of items` but no tail, slice or rest form. `part of l1 from 1 until count of l1` is invented, and a slice would be O(n) where OCaml's tail is O(1), which changes the complexity of the merge.",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [
+   {
+    "category": "pattern matching",
+    "construct": "match l1, l2 with | [], l2 -> ... | l1, [] -> ... | h1::t1, h2::t2 -> ...",
+    "description": "`choose` matches choice variants and maybe values only; there is no list pattern, no tuple pattern and no matching on two values at once. Rewritten as an if chain on count plus manual head and tail extraction.",
+    "kind": "workaround"
+   },
+   {
+    "category": "unsafe and raw memory",
+    "construct": "each cons allocates a heap cell (OCaml is garbage collected)",
+    "description": "The doc requires allocation to be visible via an Allocator in uses and says there is no garbage collector, but list-building expressions such as `followed by` give no place to name the allocator. An Allocator parameter is threaded through and declared, but the allocation sites themselves do not mention it.",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [
+   {
+    "category": "generics and type parameters",
+    "construct": "rev_merge is polymorphic in the element type 'a",
+    "description": "The doc uses T only inside `type Queue of T` and never shows how a standalone operation introduces a type parameter; T is written free in the given lines.",
+    "kind": "unclear"
+   },
+   {
+    "category": "collections and iteration",
+    "construct": "h1 :: accu (cons onto an accumulator)",
+    "description": "`followed by` appears only in an ensure line (example 9); whether it can be used in a body to build a list is not stated. Used as `[h1] followed by accu`.",
+    "kind": "unclear"
+   },
+   {
+    "category": "contracts and specifications",
+    "construct": "recursion with tail calls (OCaml guarantees tail-call optimisation)",
+    "description": "The doc gives `decreases` only for `repeat while` loops and says nothing about whether recursive operations need a termination measure or whether a tail call is guaranteed not to grow the stack.",
+    "kind": "unclear"
+   },
+   {
+    "category": "default, optional and keyword arguments",
+    "construct": "a function of three plain positional list arguments plus a captured comparator",
+    "description": "Label words are required by the call style, but the doc gives no guidance for choosing labels when arguments have no natural relation; `with`, `onto`, `by` and `using` are arbitrary picks.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [
+   "Comparison of T (function-typed parameter)",
+   "cmp h1 h2 (calling a parameter as an operation)",
+   "part of l1 from 1 until count of l1 (list slice)",
+   "[h1] followed by accu used in a body expression",
+   "free type parameter T in an operation header"
+  ],
+  "contradicted": [],
+  "gap_notes": 3
+ },
+ {
+  "id": "F05",
+  "category": "recursion",
+  "language": "go",
+  "adversarial": false,
+  "src_body_lines": 64,
+  "src_body_tokens": 360,
+  "scribe_body_lines": 55,
+  "scribe_body_tokens": 361,
+  "scribe_header_lines": 16,
+  "scribe_decl_lines": 8,
+  "ratio_tokens": 1.0027777777777778,
+  "behaviour": "approximate",
+  "gaps": [
+   {
+    "category": "characters, bytes and strings",
+    "construct": "byte/rune literals such as '[' , '^', '/', '\\\\' compared with chunk[0] and s[0]",
+    "description": "The doc has no character or byte literal and no conversion from a one-character Text to a byte; `byte \"[\"` was invented.",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [
+   {
+    "category": "characters, bytes and strings",
+    "construct": "string slicing chunk = chunk[1:], s = s[n:], and returning the suffix s as rest",
+    "description": "No slice or substring view exists. Re-slicing became two cursor variables, and the returned suffix is copied with a comprehension, which forces `uses memory` and OutOfMemory onto a function that allocates nothing in Go.",
+    "kind": "workaround"
+   },
+   {
+    "category": "pattern matching",
+    "construct": "switch on a byte value with case '[', case '?', case '\\\\' with fallthrough, default",
+    "description": "`choose` is only shown for choice variants and maybe, and there is no fallthrough, so the switch became an if chain and the fallthrough was folded into the default branch.",
+    "kind": "workaround"
+   },
+   {
+    "category": "loop forms",
+    "construct": "for { ... break } infinite loop parsing class ranges",
+    "description": "Written as `repeat while true` plus `stop`; the required `decreases` line depends on an unstated property of getEsc (it always consumes input), which the original never documents.",
+    "kind": "workaround"
+   },
+   {
+    "category": "multiple return values",
+    "construct": "(rest string, ok bool, err error) results, and getEsc/DecodeRuneInString returning pairs",
+    "description": "No tuples. The main result maps cleanly to maybe Bytes plus fails with BadPattern, but the helpers' pairs need ad hoc record types (Escape, DecodedRune).",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [
+   {
+    "category": "characters, bytes and strings",
+    "construct": "indexing a Go string yields a byte; Text vs Bytes",
+    "description": "The doc never says what `item i of` returns for Bytes or Text, or what the element type is.",
+    "kind": "unclear"
+   },
+   {
+    "category": "characters, bytes and strings",
+    "construct": "backslash in a literal",
+    "description": "No escape rules for text literals are given.",
+    "kind": "unclear"
+   },
+   {
+    "category": "numeric types and conversions",
+    "construct": "bool literals true/false",
+    "description": "The doc never shows boolean literals or a Bool type name.",
+    "kind": "unclear"
+   },
+   {
+    "category": "collections and iteration",
+    "construct": "comprehension over an index range to build the suffix",
+    "description": "Comprehensions are shown only over a list (`for each order in orders`); range comprehensions, their allocator and whether they need `try` are not specified.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [
+   "byte \"[\"",
+   "true",
+   "false"
+  ],
+  "contradicted": [],
+  "gap_notes": 1
+ },
+ {
+  "id": "F06",
+  "category": "recursion",
+  "language": "erlang",
+  "adversarial": false,
+  "src_body_lines": 8,
+  "src_body_tokens": 79,
+  "scribe_body_lines": 8,
+  "scribe_body_tokens": 97,
+  "scribe_header_lines": 28,
+  "scribe_decl_lines": 0,
+  "ratio_tokens": 1.2278481012658229,
+  "behaviour": "approximate",
+  "gaps": [
+   {
+    "category": "closures and stored callbacks",
+    "construct": "Fun parameter: an ordering function passed as a value and called as Fun(H1, H2)",
+    "description": "The doc has no type for an operation held in a parameter and no syntax to call one. Invented `an Operation from T and T to Bool` and `apply fun to h1 and h2`.",
+    "kind": "gap"
+   },
+   {
+    "category": "contracts and specifications",
+    "construct": "Effects and failures of the passed Fun",
+    "description": "uses/fails with lines are fixed per operation; there is no way to say the operation's effects are those of its function argument (effect polymorphism). Translation assumes Fun is pure.",
+    "kind": "gap"
+   },
+   {
+    "category": "numeric types and conversions",
+    "construct": "Boolean result type of Fun (true/false clauses)",
+    "description": "The doc never names a boolean type or the literals true/false; invented `Bool`.",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [
+   {
+    "category": "pattern matching",
+    "construct": "Multi-clause function head matching [H2 | T2] versus []",
+    "description": "choose only matches choices and maybe values; clause selection rewritten as `if l2 is empty` followed by the cons case.",
+    "kind": "workaround"
+   },
+   {
+    "category": "collections and iteration",
+    "construct": "Head/tail destructuring of a cons list",
+    "description": "No head/tail pattern or tail operation. Tail rebuilt with a comprehension over indices, which copies the list and changes complexity from O(n) to O(n^2) per merge.",
+    "kind": "workaround"
+   },
+   {
+    "category": "resource lifetime",
+    "construct": "Implicit allocation of cons cells on a GC heap",
+    "description": "Doc example 21 requires an explicit Allocator and `uses memory` for any allocating operation, so an allocator is threaded through all recursive calls and OutOfMemory becomes a declared failure; list literals and `followed by` inside expressions have no place to name the allocator.",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [
+   {
+    "category": "generics and type parameters",
+    "construct": "Polymorphic list element type",
+    "description": "`T` appears only inside `type Queue of T`; the doc does not say how an operation declares a type parameter. Used T as if in scope.",
+    "kind": "unclear"
+   },
+   {
+    "category": "loop forms",
+    "construct": "Tail-recursive self call (last-call optimisation)",
+    "description": "The doc has no recursion example; it does not say whether recursive operations need `decreases` or whether a call in `give back` position is a tail call.",
+    "kind": "unclear"
+   },
+   {
+    "category": "default, optional and keyword arguments",
+    "construct": "Five positional arguments",
+    "description": "Bare juxtaposition `ufmerge2_2 h1 t1 fun t2 m` is ambiguous (`fun t2` reads as a call), so label words were invented per operation; the doc does not say how operations with many unlabelled arguments are written.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [
+   "an Operation from T and T to Bool",
+   "Bool",
+   "apply fun to h1 and h2",
+   "`followed by` used in a code expression (doc shows it only in ensure lines)",
+   "label words `then`, `by`, `against`, `onto`, `after` in the operation headers"
+  ],
+  "contradicted": [
+   "\"Every operation that allocates must say so in `uses`, and the allocator is a value passed in. There is no hidden allocation\" - the list literal `[h1]`, `followed by` and the tail comprehension allocate inside expressions with no allocator named"
+  ],
+  "gap_notes": 4
+ },
+ {
+  "id": "F07",
+  "category": "data structures",
+  "language": "c",
+  "adversarial": true,
+  "src_body_lines": 3,
+  "src_body_tokens": 18,
+  "scribe_body_lines": 2,
+  "scribe_body_tokens": 14,
+  "scribe_header_lines": 3,
+  "scribe_decl_lines": 14,
+  "ratio_tokens": 0.7777777777777778,
+  "behaviour": "approximate",
+  "gaps": [
+   {
+    "category": "pointers and shared mutable references",
+    "construct": "li->next = list->head (the iterator stores a pointer into the list's node chain)",
+    "description": "Scribe fields hold values with single ownership; there is no way to store a non-owning reference to a node owned by another structure, so `maybe reference to Adlist_node` is invented.",
+    "kind": "gap"
+   },
+   {
+    "category": "pointers and shared mutable references",
+    "construct": "doubly linked list nodes with prev and next pointers forming a cycle of references",
+    "description": "A doubly linked structure needs nodes reachable from two places at once; neither `editable` nor `consumed` nor linear types cover aliasing within one data structure.",
+    "kind": "gap"
+   },
+   {
+    "category": "resource lifetime",
+    "construct": "iterator valid only while the list lives and is not modified",
+    "description": "The doc has no way to say that an output argument now borrows from an input argument, so the iterator's dependence on the list cannot be stated or checked.",
+    "kind": "gap"
+   },
+   {
+    "category": "unsafe and raw memory",
+    "construct": "void *value in listNode",
+    "description": "There is no opaque or untyped pointer type; the list would have to become generic over its value type, which the doc only shows for `Queue of T`.",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [
+   {
+    "category": "macros",
+    "construct": "#define AL_START_HEAD 0 used as an int",
+    "description": "Replaced with a choice, which is safer but changes the representation from an int to a variant.",
+    "kind": "workaround"
+   },
+   {
+    "category": "closures and stored callbacks",
+    "construct": "dup, free and match function pointers stored in the list struct",
+    "description": "Omitted from the helper type because the doc has no type for a stored operation; this function does not use them.",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [
+   {
+    "category": "naming and identifiers",
+    "construct": "struct named `list` alongside built-in `List`",
+    "description": "The doc does not say whether user type names may shadow or differ only in case from built-in type names, so the types were renamed.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [
+   "maybe reference to Adlist_node"
+  ],
+  "contradicted": [],
+  "gap_notes": 3
+ },
+ {
+  "id": "F08",
+  "category": "data structures",
+  "language": "python",
+  "adversarial": false,
+  "src_body_lines": 10,
+  "src_body_tokens": 49,
+  "scribe_body_lines": 12,
+  "scribe_body_tokens": 66,
+  "scribe_header_lines": 4,
+  "scribe_decl_lines": 0,
+  "ratio_tokens": 1.346938775510204,
+  "behaviour": "exact",
+  "gaps": [
+   {
+    "category": "generics and type parameters",
+    "construct": "heap holds items of any type that supports <",
+    "description": "The doc shows a type parameter only on a type declaration (Queue of T); there is no way for an operation to introduce T or to bound it by an ordering, so 'where T is Ordered' is invented.",
+    "kind": "gap"
+   },
+   {
+    "category": "interfaces and dynamic dispatch",
+    "construct": "newitem < parent dispatches to the items' __lt__",
+    "description": "Comparison of user values relies on an ordering capability the doc never names; 'is less than' is only shown on Int.",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [
+   {
+    "category": "bit operations",
+    "construct": "(pos - 1) >> 1",
+    "description": "No shift operator; replaced by (current - 1) / 2, which equals the shift for non-negative values.",
+    "kind": "workaround"
+   },
+   {
+    "category": "objects, methods and self",
+    "construct": "rebinding the parameter pos inside the loop",
+    "description": "The doc never shows a parameter being set, so a var copy 'current' is introduced and the original name is lost in the loop.",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [
+   {
+    "category": "collections and iteration",
+    "construct": "heap[pos] = parent (element assignment)",
+    "description": "The doc has 'item i of items' as an expression and 'set field of record to', but never sets a list element; 'set item current of heap to parent' is assumed.",
+    "kind": "unclear"
+   },
+   {
+    "category": "error types and exceptions",
+    "construct": "implicit IndexError from heap[pos] when pos is out of range",
+    "description": "The doc does not say what an out-of-range 'item i of items' does (proof obligation, failure, or abort), so the failure behaviour is left unstated.",
+    "kind": "unclear"
+   },
+   {
+    "category": "default, optional and keyword arguments",
+    "construct": "three positional parameters with no label words",
+    "description": "Every doc header with more than one parameter uses label words (from, in, onto, for, with); whether 'to siftdown heap startpos pos' is valid is not stated.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [
+   "given heap is an editable List of T where T is Ordered",
+   "set item current of heap to parent"
+  ],
+  "contradicted": [],
+  "gap_notes": 1
+ },
+ {
+  "id": "F09",
+  "category": "data structures",
+  "language": "dafny",
+  "adversarial": false,
+  "src_body_lines": 13,
+  "src_body_tokens": 160,
+  "scribe_body_lines": 14,
+  "scribe_body_tokens": 111,
+  "scribe_header_lines": 18,
+  "scribe_decl_lines": 6,
+  "ratio_tokens": 0.69375,
+  "behaviour": "approximate",
+  "gaps": [
+   {
+    "category": "closures and stored callbacks",
+    "construct": "parameter lessThanOrEq: (T, T) -> bool, called as lessThanOrEq(left[0], right[0])",
+    "description": "The doc has no function type and no syntax for calling a parameter as an operation, so a comparator-parameterised merge cannot be written without inventing both.",
+    "kind": "gap"
+   },
+   {
+    "category": "contracts and specifications",
+    "construct": "lemma call and assert inside each branch of an expression body",
+    "description": "The proof block is one trailing block; proof hints cannot be attached to a branch, so the branch-local reasoning is flattened and may not be checkable as written.",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [
+   {
+    "category": "collections and iteration",
+    "construct": "sequence slice left[1..]",
+    "description": "No slice or tail form exists; a helper `rest_of` had to be declared.",
+    "kind": "workaround"
+   },
+   {
+    "category": "contracts and specifications",
+    "construct": "multiset(left + right) == multiset(result)",
+    "description": "Expressed through the doc's `is a permutation of` named predicate, which the doc only defines for List of Int; no multiset type exists.",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [
+   {
+    "category": "generics and type parameters",
+    "construct": "function MergeSortedWith<T(!new)>",
+    "description": "Generic types appear (`type Queue of T`) but no generic operation is shown, so how T is bound on a `to` header and how type constraints like (!new) are written is open.",
+    "kind": "unclear"
+   },
+   {
+    "category": "contracts and specifications",
+    "construct": "declaration of the lemma LemmaNewFirstElementStillSortedBy",
+    "description": "`use lemma` appears but there is no form for declaring a lemma with parameters and its statement.",
+    "kind": "unclear"
+   },
+   {
+    "category": "contracts and specifications",
+    "construct": "termination of a recursive function",
+    "description": "`decreases` is documented only for `repeat while`; the doc does not say how recursion termination is stated or whether it is inferred.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [
+   "an Operation from T and T to Bool",
+   "less_than_or_eq of (x, y)",
+   "rest_of",
+   "define ... is sorted_by order (predicate with a parameter after the predicate word)"
+  ],
+  "contradicted": [],
+  "gap_notes": 2
+ },
+ {
+  "id": "F10",
+  "category": "error handling",
+  "language": "go",
+  "adversarial": false,
+  "src_body_lines": 33,
+  "src_body_tokens": 163,
+  "scribe_body_lines": 29,
+  "scribe_body_tokens": 178,
+  "scribe_header_lines": 15,
+  "scribe_decl_lines": 0,
+  "ratio_tokens": 1.0920245398773005,
+  "behaviour": "approximate",
+  "gaps": [
+   {
+    "category": "error types and exceptions",
+    "construct": "return (clamped value, ErrRange): a failure that also delivers a usable result",
+    "description": "Scribe failures are bare names with no payload and an operation either gives back or fails. The clamped value is carried in an invented failure payload (`fail with RangeError with nearest_value X`, read as `nearest_value of problem`).",
+    "kind": "gap"
+   },
+   {
+    "category": "characters, bytes and strings",
+    "construct": "s[0] compared with rune literals '+' and '-'; s = s[1:]",
+    "description": "No character or byte type, no character literal and no substring/slice form in the doc. `item 0 of text` compared with one-letter Text and `part of text from 1 until count of text` are invented.",
+    "kind": "gap"
+   },
+   {
+    "category": "bit operations",
+    "construct": "1 << uint(bitSize-1)",
+    "description": "No shift operator and no exponent operator; `2 to the power (size - 1)` is invented.",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [
+   {
+    "category": "error types and exceptions",
+    "construct": "err from ParseUint is inspected, ErrRange is tolerated and execution continues with the returned value",
+    "description": "Recovering a value from a failure and continuing needs `set` inside an `on failure` line; the doc only says such a line must give back, fail or call something, so assigning there is not clearly allowed.",
+    "kind": "workaround"
+   },
+   {
+    "category": "numeric types and conversions",
+    "construct": "int64, uint64, uint(...), int64(...) casts and a run-time bitSize choosing the width",
+    "description": "The doc has Int and Nat with no sized integers and no explicit conversion syntax; conversions go through a declared helper `int_from`. The bit width is a runtime parameter in Go, which a refinement type cannot express directly, so the result type is plain Int with the range enforced only by the body.",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [
+   {
+    "category": "integer overflow and wrapping",
+    "construct": "-int64(cutoff) where cutoff is 2^63 relies on two's-complement wrap to yield MinInt64",
+    "description": "The doc promises checked arithmetic but never says whether Int is bounded; if Int is 64-bit, `0 - int_from cutoff` would fail at int_from for size 64; if unbounded, it is exact. The doc does not settle which.",
+    "kind": "unclear"
+   },
+   {
+    "category": "global or module state",
+    "construct": "IntSize, a platform-dependent package constant",
+    "description": "Top-level `let` appears in example 17 but nothing says how a binding that depends on the compilation target is written.",
+    "kind": "unclear"
+   },
+   {
+    "category": "numeric types and conversions",
+    "construct": "unary minus (n = -n) and boolean literals",
+    "description": "The doc never shows unary minus or the literals true and false; `0 - x`, `true` and `false` are assumed.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [
+   "fail with RangeError with nearest_value X",
+   "nearest_value of problem (reading a failure payload)",
+   "on failure RangeError as problem (binding a single named failure; the doc shows `as` only after an `or` list)",
+   "item 0 of text compared with \"+\" (character access on Text)",
+   "part of text from 1 until count of text",
+   "2 to the power (size - 1)",
+   "true / false literals",
+   "0 - x for negation"
+  ],
+  "contradicted": [
+   "An `on failure` line may not be empty: it must give back a value, fail, or call something. (the RangeError handler only sets a variable)"
+  ],
+  "gap_notes": 3
+ },
+ {
+  "id": "F11",
+  "category": "error handling",
+  "language": "rust",
+  "adversarial": false,
+  "src_body_lines": 23,
+  "src_body_tokens": 129,
+  "scribe_body_lines": 34,
+  "scribe_body_tokens": 170,
+  "scribe_header_lines": 12,
+  "scribe_decl_lines": 17,
+  "ratio_tokens": 1.317829457364341,
+  "behaviour": "approximate",
+  "gaps": [
+   {
+    "category": "collections and iteration",
+    "construct": "Vec::push on a growable list",
+    "description": "The vocabulary table has no append operation; `append value to list` appears only once, in example 9, with no stated allocation behaviour.",
+    "kind": "gap"
+   },
+   {
+    "category": "characters, bytes and strings",
+    "construct": "ext.into_iter().collect::<String>()",
+    "description": "No way to build Text from a list of characters; a helper `text_from` was declared.",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [
+   {
+    "category": "pattern matching",
+    "construct": "match arm with a literal inside the payload, Token::Literal('/'), ordered before Token::Literal(c)",
+    "description": "`when Variant with field` binds payloads but cannot test them against a constant; nested patterns need an if inside the branch.",
+    "kind": "workaround"
+   },
+   {
+    "category": "collections and iteration",
+    "construct": "self.tokens.iter().rev()",
+    "description": "No reverse iteration form; written as an index loop with item (count - 1 - k).",
+    "kind": "workaround"
+   },
+   {
+    "category": "missing values",
+    "construct": "ext.last() != Some(&'.') comparing an Option directly",
+    "description": "maybe values can only be used through `choose`, so the emptiness check and the last-element check were split into two ifs.",
+    "kind": "workaround"
+   },
+   {
+    "category": "objects, methods and self",
+    "construct": "&self method",
+    "description": "No methods; the receiver became an ordinary read-only parameter, which is fine but loses method-call syntax.",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [
+   {
+    "category": "pattern matching",
+    "construct": "wildcard arm `_ => return None`",
+    "description": "The doc shows no catch-all `when` line and says missing cases are compile errors, so every other variant had to be listed by name, each repeating `give back nothing`; this also breaks if Token gains variants.",
+    "kind": "unclear"
+   },
+   {
+    "category": "characters, bytes and strings",
+    "construct": "char type and char literals '/' and '.'",
+    "description": "No Char type or character literal; one-character text literals were used and compared with `is`, which the doc's no-implicit-conversion rule may reject.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [
+   "Char",
+   "Bool",
+   "append c to ext (from example 9 only)",
+   "text_from"
+  ],
+  "contradicted": [],
+  "gap_notes": 2
+ },
+ {
+  "id": "F12",
+  "category": "error handling",
+  "language": "python",
+  "adversarial": false,
+  "src_body_lines": 5,
+  "src_body_tokens": 55,
+  "scribe_body_lines": 6,
+  "scribe_body_tokens": 50,
+  "scribe_header_lines": 15,
+  "scribe_decl_lines": 19,
+  "ratio_tokens": 0.9090909090909091,
+  "behaviour": "approximate",
+  "gaps": [
+   {
+    "category": "error types and exceptions",
+    "construct": "raise JSONDecodeError(\"Extra data\", s, end) - an exception carrying a message, the document and a position",
+    "description": "The doc only shows failures as bare names (`fail with OutOfRange`); there is no way to attach data to a failure. Invented `fail with JSONDecodeError with msg ... and doc ... and pos ...`.",
+    "kind": "gap"
+   },
+   {
+    "category": "interfaces and dynamic dispatch",
+    "construct": "Result of any Python type (dict/list/str/int/float/bool/None, or whatever object_hook returns)",
+    "description": "No dynamic or open 'any' type; a closed JsonValue choice was declared, which cannot represent object_hook/parse_float custom results.",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [
+   {
+    "category": "default, optional and keyword arguments",
+    "construct": "_w=WHITESPACE.match default parameter, and keyword argument idx=",
+    "description": "No default or keyword arguments and no function values; the parameter is dropped and the helper called directly, so callers overriding _w cannot be expressed.",
+    "kind": "workaround"
+   },
+   {
+    "category": "objects, methods and self",
+    "construct": "Method on JSONDecoder using self.raw_decode",
+    "description": "No methods; self becomes an explicit `with decoder` parameter.",
+    "kind": "workaround"
+   },
+   {
+    "category": "collections and iteration",
+    "construct": "Tuple return and unpacking: obj, end = self.raw_decode(...)",
+    "description": "No tuples or multiple results; a single-use record type DecodeResult is declared and fields read with `of`.",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [
+   {
+    "category": "characters, bytes and strings",
+    "construct": "len(s) on a str, and regex match of whitespace",
+    "description": "The doc shows `count of` only for lists and `length` only in a refinement; it is unclear which gives the length of Text. Regex matching has no vocabulary, so it is hidden behind a declared helper.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [
+   "fail with JSONDecodeError with msg \"Extra data\" and doc s and pos end",
+   "a failure declared as a `type`",
+   "Number (type name for JSON numbers)"
+  ],
+  "contradicted": [],
+  "gap_notes": 2
+ },
+ {
+  "id": "F13",
+  "category": "resource handling",
+  "language": "go",
+  "adversarial": false,
+  "src_body_lines": 12,
+  "src_body_tokens": 84,
+  "scribe_body_lines": 9,
+  "scribe_body_tokens": 78,
+  "scribe_header_lines": 7,
+  "scribe_decl_lines": 3,
+  "ratio_tokens": 0.9285714285714286,
+  "behaviour": "approximate",
+  "gaps": [
+   {
+    "category": "characters, bytes and strings",
+    "construct": "pattern[i] indexing a string by byte",
+    "description": "The doc never says whether Text is bytes or characters or whether it can be indexed; `bytes of pattern` is invented to get a byte view.",
+    "kind": "gap"
+   },
+   {
+    "category": "characters, bytes and strings",
+    "construct": "bytealg.LastIndexByteString(pattern, '*') returning -1 when absent",
+    "description": "No search-from-end operation on Text is shown; `last position of \"*\" in pattern` returning a maybe Position is invented. Using maybe is cleaner than Go's -1 sentinel.",
+    "kind": "gap"
+   },
+   {
+    "category": "characters, bytes and strings",
+    "construct": "pattern[:pos] and pattern[pos+1:] (substring slicing)",
+    "description": "No slicing form exists for Text or List; `slice of pattern from 0 until pos` is invented, reusing the doc's `until` range convention.",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [
+   {
+    "category": "error types and exceptions",
+    "construct": "multiple return values (prefix, suffix string, err error)",
+    "description": "Scribe has one result plus a failure channel, so the two strings need a helper record type declared just for this function.",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [
+   {
+    "category": "characters, bytes and strings",
+    "construct": "rune/byte literal '*'",
+    "description": "The doc has no character or byte literal, only double-quoted Text, so the single byte is written as a one-character Text.",
+    "kind": "unclear"
+   },
+   {
+    "category": "objects, methods and self",
+    "construct": "constructing a record value with named fields",
+    "description": "The doc shows record construction only once (`an Order from cart and receipt with status Paid`) without a general rule; the `with field as value and field as value` form is borrowed from choice declarations.",
+    "kind": "unclear"
+   },
+   {
+    "category": "characters, bytes and strings",
+    "construct": "len(pattern) is the byte length",
+    "description": "`count of` on Text is not defined as bytes or characters.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [
+   "bytes of pattern",
+   "last position of \"*\" in pattern",
+   "slice of pattern from 0 until pos",
+   "a Prefix_and_suffix with prefix as ... and suffix as ..."
+  ],
+  "contradicted": [],
+  "gap_notes": 2
+ },
+ {
+  "id": "F14",
+  "category": "resource handling",
+  "language": "python",
+  "adversarial": false,
+  "src_body_lines": 41,
+  "src_body_tokens": 257,
+  "scribe_body_lines": 24,
+  "scribe_body_tokens": 156,
+  "scribe_header_lines": 61,
+  "scribe_decl_lines": 16,
+  "ratio_tokens": 0.6070038910505836,
+  "behaviour": "approximate",
+  "gaps": [
+   {
+    "category": "global or module state",
+    "construct": "global _O_TMPFILE_WORKS, read on every call and cleared after the first IsADirectoryError",
+    "description": "The doc has no module-level variable and no way to declare in a header that an operation reads or writes shared state; 'module var' and listing it under uses are invented.",
+    "kind": "gap"
+   },
+   {
+    "category": "default, optional and keyword arguments",
+    "construct": "eight parameters with defaults, one keyword-only (errors)",
+    "description": "No defaults and no keyword arguments; every caller must pass all eight, and the positional order is easy to get wrong with several maybe Text parameters in a row.",
+    "kind": "gap"
+   },
+   {
+    "category": "reflection",
+    "construct": "getattr(file, 'buffer', file), getattr(raw, 'raw', raw), raw.name = fd",
+    "description": "No attribute lookup by name with a fallback and no setting a field on a dynamically reached inner object; left as a note, so the returned file's name is not set.",
+    "kind": "gap"
+   },
+   {
+    "category": "bit operations",
+    "construct": "(flags | O_TMPFILE) & ~O_CREAT & ~O_EXCL",
+    "description": "No bitwise operators or flag-set type; 'flags with o_tmpfile without o_creat without o_excl' is invented.",
+    "kind": "gap"
+   },
+   {
+    "category": "error types and exceptions",
+    "construct": "except BaseException: close(fd); raise",
+    "description": "No catch-all for cleanup-and-rethrow; only the named OSError is handled, so interrupts and other exceptions would leak the descriptor. Hold-style cleanup does not fit because fd must survive on success.",
+    "kind": "gap"
+   },
+   {
+    "category": "missing values",
+    "construct": "fd = None then later assigned; mkstemp_inner returns a tuple (fd, name)",
+    "description": "No tuple type or destructuring; 'produces a FileDescriptor and a Path' and 'fd of created' are invented.",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [
+   {
+    "category": "closures and stored callbacks",
+    "construct": "nested opener function passed to io.open that writes fd through nonlocal",
+    "description": "No closures and no capture of a mutable outer variable; restructured so the descriptor is opened first and passed to open_stream, which changes the call graph of io.open.",
+    "kind": "workaround"
+   },
+   {
+    "category": "interfaces and dynamic dispatch",
+    "construct": "io.open returns a file-like object whose concrete class depends on mode and buffering",
+    "description": "No interface type; a closed choice FileObject is used, which callers must then choose on, unlike Python's duck-typed file.",
+    "kind": "workaround"
+   },
+   {
+    "category": "error types and exceptions",
+    "construct": "except OSError: pass (swallow and fall through to the fallback path)",
+    "description": "The doc forbids an empty on failure line, but deliberately ignoring a failure and continuing is the intended behaviour; a dummy let is needed, which is exactly the filler the rule wants to prevent.",
+    "kind": "workaround"
+   },
+   {
+    "category": "characters, bytes and strings",
+    "construct": "mode is a string tested with \"b\" not in mode",
+    "description": "Replaced by a choice FileMode, which is safer but changes the parameter type and drops the many string modes.",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [
+   {
+    "category": "error types and exceptions",
+    "construct": "IsADirectoryError is a subclass of OSError, and except clauses are tried in order",
+    "description": "The doc has flat named failures with no hierarchy; whether 'on failure OSError' also catches IsADirectoryError, and whether order matters, is not stated.",
+    "kind": "unclear"
+   },
+   {
+    "category": "resource lifetime",
+    "construct": "returning an open file that the caller must close",
+    "description": "Only hold (scoped release) and linear types are shown; there is no example of producing a linear resource to the caller from an operation that opens it, nor of a file deleted on close.",
+    "kind": "unclear"
+   },
+   {
+    "category": "error types and exceptions",
+    "construct": "failures inside a handle block that are not named by any on failure line (OutOfMemory from open_stream)",
+    "description": "The doc does not say whether an unnamed failure inside handle propagates to the operation's fails with list; assumed it does.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [
+   "module var o_tmpfile_works starts at true",
+   "uses files, memory, o_tmpfile_works (state listed as a capability)",
+   "flags with o_tmpfile without o_creat without o_excl",
+   "produces a FileDescriptor and a Path",
+   "fd of created (field access on a returned pair)"
+  ],
+  "contradicted": [
+   "An `on failure` line may not be empty: it must give back a value, fail, or call something. (satisfied only by a dummy let)"
+  ],
+  "gap_notes": 7
+ },
+ {
+  "id": "F15",
+  "category": "resource handling",
+  "language": "c",
+  "adversarial": false,
+  "src_body_lines": 2,
+  "src_body_tokens": 11,
+  "scribe_body_lines": 1,
+  "scribe_body_tokens": 9,
+  "scribe_header_lines": 10,
+  "scribe_decl_lines": 1,
+  "ratio_tokens": 0.8181818181818182,
+  "behaviour": "exact",
+  "gaps": [],
+  "workarounds": [
+   {
+    "category": "missing values",
+    "construct": "NULL buffer with count 0 used as an in-band flush request",
+    "description": "No null exists; the sentinel is carried by `maybe Bytes` with `nothing`, which preserves behaviour but forces the callee's signature to change to admit an absent buffer.",
+    "kind": "workaround"
+   },
+   {
+    "category": "error types and exceptions",
+    "construct": "int 1/0 success result",
+    "description": "Kept as a Bool result instead of `fails with`, because rio's whole API reports failure through the return value plus a flags field.",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [
+   {
+    "category": "interfaces and dynamic dispatch",
+    "construct": "rioFdFlush is installed as the flush slot of the rio function-pointer table",
+    "description": "The doc has no interface, trait or function-table construct, so the role this operation plays (an implementation of rio's flush for fd targets) cannot be stated.",
+    "kind": "unclear"
+   },
+   {
+    "category": "I/O primitives",
+    "construct": "writing to a raw file descriptor held inside a struct",
+    "description": "The doc says editing an editable argument is not an effect, but this argument wraps an fd and the write is real I/O; it is not clear whether the capability is the Rio, the fd, or a separate FileSystem value.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [
+   "rio_fd_write buffer of length into r (label words chosen freely)"
+  ],
+  "contradicted": [],
+  "gap_notes": 0
+ },
+ {
+  "id": "F16",
+  "category": "input and output",
+  "language": "go",
+  "adversarial": false,
+  "src_body_lines": 4,
+  "src_body_tokens": 25,
+  "scribe_body_lines": 6,
+  "scribe_body_tokens": 27,
+  "scribe_header_lines": 3,
+  "scribe_decl_lines": 10,
+  "ratio_tokens": 1.08,
+  "behaviour": "approximate",
+  "gaps": [
+   {
+    "category": "error types and exceptions",
+    "construct": "an error stored in a struct field and compared against the sentinel io.EOF",
+    "description": "Scribe failures exist only as names in `fails with` / `fail with` / `on failure`; they are not values. A closed `choice ScanError` stands in, which cannot hold arbitrary errors returned by the wrapped io.Reader (approximated by a `ReaderError with reason as Text` variant).",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [
+   {
+    "category": "interfaces and dynamic dispatch",
+    "construct": "the open `error` interface type",
+    "description": "No interface or open sum type exists, so the set of storable errors is fixed when ScanError is declared.",
+    "kind": "workaround"
+   },
+   {
+    "category": "missing values",
+    "construct": "s.err == nil || s.err == io.EOF in one boolean test",
+    "description": "A maybe value cannot be tested inline (`err of scanner is nothing` is not shown as valid) and its payload needs `choose`, so a one-line condition becomes a choose with two branches and a duplicated set line.",
+    "kind": "workaround"
+   },
+   {
+    "category": "objects, methods and self",
+    "construct": "method with pointer receiver (s *Scanner)",
+    "description": "No methods; the receiver becomes an `editable` parameter. This works but loses method-call syntax and grouping with the type.",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [],
+  "invented": [],
+  "contradicted": [],
+  "gap_notes": 1
+ },
+ {
+  "id": "F17",
+  "category": "input and output",
+  "language": "python",
+  "adversarial": false,
+  "src_body_lines": 4,
+  "src_body_tokens": 27,
+  "scribe_body_lines": 5,
+  "scribe_body_tokens": 35,
+  "scribe_header_lines": 21,
+  "scribe_decl_lines": 0,
+  "ratio_tokens": 1.2962962962962963,
+  "behaviour": "approximate",
+  "gaps": [
+   {
+    "category": "closures and stored callbacks",
+    "construct": "nested def that captures `patterns` from ignore_patterns(*patterns) and is returned as a value to be called later by copytree",
+    "description": "The doc has no nested operations, no operation-valued parameters or results, and no capture. The captured variable became a parameter, which changes the function's arity and means copytree's `ignore` callback cannot be expressed at all.",
+    "kind": "gap"
+   },
+   {
+    "category": "collections and iteration",
+    "construct": "set(ignored_names) returning a Python set",
+    "description": "No Set type or conversion to one is in the doc; `Set of Text` and `set_of` were invented.",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [
+   {
+    "category": "collections and iteration",
+    "construct": "list.extend",
+    "description": "No in-place extend; `followed by` is only shown in specs, so its use in code (and whether it allocates) is a guess.",
+    "kind": "workaround"
+   },
+   {
+    "category": "variadic arguments",
+    "construct": "*patterns in the enclosing ignore_patterns",
+    "description": "No variadic parameters; patterns is a List and callers must build one.",
+    "kind": "workaround"
+   },
+   {
+    "category": "collections and iteration",
+    "construct": "Python list/set building with implicit allocation",
+    "description": "Allocation must be visible, so a 5-line pure-looking helper gains an Allocator parameter, `uses memory` and OutOfMemory.",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [],
+  "invented": [
+   "Set of Text",
+   "set_of",
+   "followed by used outside a spec"
+  ],
+  "contradicted": [],
+  "gap_notes": 3
+ },
+ {
+  "id": "F18",
+  "category": "input and output",
+  "language": "javascript",
+  "adversarial": true,
+  "src_body_lines": 16,
+  "src_body_tokens": 114,
+  "scribe_body_lines": 40,
+  "scribe_body_tokens": 180,
+  "scribe_header_lines": 18,
+  "scribe_decl_lines": 10,
+  "ratio_tokens": 1.5789473684210527,
+  "behaviour": "approximate",
+  "gaps": [
+   {
+    "category": "pointers and shared mutable references",
+    "construct": "this._events === ObjectGetPrototypeOf(this)._events (reference identity: is the events object shared with the prototype)",
+    "description": "Scribe has value comparison only; there is no notion of two names referring to the same object. Invented `is the same object as`.",
+    "kind": "gap"
+   },
+   {
+    "category": "objects, methods and self",
+    "construct": "Prototype inheritance: ObjectGetPrototypeOf(this), EventEmitter.prototype[kCapture], function invoked with `this` bound to a subclass instance",
+    "description": "No inheritance, prototypes or methods. `this` becomes an editable parameter and the prototype lookup an invented operation `prototype_of`.",
+    "kind": "gap"
+   },
+   {
+    "category": "collections and iteration",
+    "construct": "{ __proto__: null } dictionary from event name to listeners",
+    "description": "The doc has List only; no Map/Dictionary type or empty-map literal. Invented `a Map from EventKey to Listeners` and `an empty Map using memory`.",
+    "kind": "gap"
+   },
+   {
+    "category": "interfaces and dynamic dispatch",
+    "construct": "opts.captureRejections may be any JS value, checked at run time by validateBoolean; JS truthiness of opts?.captureRejections",
+    "description": "No dynamic/unknown type and no truthiness. Invented `Unknown` and an `is_truthy` helper; the run-time type check becomes a call that can fail.",
+    "kind": "gap"
+   },
+   {
+    "category": "numeric types and conversions",
+    "construct": "Boolean type, true/false literals, Boolean(x) conversion",
+    "description": "The doc never names a boolean type or literals; invented `Bool`, `true`, `false`.",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [
+   {
+    "category": "global or module state",
+    "construct": "EventEmitter.prototype[kCapture] is module-level mutable state set by EventEmitter.captureRejections",
+    "description": "No module state; modelled as a field of a passed-in EmitterDefaults capability, which changes every caller's signature.",
+    "kind": "workaround"
+   },
+   {
+    "category": "reflection",
+    "construct": "Symbol-keyed hidden properties this[kShapeMode], this[kCapture]",
+    "description": "Computed/symbol property keys have no equivalent; modelled as ordinary named fields, losing their privacy from other modules.",
+    "kind": "workaround"
+   },
+   {
+    "category": "missing values",
+    "construct": "undefined fields, optional chaining opts?.x, and `this._maxListeners ||= undefined`",
+    "description": "Expressible with `maybe` and nested `choose`, but each `?.` becomes a nested choose block with no-op arms; `||=` over all falsy values (0, NaN, null) cannot be reproduced exactly with a typed field.",
+    "kind": "workaround"
+   },
+   {
+    "category": "pattern matching",
+    "construct": "Branches that do nothing",
+    "description": "choose must be exhaustive and the doc shows no empty-arm form, so dummy assignments were written in `when nothing` arms.",
+    "kind": "workaround"
+   },
+   {
+    "category": "default, optional and keyword arguments",
+    "construct": "opts argument may be omitted",
+    "description": "No optional parameters; caller must pass `nothing` explicitly.",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [
+   {
+    "category": "missing values",
+    "construct": "var raw_capture starts at nothing",
+    "description": "No type annotation on var, so the type of a variable initialised to `nothing` is not stated anywhere the doc defines.",
+    "kind": "unclear"
+   },
+   {
+    "category": "resource lifetime",
+    "construct": "Allocation of the events object",
+    "description": "Doc requires an Allocator for any allocation; a JS constructor helper allocating a fresh object now needs a memory capability and an OutOfMemory failure the original does not have.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [
+   "Map from EventKey to Listeners",
+   "an empty Map using memory",
+   "is the same object as",
+   "Unknown",
+   "Bool",
+   "true / false",
+   "maybe as the type of a field (`field ... as a maybe Number`) is shown in the schema example only; used in a type"
+  ],
+  "contradicted": [],
+  "gap_notes": 6
+ },
+ {
+  "id": "F19",
+  "category": "text processing and parsing",
+  "language": "go",
+  "adversarial": false,
+  "src_body_lines": 3,
+  "src_body_tokens": 14,
+  "scribe_body_lines": 2,
+  "scribe_body_tokens": 10,
+  "scribe_header_lines": 6,
+  "scribe_decl_lines": 3,
+  "ratio_tokens": 0.7142857142857143,
+  "behaviour": "exact",
+  "gaps": [
+   {
+    "category": "characters, bytes and strings",
+    "construct": "rune (Unicode code point) type",
+    "description": "The doc has Text and Bytes but no character or code point type, and no literal for one such as U+FFFD, so Rune is assumed.",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [
+   {
+    "category": "error types and exceptions",
+    "construct": "r, _ := utf8.DecodeRune(b) (two results, one discarded)",
+    "description": "No multiple results, tuple destructuring or discard; a helper record is declared and one field read.",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [
+   {
+    "category": "characters, bytes and strings",
+    "construct": "Go's []byte slice versus Scribe Bytes",
+    "description": "The doc uses `Bytes` both as a type of data (example 20) and as a unit of size (`size as Bytes at most 1 GiB`, `offset as Bytes`), so it is unclear whether Bytes is a byte sequence or a quantity.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [],
+  "contradicted": [],
+  "gap_notes": 2
+ },
+ {
+  "id": "F20",
+  "category": "text processing and parsing",
+  "language": "python",
+  "adversarial": false,
+  "src_body_lines": 7,
+  "src_body_tokens": 75,
+  "scribe_body_lines": 10,
+  "scribe_body_tokens": 71,
+  "scribe_header_lines": 17,
+  "scribe_decl_lines": 8,
+  "ratio_tokens": 0.9466666666666667,
+  "behaviour": "approximate",
+  "gaps": [
+   {
+    "category": "objects, methods and self",
+    "construct": "sourcehook is an overridable method on shlex, documented as a hook for subclasses",
+    "description": "No methods, self or overriding; written as a free operation taking the lexer, so the hook can no longer be replaced by a subclass.",
+    "kind": "gap"
+   },
+   {
+    "category": "characters, bytes and strings",
+    "construct": "newfile[0] == '\"' and newfile[1:-1]",
+    "description": "No character literal, no indexing of Text and no slice with a negative end; 'first character of' and 'characters 1 until (length of name - 1) of name' are invented.",
+    "kind": "gap"
+   },
+   {
+    "category": "resource lifetime",
+    "construct": "returns an open file the caller must close",
+    "description": "The doc shows only hold (scoped) and says an unreleased let-bound file is rejected; how an operation hands an open linear resource to its caller, especially inside a record, is not shown.",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [
+   {
+    "category": "reflection",
+    "construct": "isinstance(self.infile, str)",
+    "description": "No run-time type test on a dynamically typed field; the field is modelled as a choice Named/Unnamed and tested with choose.",
+    "kind": "workaround"
+   },
+   {
+    "category": "collections and iteration",
+    "construct": "return (newfile, open(newfile, 'r'))",
+    "description": "No tuple type; a SourcedFile record is declared just to return two values.",
+    "kind": "workaround"
+   },
+   {
+    "category": "objects, methods and self",
+    "construct": "rebinding the parameter newfile",
+    "description": "The doc never sets a parameter; a var 'name' is introduced, so the original name is not kept.",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [
+   {
+    "category": "error types and exceptions",
+    "construct": "newfile[0] on an empty string raises IndexError",
+    "description": "The doc does not say what an out-of-range access on Text does, so this failure is not represented.",
+    "kind": "unclear"
+   },
+   {
+    "category": "pattern matching",
+    "construct": "if isinstance(...) with no else branch",
+    "description": "choose must cover every variant, and there is no 'do nothing' statement; whether a when branch holding only a note is valid is not stated.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [
+   "first character of name",
+   "\"\\\"\" (escape inside a Text literal)",
+   "characters 1 until (length of name - 1) of name",
+   "open name for reading using files (without hold)",
+   "a SourcedFile with name name and stream stream (record construction)"
+  ],
+  "contradicted": [],
+  "gap_notes": 3
+ },
+ {
+  "id": "F21",
+  "category": "text processing and parsing",
+  "language": "c",
+  "adversarial": false,
+  "src_body_lines": 93,
+  "src_body_tokens": 642,
+  "scribe_body_lines": 79,
+  "scribe_body_tokens": 466,
+  "scribe_header_lines": 22,
+  "scribe_decl_lines": 2,
+  "ratio_tokens": 0.7258566978193146,
+  "behaviour": "approximate",
+  "gaps": [
+   {
+    "category": "characters, bytes and strings",
+    "construct": "character literals '\\\\', '\"', '\\'', 'x', and control characters '\\n', '\\r', '\\t', '\\b', '\\a'",
+    "description": "The doc has no character or byte literal and does not say whether string literals have escapes, so a tokenizer cannot name the bytes it compares against without invented forms (`char \"x\"`, `byte 10`).",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [
+   {
+    "category": "characters, bytes and strings",
+    "construct": "NUL-terminated scanning with lookahead *(p+1), *(p+2), *(p+3) that safely reads the terminator",
+    "description": "Scribe Bytes have a count and no terminator, and `item i of` past the end is presumably an error; a `byte_at` helper that returns 0 past the end emulates the C behaviour.",
+    "kind": "workaround"
+   },
+   {
+    "category": "pattern matching",
+    "construct": "switch on a char value with grouped cases and default",
+    "description": "`choose` is shown only for variants and maybe values; value switches become if chains, and grouped cases become `c is in [ ... ]`.",
+    "kind": "workaround"
+   },
+   {
+    "category": "default, optional and keyword arguments",
+    "construct": "int *argc out-parameter written alongside the return value",
+    "description": "No out-parameters; argc is recovered as `count of result`, which changes the interface.",
+    "kind": "workaround"
+   },
+   {
+    "category": "error types and exceptions",
+    "construct": "goto err returning NULL with *argc = 0",
+    "description": "Expressed as `fail with BadQuoting`; the error name is invented because C signals failure only by NULL.",
+    "kind": "workaround"
+   },
+   {
+    "category": "numeric types and conversions",
+    "construct": "(unsigned char) cast of hex_digit*16 + hex_digit",
+    "description": "No implicit conversion and no named conversion operations; a `byte_from` helper is declared.",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [
+   {
+    "category": "resource lifetime",
+    "construct": "err: label freeing every token built so far and the partial current token",
+    "description": "The doc says there is no garbage collector and allocation comes from a passed Allocator, but does not say whether allocations are released when an operation fails, so the cleanup path has no counterpart.",
+    "kind": "unclear"
+   },
+   {
+    "category": "unsafe and raw memory",
+    "construct": "ownership transfer of `current` into `vector` (vector[*argc] = current; current = NULL), and s_realloc growth",
+    "description": "The doc does not say whether `append` moves or copies a value, nor which allocator `append` and a `[]` literal use.",
+    "kind": "unclear"
+   },
+   {
+    "category": "loop forms",
+    "construct": "while(1) with exits only by return or goto",
+    "description": "Written `repeat while true`; neither the literal `true` nor an intended-infinite loop appears in the doc.",
+    "kind": "unclear"
+   },
+   {
+    "category": "contracts and specifications",
+    "construct": "termination of the inner scan loop, where p does not advance on the pass that sets done at the end of input",
+    "description": "The doc does not say whether `decreases` must strictly drop on the final pass that leaves the loop; a simple measure fails if it must.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [
+   "char \"x\"",
+   "byte 10",
+   "true / false literals",
+   "[] (empty list literal)",
+   "repeat while true",
+   "fail with X because \"...\" (because attached to a fail statement rather than a clause)"
+  ],
+  "contradicted": [],
+  "gap_notes": 1
+ },
+ {
+  "id": "F22",
+  "category": "numerics",
+  "language": "python",
+  "adversarial": false,
+  "src_body_lines": 15,
+  "src_body_tokens": 119,
+  "scribe_body_lines": 39,
+  "scribe_body_tokens": 233,
+  "scribe_header_lines": 25,
+  "scribe_decl_lines": 23,
+  "ratio_tokens": 1.9579831932773109,
+  "behaviour": "approximate",
+  "gaps": [
+   {
+    "category": "reflection",
+    "construct": "groupby(data, type) and returning the class object T for later conversion",
+    "description": "Scribe has no runtime type values. Replaced by a closed `choice Number` of the four accepted numeric kinds plus a `NumberKind` choice naming the result type; user-defined numeric types (any Python object with as_integer_ratio) cannot be accepted.",
+    "kind": "gap"
+   },
+   {
+    "category": "collections and iteration",
+    "construct": "partials[d] = ... (updating an element in place)",
+    "description": "The doc reads list elements with `item i of items` but has no form for writing one; `set item i of partials to ...` is invented by analogy with field mutation.",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [
+   {
+    "category": "interfaces and dynamic dispatch",
+    "construct": "duck-typed numeric data: _exact_ratio works on anything with as_integer_ratio",
+    "description": "No interfaces or open polymorphism, so the set of supported numeric types is closed at declaration.",
+    "kind": "workaround"
+   },
+   {
+    "category": "collections and iteration",
+    "construct": "dict partials keyed by denominator, set of types",
+    "description": "The doc has List only: no Map or Set type. The dict becomes a list of records searched linearly (O(n) per item instead of O(1)), the set a list with an `is not in` guard.",
+    "kind": "workaround"
+   },
+   {
+    "category": "missing values",
+    "construct": "None used as a dict key for the non-finite partial",
+    "description": "Key-able missing values are not discussed and there is no map; the non-finite case is split into a separate `maybe` accumulator and a `Not_finite` variant of the exact ratio.",
+    "kind": "workaround"
+   },
+   {
+    "category": "collections and iteration",
+    "construct": "reduce(_coerce, types, int) and sum(Fraction(n, d) for ...)",
+    "description": "The doc has one comprehension form and a `sum of` in specs, but no fold/reduce; both become explicit accumulator loops.",
+    "kind": "workaround"
+   },
+   {
+    "category": "unsafe and raw memory",
+    "construct": "building a set and dict (allocation)",
+    "description": "The rule that allocating operations name an Allocator is followed in the header, but no example shows how `append` or list literals are tied to an allocator, so the growth sites cannot mention it.",
+    "kind": "workaround"
+   },
+   {
+    "category": "missing values",
+    "construct": "returning a 3-tuple (type, sum, count)",
+    "description": "No tuples; a result record type SumResult is declared. Minor, but adds a type per multi-result function.",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [
+   {
+    "category": "numeric types and conversions",
+    "construct": "float, Fraction, Decimal, int mixed arithmetic",
+    "description": "The doc names only Int, Nat and Money; whether Float, Fraction and Decimal exist, and how they combine under 'no implicit conversion', is not stated. Declared helper `fraction_from` does the explicit construction.",
+    "kind": "unclear"
+   },
+   {
+    "category": "contracts and specifications",
+    "construct": "assert not _isfinite(total) in the body",
+    "description": "`expect` is shown only in headers and `assert` only in proof blocks; there is no shown form for a run-time assertion mid-body. `expect` is used inside the body.",
+    "kind": "unclear"
+   },
+   {
+    "category": "objects, methods and self",
+    "construct": "record construction `Partial(denominator=d, numerator=n)` and variant construction",
+    "description": "Construction syntax appears only once (`an Order from cart and receipt with status Paid`); `a Partial with denominator d and numerator n` is a guess, and a field label that equals a bound variable name (`numerator numerator`) is hard to read and to parse.",
+    "kind": "unclear"
+   },
+   {
+    "category": "generics and type parameters",
+    "construct": "local var initialised to nothing or [] with no element type",
+    "description": "The doc does not say whether a `var` can carry a type annotation; empty initial values leave the type to inference.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [
+   "set item i of partials to ... (element assignment)",
+   "a Partial with denominator d and numerator n (record construction)",
+   "Exact with value v (variant construction as an expression)",
+   "append kind to types on a local var list",
+   "expect used as a body statement",
+   "Float, Fraction, Decimal, Bool type names"
+  ],
+  "contradicted": [],
+  "gap_notes": 4
+ },
+ {
+  "id": "F23",
+  "category": "numerics",
+  "language": "c",
+  "adversarial": false,
+  "src_body_lines": 11,
+  "src_body_tokens": 116,
+  "scribe_body_lines": 24,
+  "scribe_body_tokens": 129,
+  "scribe_header_lines": 12,
+  "scribe_decl_lines": 1,
+  "ratio_tokens": 1.1120689655172413,
+  "behaviour": "exact",
+  "gaps": [],
+  "workarounds": [
+   {
+    "category": "unsafe and raw memory",
+    "construct": "NUL-terminated char* walked with a++ / b++ and read past the shorter string up to its terminator",
+    "description": "No pointers or terminated strings; modelled as Bytes plus a byte_at helper that returns 0 at or past the end. Behaviour matches for well-formed C strings, but the type no longer says the input is unbounded and borrowed.",
+    "kind": "workaround"
+   },
+   {
+    "category": "missing values",
+    "construct": "null pointer checks zLeft==0 and zRight==0",
+    "description": "Expressible as maybe Bytes with two nested chooses; the four-way null handling takes 10 lines instead of 4, and the `when some right` arm must bind a name it never uses.",
+    "kind": "workaround"
+   },
+   {
+    "category": "integer overflow and wrapping",
+    "construct": "post-decrement inside the loop condition, N-- > 0, and the later N<0 test",
+    "description": "No assignment inside expressions (by design), so the side effect in the condition was unrolled; the C trick of using N<0 to mean 'ran out of budget' had to be re-derived as remaining <= 0, which is a behaviour-preserving but non-obvious rewrite.",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [
+   {
+    "category": "global or module state",
+    "construct": "static const UpperToLower[] lookup table",
+    "description": "The doc does not say whether a module-level constant (`let` outside an operation) is allowed or how a table literal of 256 bytes is written; replaced by a pure operation header.",
+    "kind": "unclear"
+   },
+   {
+    "category": "numeric types and conversions",
+    "construct": "(unsigned char *) cast and byte arithmetic producing a signed int difference",
+    "description": "No byte type or casts are documented; Byte was declared as a refined Int, and the subtraction is assumed to give an Int.",
+    "kind": "unclear"
+   },
+   {
+    "category": "characters, bytes and strings",
+    "construct": "calling an operation on a parenthesised argument: upper_to_lower (byte_at i of left)",
+    "description": "The doc shows parentheses only for arithmetic grouping and `item (i + 1) of items`; nesting one call inside another call's argument is not shown.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [
+   "Byte (as a refined Int type)",
+   "-1 as a negative literal"
+  ],
+  "contradicted": [],
+  "gap_notes": 1
+ },
+ {
+  "id": "F24",
+  "category": "numerics",
+  "language": "go",
+  "adversarial": false,
+  "src_body_lines": 5,
+  "src_body_tokens": 66,
+  "scribe_body_lines": 5,
+  "scribe_body_tokens": 80,
+  "scribe_header_lines": 3,
+  "scribe_decl_lines": 0,
+  "ratio_tokens": 1.2121212121212122,
+  "behaviour": "exact",
+  "gaps": [
+   {
+    "category": "bit operations",
+    "construct": "Shifts >> and <<, bitwise & and |",
+    "description": "The doc has no bitwise operators; rule 4 reserves symbols for arithmetic and comparison and `and`/`or` are logic words. Invented `shifted right by`, `shifted left by`, `bitand`, `bitor`.",
+    "kind": "gap"
+   },
+   {
+    "category": "integer overflow and wrapping",
+    "construct": "x << 8 on uint64 discards bits shifted out",
+    "description": "Scribe arithmetic is checked; there is no way to request modular / wrapping behaviour. Invented a `wrapping` suffix.",
+    "kind": "gap"
+   },
+   {
+    "category": "numeric types and conversions",
+    "construct": "uint64 fixed-width unsigned type",
+    "description": "Only Int and Nat appear; no fixed-width integer types. Invented `UInt64`.",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [
+   {
+    "category": "numeric types and conversions",
+    "construct": "Hex literals 0x00ff00ff00ff00ff",
+    "description": "Only decimal literals are shown; masks were written in decimal, which hides the bit pattern a reviewer needs to see.",
+    "kind": "workaround"
+   },
+   {
+    "category": "loop forms",
+    "construct": "Reassigning the parameter x in sequence",
+    "description": "No rebinding of parameters; each step gets a fresh let name (harmless, arguably clearer).",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [
+   {
+    "category": "global or module state",
+    "construct": "Package-level constants m3, m4",
+    "description": "The doc never shows a top-level constant declaration; top-level `let` was assumed.",
+    "kind": "unclear"
+   },
+   {
+    "category": "bit operations",
+    "construct": "Precedence of the invented bit operators",
+    "description": "The six precedence levels are not listed, so every bit expression was fully parenthesised.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [
+   "UInt64",
+   "shifted right by",
+   "shifted left by ... wrapping",
+   "bitand",
+   "bitor",
+   "top-level `let` constants"
+  ],
+  "contradicted": [
+   "\"Words replace symbols wherever the word is no less clear. Symbols stay only for arithmetic and grouping.\" - in bit-twiddling code the word forms are markedly less clear than & | << >>, so the rule pushes toward the worse spelling"
+  ],
+  "gap_notes": 4
+ },
+ {
+  "id": "F25",
+  "category": "time and dates",
+  "language": "go",
+  "adversarial": false,
+  "src_body_lines": 13,
+  "src_body_tokens": 75,
+  "scribe_body_lines": 13,
+  "scribe_body_tokens": 76,
+  "scribe_header_lines": 7,
+  "scribe_decl_lines": 3,
+  "ratio_tokens": 1.0133333333333334,
+  "behaviour": "approximate",
+  "gaps": [
+   {
+    "category": "characters, bytes and strings",
+    "construct": "value[0] (byte at index) and value[1:] (substring)",
+    "description": "No indexing or slicing form for Text; `byte 0 of value` and `slice of value from 1 until count of value` are invented.",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [
+   {
+    "category": "error types and exceptions",
+    "construct": "x, rem, err := leadingInt(...) then `if err != nil || value[1:] == rem`",
+    "description": "Go combines the error test and a value test in one condition; Scribe must split them into a handle block plus an on failure line that repeats `give back 0`, and the three results need a helper record.",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [
+   {
+    "category": "characters, bytes and strings",
+    "construct": "byte literals '-' and '+' compared with a byte",
+    "description": "No character or byte literal; writing \"-\" compares a Byte with Text, which breaks the stated rule that `is` compares like with like only.",
+    "kind": "unclear"
+   },
+   {
+    "category": "error types and exceptions",
+    "construct": "panic on value[0] when value is empty",
+    "description": "There is no panic or out-of-range rule for indexing, and the original has no stated precondition, so the empty-string behaviour is undefined in the translation.",
+    "kind": "unclear"
+   },
+   {
+    "category": "characters, bytes and strings",
+    "construct": "len(value) - len(rem) as byte counts",
+    "description": "`count of` a Text is not defined as bytes or characters.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [
+   "byte 0 of value",
+   "slice of value from 1 until count of value"
+  ],
+  "contradicted": [
+   "No implicit conversions. `is` compares like with like only (comparing a Byte with the Text \"-\")"
+  ],
+  "gap_notes": 1
+ },
+ {
+  "id": "F26",
+  "category": "time and dates",
+  "language": "python",
+  "adversarial": false,
+  "src_body_lines": 20,
+  "src_body_tokens": 116,
+  "scribe_body_lines": 48,
+  "scribe_body_tokens": 183,
+  "scribe_header_lines": 25,
+  "scribe_decl_lines": 14,
+  "ratio_tokens": 1.5775862068965518,
+  "behaviour": "approximate",
+  "gaps": [
+   {
+    "category": "default, optional and keyword arguments",
+    "construct": "nine parameters defaulting to None (tzinfo to True), fold keyword-only; callers write d.replace(day=1)",
+    "description": "No defaults and no keyword arguments, so every call must pass nine positional values, mostly 'nothing'; this destroys the purpose of replace, which is to name only the fields that change.",
+    "kind": "gap"
+   },
+   {
+    "category": "objects, methods and self",
+    "construct": "type(self)(...) constructs an instance of the receiver's own subclass",
+    "description": "No self, no subclasses and no way to say 'build a value of the same type as this one'; the result is always a plain DateTime, so subclasses lose their type.",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [
+   {
+    "category": "missing values",
+    "construct": "tzinfo=True sentinel: True keeps, None clears, a value sets",
+    "description": "maybe has two states, but the original needs three; a three-variant choice TzinfoChange is declared, which changes the caller's spelling.",
+    "kind": "workaround"
+   },
+   {
+    "category": "missing values",
+    "construct": "if x is None: x = self.x, repeated nine times",
+    "description": "There is no 'value of a maybe, or else this default' expression outside together's 'or else none'; each field needs a var plus a four-line choose, turning 18 lines into about 45.",
+    "kind": "workaround"
+   },
+   {
+    "category": "time and clocks",
+    "construct": "a broken-down local datetime with fold and optional tzinfo",
+    "description": "The doc offers 'instant' and 'calendar date' as distinct types but no naive or zoned wall-clock date-time with a fold flag, so a plain record of Ints is used.",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [
+   {
+    "category": "pattern matching",
+    "construct": "a branch where nothing happens (keep the old value)",
+    "description": "choose requires every case, and there is no 'do nothing' statement; whether a when branch containing only a note is valid is not stated.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [
+   "to replace self year month ... (nine bare positional parameters with no label words)"
+  ],
+  "contradicted": [],
+  "gap_notes": 3
+ },
+ {
+  "id": "F27",
+  "category": "time and dates",
+  "language": "erlang",
+  "adversarial": false,
+  "src_body_lines": 17,
+  "src_body_tokens": 105,
+  "scribe_body_lines": 25,
+  "scribe_body_tokens": 140,
+  "scribe_header_lines": 14,
+  "scribe_decl_lines": 2,
+  "ratio_tokens": 1.3333333333333333,
+  "behaviour": "approximate",
+  "gaps": [
+   {
+    "category": "pattern matching",
+    "construct": "multi-clause function heads matching literal strings (\"Z\", \"z\") and list destructuring [Sign, H1, H2 | MinutesDiff] = Tz",
+    "description": "The doc's only matching form is `choose` over variants and maybe values; there is no list, cons or string pattern, so the clause heads become if tests and the destructure becomes explicit length checks and indexing.",
+    "kind": "gap"
+   },
+   {
+    "category": "characters, bytes and strings",
+    "construct": "taking characters and substrings of a string ($:, [H1, H2])",
+    "description": "No character type, character literal or substring operation exists; `character i of tz` and `characters i until j of tz` are invented.",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [
+   {
+    "category": "error types and exceptions",
+    "construct": "let-it-crash: badmatch, case_clause and badarg exceptions on malformed input",
+    "description": "Scribe requires every failure to be named in `fails with`; the three implicit crash kinds collapse into one invented BadOffset, which changes the failure surface the original exposes.",
+    "kind": "workaround"
+   },
+   {
+    "category": "error types and exceptions",
+    "construct": "converting the callee's failure into a different failure name",
+    "description": "`handle` wraps a whole block; renaming NotANumber to BadOffset for one expression needed a separate helper operation.",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [
+   {
+    "category": "default, optional and keyword arguments",
+    "construct": "unused parameters _Time and _Unit",
+    "description": "The doc does not say whether unused parameters are allowed or need marking.",
+    "kind": "unclear"
+   },
+   {
+    "category": "numeric types and conversions",
+    "construct": "unary negation -Adjustment",
+    "description": "Unary minus is not shown; written as 0 - adjustment.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [
+   "character i of tz",
+   "characters i until j of tz",
+   "choice used as a set of failure names (OffsetError)"
+  ],
+  "contradicted": [],
+  "gap_notes": 1
+ },
+ {
+  "id": "F28",
+  "category": "state machines and protocols",
+  "language": "go",
+  "adversarial": false,
+  "src_body_lines": 38,
+  "src_body_tokens": 302,
+  "scribe_body_lines": 37,
+  "scribe_body_tokens": 242,
+  "scribe_header_lines": 32,
+  "scribe_decl_lines": 3,
+  "ratio_tokens": 0.8013245033112583,
+  "behaviour": "approximate",
+  "gaps": [
+   {
+    "category": "closures and stored callbacks",
+    "construct": "validateFirstLine func([]byte) error parameter, nil-able",
+    "description": "No function type in the doc. An invented `Validator` type wrapped in `maybe` is passed and called like an operation (`try check line`).",
+    "kind": "gap"
+   },
+   {
+    "category": "error types and exceptions",
+    "construct": "errors from the callback and from fmt.Errorf propagated unchanged; formatted error message",
+    "description": "`fails with` needs a closed list of names and failures carry no message. The callback's arbitrary errors collapse into one invented name InvalidLine and the 'missing validateFirstLine func' text is lost.",
+    "kind": "gap"
+   },
+   {
+    "category": "pointers and shared mutable references",
+    "construct": "line is a slice aliasing bufio's internal buffer; r.buf[:0] reuses storage; the copy exists only because the next read overwrites the alias",
+    "description": "Scribe has values and editable parameters but no slices or borrows, so the aliasing hazard that motivates the copy cannot be expressed and the copy step becomes meaningless; zero-copy behaviour is not preserved.",
+    "kind": "gap"
+   },
+   {
+    "category": "I/O primitives",
+    "construct": "bufio.Reader.Buffered() and Peek(2) without consuming input",
+    "description": "No buffered-reader vocabulary in the doc; `buffered_count of` and `peek_bytes n from` are declared as invented operations on a BufferedReader capability.",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [
+   {
+    "category": "characters, bytes and strings",
+    "construct": "byte literals '\\n', '\\r', ' ' and []byte buffers",
+    "description": "The doc names a `Bytes` type but has no byte type, byte literal or byte indexing rule; constants newline_byte, return_byte, space_byte and a Byte type are assumed.",
+    "kind": "workaround"
+   },
+   {
+    "category": "collections and iteration",
+    "construct": "append(r.buf, trim(line)...) - appending a slice to a byte buffer",
+    "description": "`append value to items` adds one element; `followed by` joins sequences but is shown only in ensure lines. `followed by` is used in body `set` lines.",
+    "kind": "workaround"
+   },
+   {
+    "category": "loop forms",
+    "construct": "for r.skipSpace() > 0 { ... } - a loop whose condition consumes input",
+    "description": "An effectful call in a `repeat while` condition is not shown, and there is no `repeat forever`; a never-changing `more` flag plus `stop` is used, and a `decreases` measure had to be derived from the size limit.",
+    "kind": "workaround"
+   },
+   {
+    "category": "missing values",
+    "construct": "after the nil check, validateFirstLine is used as non-nil later in the body",
+    "description": "There is no flow-sensitive narrowing; a value unwrapped in a `when some` branch cannot be kept outside the branch, so the maybe is opened twice with an unreachable `nothing` branch.",
+    "kind": "workaround"
+   },
+   {
+    "category": "contracts and specifications",
+    "construct": "ignored error from Peek (peek, _ := ...)",
+    "description": "Deliberately discarding a failure has no form; the invented peek_bytes is declared as not failing, which hides that the original drops an error.",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [
+   {
+    "category": "objects, methods and self",
+    "construct": "method on *Reader that reads and mutates r.buf and uses r.R",
+    "description": "Receiver becomes an editable parameter. `uses r of reader` names a capability that is a field of a parameter, which no example shows.",
+    "kind": "unclear"
+   },
+   {
+    "category": "numeric types and conversions",
+    "construct": "math.MaxInt64 and int64(len(...)) conversions",
+    "description": "No sized integers or limit constants in the doc; `max_int64` is assumed and conversions are implicit in the translation, which the doc forbids but gives no explicit form for.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [
+   "Validator type and calling a parameter as an operation (`try check line`)",
+   "uses r of reader (capability that is a field of a parameter)",
+   "buffered_count of / peek_bytes n from (buffered reader operations)",
+   "newline_byte, return_byte, space_byte, Byte type, max_int64",
+   "X followed by Y in body expressions",
+   "is_ascii_letter (item 0 of peek) - call with a parenthesised argument"
+  ],
+  "contradicted": [
+   "No implicit conversions. (int64(len(r.buf)) comparisons are written as plain Int/Nat comparisons because the doc has no explicit conversion form)"
+  ],
+  "gap_notes": 6
+ },
+ {
+  "id": "F29",
+  "category": "state machines and protocols",
+  "language": "python",
+  "adversarial": false,
+  "src_body_lines": 2,
+  "src_body_tokens": 30,
+  "scribe_body_lines": 3,
+  "scribe_body_tokens": 26,
+  "scribe_header_lines": 24,
+  "scribe_decl_lines": 5,
+  "ratio_tokens": 0.8666666666666667,
+  "behaviour": "approximate",
+  "gaps": [
+   {
+    "category": "generics and type parameters",
+    "construct": "_class=HTTPMessage: a class object passed in so the parser constructs a caller-chosen Message subclass",
+    "description": "No class values, no type parameters on operations (only on types, as in `Queue of T`), and no interface/subtyping to say 'some subclass of Message'. The parameter had to be dropped and the result fixed to HTTPMessage.",
+    "kind": "gap"
+   },
+   {
+    "category": "characters, bytes and strings",
+    "construct": "bytes.decode('iso-8859-1')",
+    "description": "The doc has Bytes and Text but no named encodings or decode operation; the phrase `decode ... as iso_8859_1` is invented.",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [
+   {
+    "category": "default, optional and keyword arguments",
+    "construct": "keyword argument with a default value (_class=HTTPMessage)",
+    "description": "No defaults or keyword arguments; normally one would add a second operation or make it required, but here the value itself is inexpressible.",
+    "kind": "workaround"
+   },
+   {
+    "category": "characters, bytes and strings",
+    "construct": "b''.join(header_lines)",
+    "description": "No join for Bytes lists; declared a helper.",
+    "kind": "workaround"
+   },
+   {
+    "category": "objects, methods and self",
+    "construct": "email.parser.Parser(...).parsestr(...) constructing a parser object and calling a method",
+    "description": "No constructors or methods; collapsed into one operation, which is fine here because the object is used once.",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [],
+  "invented": [
+   "decode joined as iso_8859_1",
+   "join_bytes"
+  ],
+  "contradicted": [],
+  "gap_notes": 3
+ },
+ {
+  "id": "F30",
+  "category": "state machines and protocols",
+  "language": "c",
+  "adversarial": false,
+  "src_body_lines": 6,
+  "src_body_tokens": 38,
+  "scribe_body_lines": 7,
+  "scribe_body_tokens": 23,
+  "scribe_header_lines": 4,
+  "scribe_decl_lines": 5,
+  "ratio_tokens": 0.6052631578947368,
+  "behaviour": "approximate",
+  "gaps": [
+   {
+    "category": "pointers and shared mutable references",
+    "construct": "return &pcmd->keys_result - a pointer to a field inside the argument struct",
+    "description": "Scribe has no references or borrowed results; returning the value would copy it and lose aliasing with the cache. Invented `produces a maybe borrowed GetKeysResult from pcmd`.",
+    "kind": "gap"
+   },
+   {
+    "category": "contracts and specifications",
+    "construct": "serverAssert(...) in the body after the NULL check",
+    "description": "The doc has `expect` only as a header precondition on parameters and no in-body assertion statement; the condition only makes sense after unwrapping the maybe. Wrote `expect` inside the body.",
+    "kind": "gap"
+   },
+   {
+    "category": "numeric types and conversions",
+    "construct": "Boolean flag fields",
+    "description": "No named boolean type in the doc; invented `Bool`.",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [
+   {
+    "category": "bit operations",
+    "construct": "pcmd->flags & PENDING_CMD_FLAG_PREPROCESSED, flags & PENDING_CMD_KEYS_RESULT_VALID",
+    "description": "No bitwise and; flag bits split into separate Bool fields, which changes the struct layout and every writer of flags.",
+    "kind": "workaround"
+   },
+   {
+    "category": "missing values",
+    "construct": "pcmd may be NULL; function returns NULL",
+    "description": "Cleanly expressed with `maybe` and `choose`; the NULL-in, NULL-out pattern costs a few lines but is clearer.",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [
+   {
+    "category": "contracts and specifications",
+    "construct": "Conditional precondition on a maybe parameter, and whether it is checked at run time",
+    "description": "Unclear whether `expect if pcmd is some command, ...` is legal, and whether `expect` is a run-time abort (like serverAssert) or a static obligation on callers.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [
+   "maybe borrowed GetKeysResult from pcmd",
+   "expect inside an operation body",
+   "Bool"
+  ],
+  "contradicted": [],
+  "gap_notes": 3
+ },
+ {
+  "id": "F31",
+  "category": "polymorphism and generics",
+  "language": "ocaml",
+  "adversarial": true,
+  "src_body_lines": 3,
+  "src_body_tokens": 29,
+  "scribe_body_lines": 8,
+  "scribe_body_tokens": 31,
+  "scribe_header_lines": 4,
+  "scribe_decl_lines": 3,
+  "ratio_tokens": 1.0689655172413792,
+  "behaviour": "approximate",
+  "gaps": [
+   {
+    "category": "closures and stored callbacks",
+    "construct": "higher-order parameter f : key -> 'a -> unit",
+    "description": "No type for an operation value and no way to call one held in a variable; `an operation taking a Key and a T` and `f v d` are invented.",
+    "kind": "gap"
+   },
+   {
+    "category": "effect polymorphism",
+    "construct": "iter has whatever side effects f has",
+    "description": "`uses` must list named capabilities, and an operation with no uses line is pure; there is no way to say an operation's effects are those of a parameter, so `uses f` is invented. This blocks every higher-order iteration function.",
+    "kind": "gap"
+   },
+   {
+    "category": "generics and type parameters",
+    "construct": "functor Make (Ord : OrderedType) providing the key type and compare",
+    "description": "Nothing in the doc parameterises a module or a group of operations over a type plus operations on it; Key is treated as a fixed type.",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [
+   {
+    "category": "missing values",
+    "construct": "returning unit () from the Empty branch",
+    "description": "No unit value or empty statement is shown; a bare `give back` is used to make an empty branch.",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [
+   {
+    "category": "generics and type parameters",
+    "construct": "recursive polymorphic variant type 'a t = Empty | Node of {...}",
+    "description": "The doc shows `type Queue of T` and plain choices but never a generic or recursive choice, so `choice Tree of T` is a combination the doc does not confirm.",
+    "kind": "unclear"
+   },
+   {
+    "category": "loop forms",
+    "construct": "let rec (structural recursion)",
+    "description": "The doc never shows recursion or says whether it needs a termination measure; `decreases size of m` is borrowed from repeat while loops.",
+    "kind": "unclear"
+   },
+   {
+    "category": "pattern matching",
+    "construct": "Node {l; v; d; r} ignoring field h",
+    "description": "The doc does not say whether a `when` pattern may bind a subset of a variant's fields.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [
+   "an operation taking a Key and a T",
+   "uses f",
+   "f v d",
+   "choice Tree of T",
+   "decreases size of m (on an operation rather than a loop)",
+   "give back (with no value)"
+  ],
+  "contradicted": [
+   "With no `uses` line the operation is pure (iter is pure only if f is, which cannot be stated)"
+  ],
+  "gap_notes": 4
+ },
+ {
+  "id": "F32",
+  "category": "polymorphism and generics",
+  "language": "rust",
+  "adversarial": true,
+  "src_body_lines": 2,
+  "src_body_tokens": 11,
+  "scribe_body_lines": 0,
+  "scribe_body_tokens": 0,
+  "scribe_header_lines": 0,
+  "scribe_decl_lines": 17,
+  "ratio_tokens": 0.0,
+  "behaviour": "approximate",
+  "gaps": [
+   {
+    "category": "interfaces and dynamic dispatch",
+    "construct": "trait Captures with a required method get and a provided method as_match",
+    "description": "The doc has no trait or interface declaration and no way to write an operation over 'any type that provides get'; an 'interface' block with 'given captures is a Self' is invented.",
+    "kind": "gap"
+   },
+   {
+    "category": "objects, methods and self",
+    "construct": "default method body (as_match) inherited by every implementer, callable as self.get(0)",
+    "description": "No default bodies, no Self type and no method-call form; the call on self becomes 'get 0 from captures', resolved by an unspecified dispatch rule.",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [
+   {
+    "category": "error types and exceptions",
+    "construct": "Option::unwrap, which panics on None",
+    "description": "No panic or unwrap; the doc has only declared failures, so the panic becomes a declared failure NoOverallMatch, which changes the signature (callers must handle or propagate it) and does not match Rust's abort-on-bug behaviour.",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [
+   {
+    "category": "contracts and specifications",
+    "construct": "implicit precondition that group 0 always exists for a successful match",
+    "description": "The original relies on, but never states, this invariant; the honest Scribe form would be an invariant on the interface, which the doc cannot attach to a trait.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [
+   "interface Captures",
+   "given captures is a Self",
+   "an operation with a body nested inside an interface block"
+  ],
+  "contradicted": [],
+  "gap_notes": 2
+ },
+ {
+  "id": "F33",
+  "category": "polymorphism and generics",
+  "language": "go",
+  "adversarial": true,
+  "src_body_lines": 16,
+  "src_body_tokens": 111,
+  "scribe_body_lines": 14,
+  "scribe_body_tokens": 75,
+  "scribe_header_lines": 27,
+  "scribe_decl_lines": 6,
+  "ratio_tokens": 0.6756756756756757,
+  "behaviour": "not possible",
+  "gaps": [
+   {
+    "category": "reflection",
+    "construct": "reflect.Type as a map key and the input to newTypeEncoder",
+    "description": "The doc has no type-as-value and no way to inspect a value's type at run time; the key is declared as an opaque TypeDescription with no source.",
+    "kind": "gap"
+   },
+   {
+    "category": "closures and stored callbacks",
+    "construct": "encoderFunc func values stored in a map, plus an anonymous func literal that captures `indirect`",
+    "description": "No function type, no lambda, no capture and no way to call a stored operation; `Operation from ... to nothing`, `operation given ... doing` and `call f with ...` are invented.",
+    "kind": "gap"
+   },
+   {
+    "category": "concurrency, threads and locks",
+    "construct": "sync.OnceValue: a value computed once on first use, safely shared by racing goroutines",
+    "description": "No lazy or once-only value exists; `once ... computing` and `value_of` are invented.",
+    "kind": "gap"
+   },
+   {
+    "category": "concurrency, threads and locks",
+    "construct": "deliberately racy publication protocol: LoadOrStore of a placeholder, then Store of the real encoder, with other goroutines briefly using the placeholder",
+    "description": "Structured concurrency with no shared mutation cannot express a benign race between independent callers; the translation is correct only for one caller at a time.",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [
+   {
+    "category": "global or module state",
+    "construct": "package-level encoderCache (sync.Map) shared and mutated by all goroutines",
+    "description": "The doc forbids sharing mutable values between tasks (example 38) and shows no module-level var; the cache was turned into a capability parameter, changing the public signature of typeEncoder and pushing the parameter onto every caller.",
+    "kind": "workaround"
+   },
+   {
+    "category": "missing values",
+    "construct": "(value, ok) two-result lookup and (actual, loaded) from LoadOrStore",
+    "description": "Mapped to `maybe EncoderFunc` with `choose`; works cleanly but LoadOrStore's two meanings of the result (found vs stored) live only in a note.",
+    "kind": "workaround"
+   },
+   {
+    "category": "generics and type parameters",
+    "construct": "type assertion fi.(encoderFunc) on an any value from sync.Map",
+    "description": "Absorbed by typing the cache as holding EncoderFunc; the doc has no generic map type, so EncoderCache is opaque.",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [
+   {
+    "category": "pattern matching",
+    "construct": "an arm of `choose` that does nothing and falls through",
+    "description": "The doc does not say whether an empty `when` arm is allowed; only an empty `on failure` is forbidden.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [
+   "Operation from A and B and C to nothing",
+   "operation given a, b and c doing",
+   "call f with a, b and c",
+   "once computing <expression>",
+   "value_of"
+  ],
+  "contradicted": [
+   "Because values are never shared mutably between tasks, there is nothing for a lock to protect, and no way to forget one."
+  ],
+  "gap_notes": 4
+ },
+ {
+  "id": "F34",
+  "category": "callbacks and events",
+  "language": "javascript",
+  "adversarial": true,
+  "src_body_lines": 11,
+  "src_body_tokens": 78,
+  "scribe_body_lines": 21,
+  "scribe_body_tokens": 83,
+  "scribe_header_lines": 27,
+  "scribe_decl_lines": 8,
+  "ratio_tokens": 1.064102564102564,
+  "behaviour": "approximate",
+  "gaps": [
+   {
+    "category": "closures and stored callbacks",
+    "construct": "listeners are functions stored in a registry and returned to callers",
+    "description": "The doc has no function type; an opaque invented `Handler` type stands in, so nothing in Scribe says these values can be called.",
+    "kind": "gap"
+   },
+   {
+    "category": "collections and iteration",
+    "construct": "target._events used as a dictionary keyed by string or Symbol",
+    "description": "No map type and no Symbol type in the doc; `Map of EventName to EventSlot` and `lookup name in table` are invented.",
+    "kind": "gap"
+   },
+   {
+    "category": "interfaces and dynamic dispatch",
+    "construct": "works on any object with an _events property (EventEmitter and all subclasses, plus mixins)",
+    "description": "No interfaces or structural typing; restricted to one concrete Emitter type.",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [
+   {
+    "category": "reflection",
+    "construct": "typeof evlistener === 'function' to distinguish one listener from an array",
+    "description": "No run-time type test. The single-or-array storage trick becomes an explicit `choice EventSlot`, which changes the data representation that the rest of events.js relies on.",
+    "kind": "workaround"
+   },
+   {
+    "category": "objects, methods and self",
+    "construct": "evlistener.listener || evlistener - an ad hoc property attached to a function object by once()",
+    "description": "Functions cannot carry properties; the once-wrapper is modelled as a choice variant holding both wrapper and original.",
+    "kind": "workaround"
+   },
+   {
+    "category": "missing values",
+    "construct": "two `=== undefined` checks with early return",
+    "description": "Expressible with `maybe`, but each check adds a `choose` level, so a flat 16-line function nests five levels deep. No early-return form like `give back [] if nothing` exists.",
+    "kind": "workaround"
+   },
+   {
+    "category": "unsafe and raw memory",
+    "construct": "returning a fresh array (arrayClone) so callers cannot mutate the registry",
+    "description": "The defensive copy matters only because JS arrays are shared mutable references; in Scribe values are not shared, so the copy is semantically a no-op but still allocates and needs an Allocator.",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [
+   {
+    "category": "default, optional and keyword arguments",
+    "construct": "boolean flag argument `unwrap`",
+    "description": "Kept as a Bool with an invented label phrase (`unwrapped unwrap`); the doc offers no guidance for naming flag arguments in sentence-style calls.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [
+   "Handler type (function value)",
+   "Map of EventName to EventSlot",
+   "lookup name in table",
+   "a maybe Map of ... (maybe around a parameterised type)",
+   "label phrase `unwrapped unwrap` for a Bool flag"
+  ],
+  "contradicted": [],
+  "gap_notes": 3
+ },
+ {
+  "id": "F35",
+  "category": "callbacks and events",
+  "language": "python",
+  "adversarial": true,
+  "src_body_lines": 5,
+  "src_body_tokens": 32,
+  "scribe_body_lines": 2,
+  "scribe_body_tokens": 32,
+  "scribe_header_lines": 12,
+  "scribe_decl_lines": 11,
+  "ratio_tokens": 1.0,
+  "behaviour": "not possible",
+  "gaps": [
+   {
+    "category": "closures and stored callbacks",
+    "construct": "self.timefunc = timefunc; self.delayfunc = delayfunc (caller-supplied functions stored in fields and called later)",
+    "description": "The doc has no function type, no operation values and no way to call a stored one; `TimeFunction` and `DelayFunction` are placeholders whose call syntax is undefined. Event actions (stored callables with arguments) hit the same gap.",
+    "kind": "gap"
+   },
+   {
+    "category": "concurrency, threads and locks",
+    "construct": "self._lock = threading.RLock() so one scheduler can be used from several threads",
+    "description": "Scribe's only concurrency is structured `together` blocks with no shared mutable state, and example 38 says there is nothing for a lock to protect. A long-lived object shared across threads, guarded by a re-entrant lock, has no form; `ReentrantLock` is a placeholder.",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [
+   {
+    "category": "closures and stored callbacks",
+    "construct": "self._sequence_generator = count() (a stateful iterator stored in a field)",
+    "description": "No generators or iterator objects; replaced with a Nat counter field, which changes the design from a shared generator to a value advanced through an editable Scheduler.",
+    "kind": "workaround"
+   },
+   {
+    "category": "objects, methods and self",
+    "construct": "__init__ initialising fields through self",
+    "description": "No constructors; written as an operation that returns a record.",
+    "kind": "workaround"
+   },
+   {
+    "category": "default, optional and keyword arguments",
+    "construct": "timefunc=_time, delayfunc=time.sleep defaults",
+    "description": "No default arguments; both are required parameters. The defaults are also ambient-authority functions, which Scribe deliberately forbids.",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [
+   {
+    "category": "time and clocks",
+    "construct": "timefunc returning a float of seconds and delayfunc sleeping for a float of seconds",
+    "description": "The doc has a Clock capability and `now using clock`, but no sleep/delay operation and no way to let the caller substitute a different time source except passing a different Clock value.",
+    "kind": "unclear"
+   },
+   {
+    "category": "objects, methods and self",
+    "construct": "record construction with every field named",
+    "description": "Only `an Order from cart and receipt with status Paid` is shown; there is no general record-literal form. `a Scheduler with queue as [] and lock as lock and ...` is a guess.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [
+   "TimeFunction",
+   "DelayFunction",
+   "Action",
+   "ReentrantLock",
+   "a Scheduler with queue as [] and lock as lock and ...",
+   "new_reentrant_lock"
+  ],
+  "contradicted": [
+   "Because values are never shared mutably between tasks, there is nothing for a lock to protect, and no way to forget one."
+  ],
+  "gap_notes": 4
+ },
+ {
+  "id": "F36",
+  "category": "callbacks and events",
+  "language": "c",
+  "adversarial": true,
+  "src_body_lines": 29,
+  "src_body_tokens": 258,
+  "scribe_body_lines": 14,
+  "scribe_body_tokens": 140,
+  "scribe_header_lines": 16,
+  "scribe_decl_lines": 22,
+  "ratio_tokens": 0.5426356589147286,
+  "behaviour": "approximate",
+  "gaps": [
+   {
+    "category": "closures and stored callbacks",
+    "construct": "beforesleep / aftersleep function-pointer fields (aeBeforeSleepProc *), set to NULL and called later by the loop",
+    "description": "No function type and no way to store an operation in a field. Invented `maybe Operation from EventLoop to nothing`. Also no way to say what effects a stored callback will have when it runs.",
+    "kind": "gap"
+   },
+   {
+    "category": "pointers and shared mutable references",
+    "construct": "timeEventHead: head of a doubly linked list of aeTimeEvent with next/prev pointers",
+    "description": "Self-referential, shared mutable nodes cannot be declared without references; only the head was modelled.",
+    "kind": "gap"
+   },
+   {
+    "category": "unsafe and raw memory",
+    "construct": "void *privdata[2] cleared with memset; zmalloc(sizeof(T) * n) uninitialised storage",
+    "description": "No untyped pointer, fixed-size array or raw zeroing. Invented `Opaque` and used a list of nothing; uninitialised allocation replaced by a comprehension.",
+    "kind": "gap"
+   },
+   {
+    "category": "resource lifetime",
+    "construct": "Naming the allocator for record construction and comprehensions",
+    "description": "Doc requires allocation to be visible and the allocator passed in, but only shows `using memory` on calls to operations, not on record literals or comprehensions. Invented trailing `using memory`.",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [
+   {
+    "category": "global or module state",
+    "construct": "monotonicInit(NULL) - idempotent process-wide initialisation called defensively",
+    "description": "No module state; modelled as an operation on a Clock capability, which cannot express 'only the first call has an effect'.",
+    "kind": "workaround"
+   },
+   {
+    "category": "error types and exceptions",
+    "construct": "Return NULL on any failure",
+    "description": "Kept as `maybe EventLoop` with failures handled internally to preserve behaviour; idiomatic Scribe would use fails with, which changes the interface.",
+    "kind": "workaround"
+   },
+   {
+    "category": "I/O primitives",
+    "construct": "aeApiCreate selects epoll/kqueue/evport/select at compile time and creates OS state",
+    "description": "No conditional compilation or platform selection; modelled as one operation on an OperatingSystem capability with an invented opaque ApiState.",
+    "kind": "workaround"
+   },
+   {
+    "category": "bit operations",
+    "construct": "Event masks AE_NONE / AE_READABLE / AE_WRITABLE combined as bit flags; int flags field",
+    "description": "No bit sets; mask modelled as a choice with only AeNone, which cannot represent READABLE|WRITABLE.",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [
+   {
+    "category": "resource lifetime",
+    "construct": "goto err: free whichever of events, fired, eventLoop were allocated",
+    "description": "handle/on failure covers the control flow, but the doc never says how allocated memory is released (no free, and hold is shown only for files), so whether the partial loop is freed on the failure path is unspecified.",
+    "kind": "unclear"
+   },
+   {
+    "category": "collections and iteration",
+    "construct": "Allocate an array of n elements, then initialise each mask in a for loop",
+    "description": "No 'list of n elements' constructor; replaced with a comprehension over a range, which merges allocation and the initialisation loop.",
+    "kind": "unclear"
+   },
+   {
+    "category": "objects, methods and self",
+    "construct": "Constructing a large record and then passing it editable to aeApiCreate",
+    "description": "The doc shows record construction only in prose-like `an Order from cart and receipt with status Paid`; a 13-field `with ... and ...` constructor is one very long line, and it is unclear whether a var-held record can be passed as editable.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [
+   "Operation from EventLoop to nothing",
+   "Opaque",
+   "ApiState",
+   "OperatingSystem (capability)",
+   "(... for each i from 0 until nevents) using memory",
+   "an EventLoop with a and b and ... using memory",
+   "top-level `let` constant"
+  ],
+  "contradicted": [
+   "\"There is no hidden allocation and no garbage collector\" - the doc gives no way to free memory and no allocator annotation on record construction, so the translation either hides allocation or invents syntax",
+   "Density budget per line - the 13-field EventLoop construction line is far over any plausible budget, and the doc offers no multi-line record construction form"
+  ],
+  "gap_notes": 7
+ },
+ {
+  "id": "F37",
+  "category": "concurrency and async",
+  "language": "go",
+  "adversarial": true,
+  "src_body_lines": 4,
+  "src_body_tokens": 18,
+  "scribe_body_lines": 2,
+  "scribe_body_tokens": 11,
+  "scribe_header_lines": 8,
+  "scribe_decl_lines": 3,
+  "ratio_tokens": 0.6111111111111112,
+  "behaviour": "not possible",
+  "gaps": [
+   {
+    "category": "concurrency, threads and locks",
+    "construct": "atomic.Bool field and Mutex field inside Once",
+    "description": "The doc rules out shared mutable values between tasks and so has no atomic or lock types; `Atomic Bool` and `Mutex` are invented.",
+    "kind": "gap"
+   },
+   {
+    "category": "pointers and shared mutable references",
+    "construct": "one *Once used by many goroutines at once",
+    "description": "`editable` implies exclusive access and `together` rejects two tasks changing one value; there is no way to declare a value intended for concurrent mutation, so `shared` is invented.",
+    "kind": "gap"
+   },
+   {
+    "category": "concurrency, threads and locks",
+    "construct": "o.done.Load() with acquire semantics",
+    "description": "No memory-ordering or atomic-operation vocabulary; `atomically load done of o` is invented.",
+    "kind": "gap"
+   },
+   {
+    "category": "closures and stored callbacks",
+    "construct": "f func() parameter",
+    "description": "No type for an operation value; `an operation` is invented, and calling f inside do_slow needs an invented call form too.",
+    "kind": "gap"
+   },
+   {
+    "category": "effect polymorphism",
+    "construct": "Do has whatever effects f has",
+    "description": "`uses` must name capabilities; there is no way to say the effects come from a parameter, so `uses f` is invented.",
+    "kind": "gap"
+   },
+   {
+    "category": "contracts and specifications",
+    "construct": "documented guarantee: f runs at most once, and every Do returns only after f has finished",
+    "description": "This is a property across concurrent calls; `ensure` and `at entry` describe one call, so the core contract of sync.Once cannot be written.",
+    "kind": "gap"
+   },
+   {
+    "category": "resource lifetime",
+    "construct": "defer o.done.Store(true) and defer o.m.Unlock() in doSlow",
+    "description": "`hold` covers releasing a resource on every exit but there is no general deferred statement, so the store-after-f ordering cannot be expressed.",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [
+   {
+    "category": "objects, methods and self",
+    "construct": "method on pointer receiver (o *Once) Do",
+    "description": "No methods; the receiver becomes a labelled parameter, which changes call sites from o.Do(f) to `do f with o`.",
+    "kind": "workaround"
+   },
+   {
+    "category": "concurrency, threads and locks",
+    "construct": "fast-path / slow-path split for inlining",
+    "description": "No inlining control, so the reason for the split disappears; it is kept only to mirror the original.",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [],
+  "invented": [
+   "an Atomic Bool",
+   "a Mutex",
+   "a shared Once",
+   "an operation (as a parameter type)",
+   "uses f, o",
+   "atomically load done of o"
+  ],
+  "contradicted": [
+   "Because values are never shared mutably between tasks, there is nothing for a lock to protect, and no way to forget one.",
+   "With no `uses` line the operation is pure (Do's effects depend on f and cannot be named)"
+  ],
+  "gap_notes": 7
+ },
+ {
+  "id": "F38",
+  "category": "concurrency and async",
+  "language": "python",
+  "adversarial": true,
+  "src_body_lines": 9,
+  "src_body_tokens": 67,
+  "scribe_body_lines": 9,
+  "scribe_body_tokens": 53,
+  "scribe_header_lines": 12,
+  "scribe_decl_lines": 12,
+  "ratio_tokens": 0.7910447761194029,
+  "behaviour": "not possible",
+  "gaps": [
+   {
+    "category": "concurrency, threads and locks",
+    "construct": "with self._condition: (acquire a re-entrant lock for a block, release on every exit)",
+    "description": "The doc rules out shared mutable state between tasks and says there is nothing for a lock to protect, so there is no lock type and no locked block; 'hold guard as locked condition of future' is invented by analogy with hold for files.",
+    "kind": "gap"
+   },
+   {
+    "category": "concurrency, threads and locks",
+    "construct": "self._condition.notify_all() waking threads blocked in result() or wait()",
+    "description": "No condition variables, wait or notify; structured concurrency (together, pipeline) covers fork-join and queues but not one thread signalling others that are already blocked.",
+    "kind": "gap"
+   },
+   {
+    "category": "pointers and shared mutable references",
+    "construct": "the Future is mutated by the executor thread while client threads hold it; waiters are shared objects owned elsewhere",
+    "description": "editable means exclusive ownership; there is no shared reference type, so 'editable shared' and 'List of shared Waiter' are invented.",
+    "kind": "gap"
+   },
+   {
+    "category": "closures and stored callbacks",
+    "construct": "_invoke_callbacks runs user-registered done callbacks after the lock is released",
+    "description": "No type for a stored operation, and no way to state in a header the effects of callbacks supplied by others; 'uses callbacks' is a placeholder.",
+    "kind": "gap"
+   },
+   {
+    "category": "generics and type parameters",
+    "construct": "result may be any object",
+    "description": "Future of T is declared, but the doc has no way for an operation to introduce T.",
+    "kind": "gap"
+   },
+   {
+    "category": "error types and exceptions",
+    "construct": "InvalidStateError('{}: {!r}'.format(self._state, self))",
+    "description": "Failures in the doc are bare names with no payload or message, and there is no repr; the diagnostic text is lost.",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [
+   {
+    "category": "objects, methods and self",
+    "construct": "set_result is a method; Executor subclasses and tests call it on a shared instance",
+    "description": "No methods or self; written as 'set_result result on future'.",
+    "kind": "workaround"
+   },
+   {
+    "category": "collections and iteration",
+    "construct": "self._state in {CANCELLED, CANCELLED_AND_NOTIFIED, FINISHED} (set literal membership)",
+    "description": "Only list literals exist; a list of variants is used with 'is in', which works but whether 'is in' applies to variants of a choice is not stated.",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [
+   {
+    "category": "contracts and specifications",
+    "construct": "uses line for an operation whose effects are on shared memory and other threads",
+    "description": "The doc's uses lists capabilities; whether a lock, a condition, or a shared object counts as a capability is not settled.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [
+   "editable shared Future of T",
+   "List of shared Waiter",
+   "hold guard as locked condition of future",
+   "notify_all condition of future",
+   "uses condition of future (a field as a capability)",
+   "uses callbacks (a capability name for unknown stored-callback effects)"
+  ],
+  "contradicted": [
+   "Because values are never shared mutably between tasks, there is nothing for a lock to protect, and no way to forget one.",
+   "A task cannot outlive its scope (the Future is set by a worker thread long after the submitting scope continues)"
+  ],
+  "gap_notes": 8
+ },
+ {
+  "id": "F39",
+  "category": "concurrency and async",
+  "language": "rust",
+  "adversarial": true,
+  "src_body_lines": 33,
+  "src_body_tokens": 233,
+  "scribe_body_lines": 40,
+  "scribe_body_tokens": 180,
+  "scribe_header_lines": 41,
+  "scribe_decl_lines": 20,
+  "ratio_tokens": 0.7725321888412017,
+  "behaviour": "not possible",
+  "gaps": [
+   {
+    "category": "async and futures",
+    "construct": "hand-written Future::poll step returning Poll<()> and registering a Waker in Context",
+    "description": "Scribe's concurrency is structured and implicit (`together`, `pipeline`, `workflow`); there is no notion of a resumable step, an executor, a task context or a waker, so the whole contract with the runtime is lost and Poll/Context/Waker are opaque stand-ins.",
+    "kind": "gap"
+   },
+   {
+    "category": "concurrency, threads and locks",
+    "construct": "AtomicUsize state shared between Sender and Receiver with Acquire / AcqRel ordering and compare-and-swap updates",
+    "description": "The doc forbids mutable sharing between tasks and has no atomics or memory orderings; the atomic is hidden behind an opaque capability and the ordering is a label word that means nothing to the checker.",
+    "kind": "gap"
+   },
+   {
+    "category": "unsafe and raw memory",
+    "construct": "UnsafeCell<MaybeUninit<Waker>> accessed in `unsafe` blocks, guarded by a state bit",
+    "description": "The only escape hatch is `trust`, which records a reason and owner but has no scope, so it is unclear which following lines it covers; the invariant linking the bit to the cell's initialisation cannot be written.",
+    "kind": "gap"
+   },
+   {
+    "category": "pointers and shared mutable references",
+    "construct": "Option<Arc<Inner>> shared with the Receiver",
+    "description": "No reference-counted shared ownership exists; Inner is modelled as an owned field, which misstates who can see it.",
+    "kind": "gap"
+   },
+   {
+    "category": "resource lifetime",
+    "construct": "RestoreOnPending guard whose Drop restores the coop budget unless made_progress() was called",
+    "description": "`hold` releases a resource on every exit but cannot run conditional behaviour on drop; linear `consumed` types would force consumption on the Pending path too, which is the opposite of the intent.",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [
+   {
+    "category": "macros",
+    "construct": "ready!(expr) early-returning Pending",
+    "description": "No macros; each use is spelled out as a three-line `choose`.",
+    "kind": "workaround"
+   },
+   {
+    "category": "missing values",
+    "construct": "inner.as_ref().unwrap() (panic on None) and binding the payload for the rest of the function",
+    "description": "No panic, and `choose` binds the payload only inside its arm; unwrapping for the remainder of the body needs a var plus repeated matching, or an invented failure.",
+    "kind": "workaround"
+   },
+   {
+    "category": "error types and exceptions",
+    "construct": "panic as an undeclared failure",
+    "description": "Turned into a named failure SenderHasNoInner, which adds a `fails with` line the original API does not have.",
+    "kind": "workaround"
+   },
+   {
+    "category": "objects, methods and self",
+    "construct": "calling an operation for its side effect and discarding its result (State::set_tx_task(&inner.state);)",
+    "description": "No statement form for a discarded result is shown; written as `let ignored be ...`.",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [
+   {
+    "category": "contracts and specifications",
+    "construct": "scope of an unsafe block",
+    "description": "`trust` is a single line with no block, so the doc does not settle which statements a trust covers.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [
+   "load_state ... with acquire_ordering",
+   "choice Poll used as a return protocol with an executor",
+   "let ignored be ...",
+   "trust used to scope over following statements"
+  ],
+  "contradicted": [
+   "Because values are never shared mutably between tasks, there is nothing for a lock to protect, and no way to forget one.",
+   "Structured concurrency only. A task cannot outlive its scope"
+  ],
+  "gap_notes": 8
+ },
+ {
+  "id": "F40",
+  "category": "persistence and schemas",
+  "language": "python",
+  "adversarial": false,
+  "src_body_lines": 4,
+  "src_body_tokens": 19,
+  "scribe_body_lines": 5,
+  "scribe_body_tokens": 20,
+  "scribe_header_lines": 12,
+  "scribe_decl_lines": 2,
+  "ratio_tokens": 1.0526315789473684,
+  "behaviour": "approximate",
+  "gaps": [
+   {
+    "category": "collections and iteration",
+    "construct": "iter(self._index) - a lazy iterator over a live dict",
+    "description": "No iterator, generator or lazy sequence type. A List of keys is returned instead, which allocates a copy of every key and drops Python's 'dictionary changed size during iteration' detection.",
+    "kind": "gap"
+   },
+   {
+    "category": "collections and iteration",
+    "construct": "self._index is a dict from key to (pos, siz)",
+    "description": "No map type in the doc; `Map of Key to Position` and `keys of index` are invented.",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [
+   {
+    "category": "error types and exceptions",
+    "construct": "except TypeError: raise error('DBM object has already been closed') from None",
+    "description": "Exception translation with a message and suppressed cause. Scribe failures have no message and no cause chain; the closed check is made explicitly and the message becomes the failure name DatabaseClosed.",
+    "kind": "workaround"
+   },
+   {
+    "category": "objects, methods and self",
+    "construct": "method on self",
+    "description": "Receiver becomes a read-only parameter; works.",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [
+   {
+    "category": "resource lifetime",
+    "construct": "use-after-close detected at run time via _index = None",
+    "description": "Expressible with `maybe`; the doc's typestate (`in state Closed or Open`) would make it a compile-time error but would change the API, since Python callers can hold a closed database. The doc does not say which to prefer when an object is shared after close.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [
+   "Map of Key to Position",
+   "keys of index using memory",
+   "a maybe Map of ... as a field type"
+  ],
+  "contradicted": [],
+  "gap_notes": 2
+ },
+ {
+  "id": "F41",
+  "category": "persistence and schemas",
+  "language": "c",
+  "adversarial": false,
+  "src_body_lines": 41,
+  "src_body_tokens": 310,
+  "scribe_body_lines": 38,
+  "scribe_body_tokens": 237,
+  "scribe_header_lines": 77,
+  "scribe_decl_lines": 19,
+  "ratio_tokens": 0.7645161290322581,
+  "behaviour": "approximate",
+  "gaps": [
+   {
+    "category": "unsafe and raw memory",
+    "construct": "ztrymalloc(clen) / ztrymalloc_usable(len, &usable): ask an allocator for n bytes, which may fail",
+    "description": "Example 21 makes the Allocator a capability but shows no operation that requests a sized buffer from it, nor one that reports the usable size actually granted; `allocate` and `allocated_size_of` are invented.",
+    "kind": "gap"
+   },
+   {
+    "category": "global or module state",
+    "construct": "isRestoreContext() reading process-global server state to choose a log level",
+    "description": "No global state; modelled as a query on the ServerLog capability.",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [
+   {
+    "category": "bit operations",
+    "construct": "flags & RDB_LOAD_PLAIN, flags & RDB_LOAD_SDS",
+    "description": "No bitwise operators; the int flags became a three-variant choice. This is clearer but drops any other flag bits a caller passes.",
+    "kind": "workaround"
+   },
+   {
+    "category": "pointers and shared mutable references",
+    "construct": "optional out-parameters size_t *lenptr and size_t *usable, each possibly NULL",
+    "description": "No pointers or out-parameters; both values are always returned in a result record.",
+    "kind": "workaround"
+   },
+   {
+    "category": "unsafe and raw memory",
+    "construct": "void* result whose type (raw buffer, sds, robj) depends on the flag argument",
+    "description": "No untyped pointer and no dependent result type; the result is a choice, so callers must `choose` on a form they already selected, and the body matches `form` twice.",
+    "kind": "workaround"
+   },
+   {
+    "category": "error types and exceptions",
+    "construct": "RDB_LENERR in-band sentinel and NULL return for every failure",
+    "description": "Mapped to named failures (LengthError, OutOfMemory, ReadError, CorruptRdb). This is more informative than the original, so callers see failures C callers could not distinguish.",
+    "kind": "workaround"
+   },
+   {
+    "category": "pattern matching",
+    "construct": "C ternary `cond ? a : b` and the `else` branch covering two flags",
+    "description": "No conditional expression and no `when A or B` arm, so the logging call is duplicated in an if/otherwise and the sds/object arms are written out twice.",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [
+   {
+    "category": "resource lifetime",
+    "construct": "goto err cleanup that frees c and, depending on flag, frees val with zfree or sdsfree",
+    "description": "`hold` covers c, which is always freed. val is released on failure paths but returned on success; the doc never says how a linear value that is sometimes handed back is released on the other paths, nor how a linear var gets a placeholder start value before `choose` assigns it.",
+    "kind": "unclear"
+   },
+   {
+    "category": "objects, methods and self",
+    "construct": "nested record/variant construction `a LoadedLzf with value as PlainBuffer with buffer as val and len as len`",
+    "description": "Record construction syntax is not defined beyond one example; with nesting, `and` cannot tell which record a field belongs to.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [
+   "allocate n bytes using memory",
+   "allocated_size_of",
+   "a LoadedLzf with value as ... and len as ...",
+   "let at module level for empty_bytes",
+   "Bool"
+  ],
+  "contradicted": [],
+  "gap_notes": 2
+ },
+ {
+  "id": "F42",
+  "category": "persistence and schemas",
+  "language": "go",
+  "adversarial": false,
+  "src_body_lines": 21,
+  "src_body_tokens": 118,
+  "scribe_body_lines": 20,
+  "scribe_body_tokens": 122,
+  "scribe_header_lines": 10,
+  "scribe_decl_lines": 0,
+  "ratio_tokens": 1.0338983050847457,
+  "behaviour": "approximate",
+  "gaps": [
+   {
+    "category": "error types and exceptions",
+    "construct": "Return (x, err): a partial value alongside the error",
+    "description": "Scribe failures carry no value and a failed operation produces nothing, so the partially decoded x returned with an error is lost.",
+    "kind": "gap"
+   },
+   {
+    "category": "error types and exceptions",
+    "construct": "Pass through any error from r.ReadByte unchanged",
+    "description": "`fails with` requires a closed list of failure names; an arbitrary error from an interface implementation has no name. Invented catch-all ReadError.",
+    "kind": "gap"
+   },
+   {
+    "category": "interfaces and dynamic dispatch",
+    "construct": "io.ByteReader interface parameter",
+    "description": "No interfaces; treated as a capability type, which hides that any implementation can be passed.",
+    "kind": "gap"
+   },
+   {
+    "category": "bit operations",
+    "construct": "x |= uint64(b&0x7f) << s, b < 0x80",
+    "description": "No bitwise and/or/shift and no hex literals; invented `bitand`, `bitor`, `shifted left by`, and wrote 128/127 in decimal.",
+    "kind": "gap"
+   },
+   {
+    "category": "numeric types and conversions",
+    "construct": "uint64, byte, and explicit conversion uint64(b)",
+    "description": "No fixed-width types and no explicit conversion form even though implicit conversion is banned. Invented `UInt64`, `Byte`, `b as a UInt64`.",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [
+   {
+    "category": "error types and exceptions",
+    "construct": "if i > 0 && err == io.EOF { err = io.ErrUnexpectedEOF }",
+    "description": "Inspecting and rewriting an error needs a nested handle block with one on failure line per name, including a line that just re-fails with the same name.",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [
+   {
+    "category": "numeric types and conversions",
+    "construct": "Typed zero-initialised locals (var x uint64; var s uint)",
+    "description": "`var` has no type annotation, and the literal 0 does not fix the type.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [
+   "UInt64",
+   "Byte",
+   "b as a UInt64",
+   "bitand",
+   "bitor",
+   "shifted left by",
+   "ReadError (catch-all failure name)",
+   "top-level `let` constant"
+  ],
+  "contradicted": [],
+  "gap_notes": 5
+ },
+ {
+  "id": "F43",
+  "category": "configuration",
+  "language": "python",
+  "adversarial": false,
+  "src_body_lines": 7,
+  "src_body_tokens": 89,
+  "scribe_body_lines": 11,
+  "scribe_body_tokens": 93,
+  "scribe_header_lines": 18,
+  "scribe_decl_lines": 15,
+  "ratio_tokens": 1.0449438202247192,
+  "behaviour": "approximate",
+  "gaps": [
+   {
+    "category": "characters, bytes and strings",
+    "construct": "self.SECTCRE.match(line.clean) and mo.group('header')",
+    "description": "The doc says patterns get names but defines no pattern type, match result or named-group access; `match of ... against ...` and `header of m` are invented.",
+    "kind": "gap"
+   },
+   {
+    "category": "error types and exceptions",
+    "construct": "raise MissingSectionHeaderError(fpname, st.lineno, line)",
+    "description": "Failures in the doc are bare names; there is no way to attach data to a failure, so `fail with X with file as ... and lineno as ...` is invented.",
+    "kind": "gap"
+   },
+   {
+    "category": "interfaces and dynamic dispatch",
+    "construct": "self._handle_header / self._handle_option resolved on the instance, overridable by subclasses",
+    "description": "No methods, interfaces or overriding; the calls are bound statically to one operation, losing subclass extension.",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [
+   {
+    "category": "global or module state",
+    "construct": "UNNAMED_SECTION module-level sentinel object",
+    "description": "No module constants or singleton objects; replaced by a choice Section_name with an Unnamed variant, which changes the type of the header argument.",
+    "kind": "workaround"
+   },
+   {
+    "category": "objects, methods and self",
+    "construct": "method on self reading self._allow_unnamed_section and self.SECTCRE",
+    "description": "The receiver becomes an explicit labelled parameter; SECTCRE is a class attribute in Python but has to become an instance field.",
+    "kind": "workaround"
+   },
+   {
+    "category": "missing values",
+    "construct": "`if not mo and st.cursect is None: raise` followed by `handle_header if mo else handle_option`",
+    "description": "A maybe can only be opened with choose, so the guard and the dispatch must be merged into one choose with a nested if; the result is correct but the structure differs from the original.",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [
+   {
+    "category": "objects, methods and self",
+    "construct": "constructing a choice value with a payload: Named with name as header of m",
+    "description": "The doc shows constructing payload-free variants and `some x`, but not how to build a variant with fields in an expression.",
+    "kind": "unclear"
+   },
+   {
+    "category": "error types and exceptions",
+    "construct": "exceptions propagating from helpers without being declared",
+    "description": "The `fails with` list has to guess the helper failures; the doc does not say whether a failure name can carry data or be a family of related errors.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [
+   "match of sectcre of parser against clean of line",
+   "header of m (named regex group)",
+   "fail with MissingSectionHeaderError with file as fpname and lineno as lineno of st and line as line",
+   "Named with name as header of m (variant construction in an expression)"
+  ],
+  "contradicted": [],
+  "gap_notes": 4
+ },
+ {
+  "id": "F44",
+  "category": "configuration",
+  "language": "go",
+  "adversarial": false,
+  "src_body_lines": 3,
+  "src_body_tokens": 13,
+  "scribe_body_lines": 2,
+  "scribe_body_tokens": 12,
+  "scribe_header_lines": 4,
+  "scribe_decl_lines": 1,
+  "ratio_tokens": 0.9230769230769231,
+  "behaviour": "not possible",
+  "gaps": [
+   {
+    "category": "pointers and shared mutable references",
+    "construct": "p *int64 kept by the flag package and written later during Parse, while the caller reads the same variable",
+    "description": "editable lends exclusive access for the length of one call; there is no long-lived shared reference, so 'shared Reference to an Int64' is invented. The whole flag package design (flag.Int64Var(&cfg.port, ...)) depends on this aliasing.",
+    "kind": "gap"
+   },
+   {
+    "category": "pointers and shared mutable references",
+    "construct": "*p = val (write through a pointer)",
+    "description": "No dereference; 'set target of p to val' is invented.",
+    "kind": "gap"
+   },
+   {
+    "category": "unsafe and raw memory",
+    "construct": "(*int64Value)(p): reinterpret a pointer to int64 as a pointer to the named type int64Value",
+    "description": "No newtype, type alias or pointer conversion; written as a constructor wrapping the reference, which only works because Int64Value was declared as that wrapper.",
+    "kind": "gap"
+   },
+   {
+    "category": "interfaces and dynamic dispatch",
+    "construct": "int64Value exists so the same memory satisfies the flag.Value interface (Set, String)",
+    "description": "The point of the conversion is to attach methods to an existing int64; without interfaces or methods the purpose of the function cannot be expressed, only its two statements.",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [],
+  "unclear": [
+   {
+    "category": "numeric types and conversions",
+    "construct": "int64",
+    "description": "The doc names Int and Nat but no fixed-width types; Int64 is assumed as a refinement of Int.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [
+   "type Int64Value is a reference to an Int64",
+   "given p is a shared Reference to an Int64",
+   "set target of p to val",
+   "an Int64Value from p"
+  ],
+  "contradicted": [
+   "Changing an `editable` argument is not an effect, because ownership already says who can see it. (here the caller and the flag set both see p, so the write is a real shared-state effect with no uses line)"
+  ],
+  "gap_notes": 3
+ },
+ {
+  "id": "F45",
+  "category": "configuration",
+  "language": "c",
+  "adversarial": false,
+  "src_body_lines": 20,
+  "src_body_tokens": 146,
+  "scribe_body_lines": 8,
+  "scribe_body_tokens": 43,
+  "scribe_header_lines": 25,
+  "scribe_decl_lines": 6,
+  "ratio_tokens": 0.2945205479452055,
+  "behaviour": "approximate",
+  "gaps": [],
+  "workarounds": [
+   {
+    "category": "global or module state",
+    "construct": "reading the global server struct (server.acl_filename) and the global Users tree",
+    "description": "The doc has no module-level state; both globals become capability parameters, which changes the function's signature and every call site.",
+    "kind": "workaround"
+   },
+   {
+    "category": "collections and iteration",
+    "construct": "rax iterator protocol: raxStart, raxSeek(\"^\"), raxNext loop, raxStop",
+    "description": "Only `for each x in <list>` exists, with no iterator or ordered-map traversal form, so the tree is materialised into a list first, which adds an allocation the original avoids.",
+    "kind": "workaround"
+   },
+   {
+    "category": "resource lifetime",
+    "construct": "reference-counted robj from ACLDescribeUser released with decrRefCount; sds line ownership passed to rewriteConfigRewriteLine",
+    "description": "Refcounting has no counterpart; the robj becomes owned Text, and the ownership transfer of `line` is expressed with `consumed`, which fits.",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [
+   {
+    "category": "characters, bytes and strings",
+    "construct": "string building by repeated sdscat on a growable buffer",
+    "description": "Collapsed into one interpolated string, which reads better but hides which allocator is used, against the doc's rule that allocation is visible.",
+    "kind": "unclear"
+   },
+   {
+    "category": "error types and exceptions",
+    "construct": "allocation that aborts the process on OOM rather than returning an error",
+    "description": "The doc's allocation rule (example 21) forces `fails with OutOfMemory`, adding a failure mode the original does not have; there is no way to say 'allocation failure is fatal here'.",
+    "kind": "unclear"
+   },
+   {
+    "category": "early exit from loops",
+    "construct": "bare `return;` in a void function",
+    "description": "Only `give back <value>` is shown.",
+    "kind": "unclear"
+   },
+   {
+    "category": "objects, methods and self",
+    "construct": "reading a field of a capability value (server.acl_filename)",
+    "description": "Capabilities appear only as call targets in the doc; whether one can also be a record with fields is not stated.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [
+   "give back (with no value)",
+   "users_in_order of table (a call whose label word is `of`)"
+  ],
+  "contradicted": [],
+  "gap_notes": 1
+ },
+ {
+  "id": "F46",
+  "category": "security checks",
+  "language": "go",
+  "adversarial": false,
+  "src_body_lines": 9,
+  "src_body_tokens": 58,
+  "scribe_body_lines": 6,
+  "scribe_body_tokens": 48,
+  "scribe_header_lines": 11,
+  "scribe_decl_lines": 0,
+  "ratio_tokens": 0.8275862068965517,
+  "behaviour": "approximate",
+  "gaps": [
+   {
+    "category": "bit operations",
+    "construct": "v |= x[i] ^ y[i] (bitwise OR and XOR on bytes)",
+    "description": "The doc lists only + - * / and mod; there are no bitwise operators. `bitwise_or` and `bitwise_xor` are invented word operators.",
+    "kind": "gap"
+   },
+   {
+    "category": "contracts and specifications",
+    "construct": "constant-time execution with respect to secret contents (the function's entire reason to exist)",
+    "description": "Information-flow labels cover where secret data may go, not whether control flow or timing depends on it. Nothing stops the compiler or a reader from replacing the loop with an early-exit comparison. Invented header `runs in constant time with respect to x and y`.",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [],
+  "unclear": [
+   {
+    "category": "numeric types and conversions",
+    "construct": "byte type, byte arithmetic, and result int restricted to 0 or 1",
+    "description": "The doc names Bytes but no single Byte type or byte literal; `0` is used as a byte. The 0/1 result fits a refinement (`Int with value 0 through 1`), which works well.",
+    "kind": "unclear"
+   },
+   {
+    "category": "contracts and specifications",
+    "construct": "returning a derived boolean from secret inputs",
+    "description": "Unclear whether a comparison result derived from secret-labelled data must be declassified; a `declassifies` line is added to make the release explicit.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [
+   "bitwise_or, bitwise_xor",
+   "runs in constant time with respect to x and y (header line)",
+   "Byte type"
+  ],
+  "contradicted": [],
+  "gap_notes": 2
+ },
+ {
+  "id": "F47",
+  "category": "security checks",
+  "language": "python",
+  "adversarial": false,
+  "src_body_lines": 2,
+  "src_body_tokens": 15,
+  "scribe_body_lines": 5,
+  "scribe_body_tokens": 22,
+  "scribe_header_lines": 11,
+  "scribe_decl_lines": 7,
+  "ratio_tokens": 1.4666666666666666,
+  "behaviour": "approximate",
+  "gaps": [
+   {
+    "category": "interfaces and dynamic dispatch",
+    "construct": "inst.update(msg) on whichever object is present, relying on duck typing across OpenSSL/HACL* HMAC objects and any hashlib hash",
+    "description": "No interfaces, traits or dynamic dispatch; the two cases became a closed choice with an explicit `choose`. The digestmod can be any hash constructor, so `Hash` is a placeholder for an open set of types the doc cannot name.",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [
+   {
+    "category": "missing values",
+    "construct": "self._hmac or self._inner, where exactly one field is None",
+    "description": "Expressible better than the original as a choice, but this redesigns the object's state rather than translating its two nullable fields.",
+    "kind": "workaround"
+   },
+   {
+    "category": "objects, methods and self",
+    "construct": "method on self",
+    "description": "Became an operation taking the object as editable.",
+    "kind": "workaround"
+   },
+   {
+    "category": "interfaces and dynamic dispatch",
+    "construct": "msg accepts any bytes-like object (buffer protocol)",
+    "description": "No interface to say 'anything that exposes bytes'; narrowed to Bytes.",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [
+   {
+    "category": "pointers and shared mutable references",
+    "construct": "mutating an object reached through a field of self (an aliased reference)",
+    "description": "The doc does not say whether a payload bound by `when` on an editable record is itself editable, or whether mutating a field's referent needs `uses`.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [
+   "NativeHmac",
+   "Hash"
+  ],
+  "contradicted": [],
+  "gap_notes": 1
+ },
+ {
+  "id": "F48",
+  "category": "security checks",
+  "language": "c",
+  "adversarial": true,
+  "src_body_lines": 7,
+  "src_body_tokens": 73,
+  "scribe_body_lines": 1,
+  "scribe_body_tokens": 15,
+  "scribe_header_lines": 5,
+  "scribe_decl_lines": 0,
+  "ratio_tokens": 0.2054794520547945,
+  "behaviour": "approximate",
+  "gaps": [
+   {
+    "category": "generics and type parameters",
+    "construct": "typeof(start): generic over every C integer type, signed or unsigned",
+    "description": "The doc has no operation-level type parameters and no bound such as 'any integer type'; T used as if in scope.",
+    "kind": "gap"
+   },
+   {
+    "category": "numeric types and conversions",
+    "construct": "Boolean (int 0/1) result",
+    "description": "No named boolean type; invented `Bool`. Also unclear whether `give back` accepts a logic expression directly.",
+    "kind": "gap"
+   }
+  ],
+  "workarounds": [
+   {
+    "category": "macros",
+    "construct": "GNU statement-expression macro ({ ... }) with typeof",
+    "description": "No macros; rewritten as an ordinary operation. Here that loses nothing because the macro only emulates a generic inline function.",
+    "kind": "workaround"
+   },
+   {
+    "category": "contracts and specifications",
+    "construct": "(void)(&start__ == &size__) compile-time same-type check",
+    "description": "Replaced by giving all three parameters the same type T, which is a cleaner expression of the same check.",
+    "kind": "workaround"
+   }
+  ],
+  "unclear": [
+   {
+    "category": "integer overflow and wrapping",
+    "construct": "Short-circuit || guarding max__ - start__ against unsigned wrap",
+    "description": "The doc does not say whether `or` short-circuits; with checked arithmetic, correctness (no spurious failure) depends on it.",
+    "kind": "unclear"
+   },
+   {
+    "category": "default, optional and keyword arguments",
+    "construct": "Three positional arguments of the same type",
+    "description": "Label-word calls need a word between each argument; `and` is the natural one but is also logical and, so `range_end_overflows a and b against c` can misparse when an argument is a condition.",
+    "kind": "unclear"
+   }
+  ],
+  "invented": [
+   "Bool",
+   "T as an operation-level type parameter without declaration",
+   "label word `against` in `range_end_overflows start and size against max` (and `and` as an argument separator, colliding with logical and)"
+  ],
+  "contradicted": [],
+  "gap_notes": 3
+ }
+]

@@ -1,0 +1,12 @@
+FAIL       F01.scribe: {'line': 5, 'column': 22, 'token': 'a', 'source': 'to bisect_right x in a from lo below hi with key'}
+ok         F15.scribe
+FAIL       F21.scribe: {'line': 67, 'column': 48, 'token': '⏎', 'source': 'repeat while byte_at p in line is a space_byte'}
+ok         F25.scribe
+FAIL       F26.scribe: {'line': 19, 'column': 23, 'token': 'and', 'source': 'to new_datetime year and month and day and hour and minute and second and microsecond and tzinfo and fold'}
+FAIL       F31.scribe: {'line': 5, 'column': 12, 'token': 'of', 'source': 'choice Map of K and V'}
+FAIL       F35.scribe: {'line': 9, 'column': 32, 'token': 'producing', 'source': 'field timefunc as an Operation producing a Number'}
+FAIL       F38.scribe: {'line': 14, 'column': 7, 'token': 'result', 'source': 'field result as a maybe Value'}
+FAIL       F41.scribe: {'line': 30, 'column': 19, 'token': 'bytes', 'source': 'to rio_read size bytes from rdb into buffer'}
+ok         F47.scribe
+
+{'fail': 7, 'ok': 3} of 10

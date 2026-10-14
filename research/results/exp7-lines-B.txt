@@ -1,0 +1,12 @@
+F01.scribe: 0/40 lines parse, 1 failure points
+F15.scribe: 13/13 lines parse, 0 failure points
+F21.scribe: 78/111 lines parse, 7 failure points
+F25.scribe: 33/33 lines parse, 0 failure points
+F26.scribe: 14/94 lines parse, 2 failure points
+F31.scribe: 3/13 lines parse, 5 failure points
+F35.scribe: 9/20 lines parse, 3 failure points
+F38.scribe: 15/32 lines parse, 4 failure points
+F41.scribe: 65/137 lines parse, 4 failure points
+F47.scribe: 20/20 lines parse, 0 failure points
+
+TOTAL 250/513 code lines parse (49%)

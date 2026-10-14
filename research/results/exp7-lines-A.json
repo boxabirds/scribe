@@ -1,0 +1,714 @@
+{
+ "F01.scribe": {
+  "code_lines": 38,
+  "parsed_lines": 0,
+  "failing_lines": [
+   [
+    6,
+    "to bisect_right x in a from lo to hi by key"
+   ]
+  ]
+ },
+ "F02.scribe": {
+  "code_lines": 16,
+  "parsed_lines": 0,
+  "failing_lines": [
+   [
+    3,
+    "to search n f"
+   ]
+  ]
+ },
+ "F03.scribe": {
+  "code_lines": 20,
+  "parsed_lines": 1,
+  "failing_lines": [
+   [
+    7,
+    "define x minus y stays in range"
+   ],
+   [
+    13,
+    "to adjacent_difference a into b"
+   ]
+  ]
+ },
+ "F04.scribe": {
+  "code_lines": 28,
+  "parsed_lines": 26,
+  "failing_lines": [
+   [
+    43,
+    "let t1 be part of l1 from 1 until count of l1"
+   ],
+   [
+    44,
+    "let t2 be part of l2 from 1 until count of l2"
+   ]
+  ]
+ },
+ "F05.scribe": {
+  "code_lines": 79,
+  "parsed_lines": 17,
+  "failing_lines": [
+   [
+    30,
+    "to match_chunk chunk against s using memory"
+   ]
+  ]
+ },
+ "F06.scribe": {
+  "code_lines": 36,
+  "parsed_lines": 7,
+  "failing_lines": [
+   [
+    8,
+    "to ufmerge2_1 l1 against h2 by fun then t2 onto m after h2m using memory"
+   ],
+   [
+    31,
+    "to ufmerge2_2 h1 then t1 by fun against l2 onto m using memory"
+   ]
+  ]
+ },
+ "F07.scribe": {
+  "code_lines": 19,
+  "parsed_lines": 14,
+  "failing_lines": [
+   [
+    6,
+    "field prev as a maybe reference to Adlist_node"
+   ],
+   [
+    7,
+    "field next as a maybe reference to Adlist_node"
+   ],
+   [
+    12,
+    "field head as a maybe reference to Adlist_node"
+   ],
+   [
+    13,
+    "field tail as a maybe reference to Adlist_node"
+   ],
+   [
+    23,
+    "field next as a maybe reference to Adlist_node"
+   ]
+  ]
+ },
+ "F08.scribe": {
+  "code_lines": 16,
+  "parsed_lines": 0,
+  "failing_lines": [
+   [
+    5,
+    "to siftdown heap startpos pos"
+   ]
+  ]
+ },
+ "F09.scribe": {
+  "code_lines": 38,
+  "parsed_lines": 5,
+  "failing_lines": [
+   [
+    6,
+    "define items is sorted_by order"
+   ],
+   [
+    12,
+    "given order is an Operation from T and T to Bool"
+   ],
+   [
+    14,
+    "to lemma_new_first_element_still_sorted_by x and items with order"
+   ],
+   [
+    20,
+    "to merge_sorted_with left and right by less_than_or_eq"
+   ]
+  ]
+ },
+ "F10.scribe": {
+  "code_lines": 44,
+  "parsed_lines": 39,
+  "failing_lines": [
+   [
+    45,
+    "set digits to part of text from 1 until count of text"
+   ],
+   [
+    47,
+    "set digits to part of text from 1 until count of text"
+   ],
+   [
+    67,
+    "let cutoff be 2 to the power (size - 1)"
+   ],
+   [
+    69,
+    "fail with RangeError with nearest_value int_from (cutoff - 1)"
+   ],
+   [
+    74,
+    "fail with RangeError with nearest_value 0 - int_from cutoff"
+   ]
+  ]
+ },
+ "F11.scribe": {
+  "code_lines": 63,
+  "parsed_lines": 61,
+  "failing_lines": [
+   [
+    76,
+    "let ordered be item (count of ext - 1 - k) of ext for each k from 0 until count of ext"
+   ],
+   [
+    77,
+    "give back some try text_from ordered using memory"
+   ]
+  ]
+ },
+ "F12.scribe": {
+  "code_lines": 40,
+  "parsed_lines": 39,
+  "failing_lines": [
+   [
+    60,
+    "fail with JSONDecodeError with msg \"Extra data\" and doc s and pos end"
+   ]
+  ]
+ },
+ "F13.scribe": {
+  "code_lines": 19,
+  "parsed_lines": 17,
+  "failing_lines": [
+   [
+    29,
+    "give back a Prefix_and_suffix with prefix as slice of pattern from 0 until pos and suffix as slice of pattern from pos + 1 until count of pattern_bytes"
+   ],
+   [
+    31,
+    "give back a Prefix_and_suffix with prefix as pattern and suffix as \"\""
+   ]
+  ]
+ },
+ "F14.scribe": {
+  "code_lines": 101,
+  "parsed_lines": 34,
+  "failing_lines": [
+   [
+    32,
+    "to sanitize_params prefix suffix dir using files"
+   ],
+   [
+    48,
+    "to mkstemp_inner dir prefix suffix flags output_type using files"
+   ],
+   [
+    70,
+    "to open_stream fd with mode and buffering and newline and encoding and errors using memory"
+   ],
+   [
+    83,
+    "module var o_tmpfile_works starts at true"
+   ],
+   [
+    86,
+    "to temporary_file mode buffering encoding newline suffix prefix dir errors using files and memory"
+   ]
+  ]
+ },
+ "F15.scribe": {
+  "code_lines": 12,
+  "parsed_lines": 12,
+  "failing_lines": []
+ },
+ "F16.scribe": {
+  "code_lines": 19,
+  "parsed_lines": 10,
+  "failing_lines": [
+   [
+    21,
+    "to set_err err on scanner"
+   ]
+  ]
+ },
+ "F17.scribe": {
+  "code_lines": 26,
+  "parsed_lines": 13,
+  "failing_lines": [
+   [
+    22,
+    "to ignore_patterns_for path and names with patterns using memory"
+   ]
+  ]
+ },
+ "F18.scribe": {
+  "code_lines": 68,
+  "parsed_lines": 15,
+  "failing_lines": [
+   [
+    7,
+    "field events as a maybe Map from EventKey to Listeners"
+   ],
+   [
+    18,
+    "to validate_boolean value named name"
+   ],
+   [
+    35,
+    "to init emitter with opts using defaults and memory"
+   ]
+  ]
+ },
+ "F19.scribe": {
+  "code_lines": 11,
+  "parsed_lines": 11,
+  "failing_lines": []
+ },
+ "F20.scribe": {
+  "code_lines": 35,
+  "parsed_lines": 32,
+  "failing_lines": [
+   [
+    44,
+    "set name to characters 1 until (length of name - 1) of name"
+   ],
+   [
+    50,
+    "when Unnamed"
+   ],
+   [
+    56,
+    "give back a SourcedFile with name name and stream stream"
+   ]
+  ]
+ },
+ "F21.scribe": {
+  "code_lines": 103,
+  "parsed_lines": 99,
+  "failing_lines": [
+   [
+    97,
+    "fail with BadQuoting because \"closing quote must be followed by a space or nothing at all\""
+   ],
+   [
+    100,
+    "fail with BadQuoting because \"unterminated quotes\""
+   ],
+   [
+    109,
+    "fail with BadQuoting because \"closing quote must be followed by a space or nothing at all\""
+   ],
+   [
+    112,
+    "fail with BadQuoting because \"unterminated quotes\""
+   ]
+  ]
+ },
+ "F22.scribe": {
+  "code_lines": 87,
+  "parsed_lines": 78,
+  "failing_lines": [
+   [
+    53,
+    "to coerce first and second"
+   ],
+   [
+    114,
+    "set item i of partials to a Partial with denominator denominator and numerator numerator of entry + numerator"
+   ],
+   [
+    118,
+    "append a Partial with denominator denominator and numerator numerator to partials"
+   ],
+   [
+    135,
+    "expect not is_finite value"
+   ],
+   [
+    148,
+    "give back a SumResult with kind result_kind and total total and count count"
+   ]
+  ]
+ },
+ "F23.scribe": {
+  "code_lines": 37,
+  "parsed_lines": 11,
+  "failing_lines": [
+   [
+    21,
+    "to sqlite3_strnicmp z_left and z_right up_to n"
+   ]
+  ]
+ },
+ "F24.scribe": {
+  "code_lines": 8,
+  "parsed_lines": 5,
+  "failing_lines": [
+   [
+    20,
+    "let swapped_bytes be ((x shifted right by 8) bitand m3) bitor ((x bitand m3) shifted left by 8 wrapping)"
+   ],
+   [
+    21,
+    "let swapped_halves be ((swapped_bytes shifted right by 16) bitand m4) bitor ((swapped_bytes bitand m4) shifted left by 16 wrapping)"
+   ],
+   [
+    22,
+    "give back (swapped_halves shifted right by 32) bitor (swapped_halves shifted left by 32 wrapping)"
+   ]
+  ]
+ },
+ "F25.scribe": {
+  "code_lines": 23,
+  "parsed_lines": 22,
+  "failing_lines": [
+   [
+    24,
+    "let rest be slice of value from 1 until count of value"
+   ]
+  ]
+ },
+ "F26.scribe": {
+  "code_lines": 87,
+  "parsed_lines": 14,
+  "failing_lines": [
+   [
+    21,
+    "to make_datetime year month day hour minute second microsecond tzinfo fold"
+   ],
+   [
+    36,
+    "to replace self year month day hour minute second microsecond tzinfo fold"
+   ]
+  ]
+ },
+ "F27.scribe": {
+  "code_lines": 41,
+  "parsed_lines": 14,
+  "failing_lines": [
+   [
+    13,
+    "to offset_string_adjustment time and unit for tz"
+   ]
+  ]
+ },
+ "F28.scribe": {
+  "code_lines": 72,
+  "parsed_lines": 20,
+  "failing_lines": [
+   [
+    17,
+    "to read_line_slice from reader within lim"
+   ],
+   [
+    27,
+    "uses r of reader"
+   ],
+   [
+    47,
+    "to read_continued_line_slice from reader within lim checked by validate_first_line using memory"
+   ]
+  ]
+ },
+ "F29.scribe": {
+  "code_lines": 32,
+  "parsed_lines": 32,
+  "failing_lines": []
+ },
+ "F30.scribe": {
+  "code_lines": 16,
+  "parsed_lines": 13,
+  "failing_lines": [
+   [
+    17,
+    "produces a maybe borrowed GetKeysResult from pcmd"
+   ],
+   [
+    25,
+    "expect preprocessed of command because \"serverAssert(pcmd->flags & PENDING_CMD_FLAG_PREPROCESSED)\""
+   ],
+   [
+    28,
+    "give back some keys_result of command"
+   ]
+  ]
+ },
+ "F31.scribe": {
+  "code_lines": 15,
+  "parsed_lines": 10,
+  "failing_lines": [
+   [
+    5,
+    "choice Tree of T"
+   ],
+   [
+    13,
+    "given f is an operation taking a Key and a T"
+   ],
+   [
+    21,
+    "give back"
+   ]
+  ]
+ },
+ "F32.scribe": {
+  "code_lines": 17,
+  "parsed_lines": 3,
+  "failing_lines": [
+   [
+    8,
+    "interface Captures"
+   ]
+  ]
+ },
+ "F33.scribe": {
+  "code_lines": 47,
+  "parsed_lines": 36,
+  "failing_lines": [
+   [
+    11,
+    "type EncoderFunc is an Operation from an editable EncodeState and a ReflectedValue and an EncodeOptions to nothing"
+   ],
+   [
+    37,
+    "to new_type_encoder type_key allowing_address using encoder_cache"
+   ],
+   [
+    54,
+    "when nothing"
+   ],
+   [
+    61,
+    "let placeholder be operation given state, value and options doing"
+   ],
+   [
+    66,
+    "when nothing"
+   ]
+  ]
+ },
+ "F34.scribe": {
+  "code_lines": 56,
+  "parsed_lines": 25,
+  "failing_lines": [
+   [
+    25,
+    "field events as a maybe Map of EventName to EventSlot"
+   ],
+   [
+    29,
+    "given table is a Map of EventName to EventSlot"
+   ],
+   [
+    52,
+    "to listeners_of target for type unwrapped unwrap using memory"
+   ]
+  ]
+ },
+ "F35.scribe": {
+  "code_lines": 25,
+  "parsed_lines": 16,
+  "failing_lines": [
+   [
+    26,
+    "to new_scheduler with timefunc and delayfunc using memory"
+   ]
+  ]
+ },
+ "F36.scribe": {
+  "code_lines": 52,
+  "parsed_lines": 23,
+  "failing_lines": [
+   [
+    30,
+    "field stop as an Int"
+   ],
+   [
+    32,
+    "field beforesleep as a maybe Operation from EventLoop to nothing"
+   ],
+   [
+    33,
+    "field aftersleep as a maybe Operation from EventLoop to nothing"
+   ],
+   [
+    43,
+    "to ae_api_create for event_loop using system and memory"
+   ],
+   [
+    55,
+    "to ae_create_event_loop setsize using clock and system and memory"
+   ]
+  ]
+ },
+ "F37.scribe": {
+  "code_lines": 13,
+  "parsed_lines": 10,
+  "failing_lines": [
+   [
+    5,
+    "field done as an Atomic Bool"
+   ],
+   [
+    13,
+    "given o is a shared Once"
+   ],
+   [
+    27,
+    "given o is a shared Once"
+   ]
+  ]
+ },
+ "F38.scribe": {
+  "code_lines": 33,
+  "parsed_lines": 16,
+  "failing_lines": [
+   [
+    16,
+    "field result as a maybe T"
+   ],
+   [
+    18,
+    "field waiters as a List of shared Waiter"
+   ],
+   [
+    24,
+    "given waiter is an editable shared Waiter"
+   ],
+   [
+    33,
+    "to set_result result on future"
+   ]
+  ]
+ },
+ "F39.scribe": {
+  "code_lines": 101,
+  "parsed_lines": 100,
+  "failing_lines": [
+   [
+    97,
+    "when Ready"
+   ]
+  ]
+ },
+ "F40.scribe": {
+  "code_lines": 19,
+  "parsed_lines": 17,
+  "failing_lines": [
+   [
+    9,
+    "field index as a maybe Map of Key to Position"
+   ],
+   [
+    18,
+    "given index is a Map of Key to Position"
+   ]
+  ]
+ },
+ "F41.scribe": {
+  "code_lines": 134,
+  "parsed_lines": 73,
+  "failing_lines": [
+   [
+    85,
+    "to allocate_logged size bytes using memory and log"
+   ],
+   [
+    101,
+    "to rdb_load_lzf_string_object from rdb as form using memory and log"
+   ],
+   [
+    149,
+    "to allocate size bytes using memory"
+   ],
+   [
+    163,
+    "to sds_new_uninitialised size using memory and log"
+   ]
+  ]
+ },
+ "F42.scribe": {
+  "code_lines": 30,
+  "parsed_lines": 28,
+  "failing_lines": [
+   [
+    43,
+    "give back x bitor ((b as a UInt64) shifted left by s)"
+   ],
+   [
+    44,
+    "set x to x bitor (((b bitand 127) as a UInt64) shifted left by s)"
+   ]
+  ]
+ },
+ "F43.scribe": {
+  "code_lines": 44,
+  "parsed_lines": 43,
+  "failing_lines": [
+   [
+    65,
+    "fail with MissingSectionHeaderError with file as fpname and lineno as lineno of st and line as line"
+   ]
+  ]
+ },
+ "F44.scribe": {
+  "code_lines": 7,
+  "parsed_lines": 5,
+  "failing_lines": [
+   [
+    4,
+    "type Int64Value is a reference to an Int64"
+   ],
+   [
+    10,
+    "given p is a shared Reference to an Int64"
+   ]
+  ]
+ },
+ "F45.scribe": {
+  "code_lines": 39,
+  "parsed_lines": 19,
+  "failing_lines": [
+   [
+    34,
+    "to rewrite_config_rewrite_line state for option with line forced"
+   ],
+   [
+    41,
+    "to rewrite_config_user_option state using server and users and memory"
+   ]
+  ]
+ },
+ "F46.scribe": {
+  "code_lines": 17,
+  "parsed_lines": 0,
+  "failing_lines": [
+   [
+    12,
+    "to byte_eq a and b"
+   ],
+   [
+    18,
+    "to constant_time_compare x and y"
+   ]
+  ]
+ },
+ "F47.scribe": {
+  "code_lines": 23,
+  "parsed_lines": 23,
+  "failing_lines": []
+ },
+ "F48.scribe": {
+  "code_lines": 6,
+  "parsed_lines": 0,
+  "failing_lines": [
+   [
+    9,
+    "to range_end_overflows start and size against max"
+   ]
+  ]
+ }
+}

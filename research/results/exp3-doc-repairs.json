@@ -1,0 +1,92 @@
+[
+ {
+  "file": "15_15-examples-and-properties-run-as-tests.scribe",
+  "before": "non-empty",
+  "after": "non_empty",
+  "reason": "Names use underscores, not hyphens (core rule 9); the example broke its own rule"
+ },
+ {
+  "file": "16_16-records-and-choices.scribe",
+  "before": "a Positive Int",
+  "after": "a positive Int",
+  "reason": "Modifier written in two cases across examples (`positive Money` vs `Positive Int`)"
+ },
+ {
+  "file": "22_22-authority-enters-at-one-place-and-is-.scribe",
+  "before": "run ReportExporter with reports and partner",
+  "after": "run ReportExporter with [reports, partner]",
+  "reason": "FIX-6: `and` is logic only; as a list separator it was silently read as logic"
+ },
+ {
+  "file": "28_27-a-protocol-declared-once-checked-on-b.scribe",
+  "before": "ensure if it succeeds, checksum sent is hash of every Chunk data received",
+  "after": "ensure if it succeeds, \"checksum sent is the hash of every Chunk data received\"",
+  "reason": "FIX-9: an informal clause is quoted text; unquoted English is not code"
+ },
+ {
+  "file": "29_28-the-manifest.scribe",
+  "before": "payments answers within 2 seconds for 99 percent of calls    assumed",
+  "after": "\"payments answers within 2 seconds for 99 percent of calls\"    assumed",
+  "reason": "FIX-9: informal assumption quoted"
+ },
+ {
+  "file": "29_28-the-manifest.scribe",
+  "before": "charging with the same key twice charges once               assumed",
+  "after": "\"charging with the same key twice charges once\"    assumed",
+  "reason": "FIX-9: informal assumption quoted"
+ },
+ {
+  "file": "30_29-the-implementation-below-it.scribe",
+  "before": "an Order from cart and receipt with status Paid",
+  "after": "an Order from cart, receipt with status Paid",
+  "reason": "FIX-6: construction parts separated by commas"
+ },
+ {
+  "file": "31_30-a-versioned-schema-and-a-checked-migr.scribe",
+  "before": "ensure for every field other than note, that field of new is that field of old",
+  "after": "ensure \"every field other than note is the same in new as in old\"",
+  "reason": "FIX-9: quantifying over fields is not expressible; kept as informal text (gap G1)"
+ },
+ {
+  "file": "40_37-doing-several-things-at-once.scribe",
+  "before": "a Dashboard from profile and orders and alerts",
+  "after": "a Dashboard from profile, orders, alerts",
+  "reason": "FIX-6: construction parts separated by commas"
+ },
+ {
+  "file": "41_38-the-race-that-cannot-be-written.scribe",
+  "before": "for each a in first_half",
+  "after": "for each x in first_half",
+  "reason": "Articles are reserved, so `a` cannot be a name"
+ },
+ {
+  "file": "41_38-the-race-that-cannot-be-written.scribe",
+  "before": "set total to total + a",
+  "after": "set total to total + x",
+  "reason": "follows the rename above"
+ },
+ {
+  "file": "43_39-a-pipeline-with-a-bounded-queue.scribe",
+  "before": "ensure every row read is either saved or listed in rejects of result",
+  "after": "ensure \"every row read is either saved or listed in rejects of result\"",
+  "reason": "FIX-9: informal clause quoted"
+ },
+ {
+  "file": "46_41-time-and-ordering-are-written-down.scribe",
+  "before": "remove every s from sessions where expires_at of s is not after now using clock",
+  "after": "set sessions to (s for each s in sessions where expires_at of s is after now using clock)",
+  "reason": "`remove every X from Y where` has no rule; rewritten with the existing comprehension"
+ },
+ {
+  "file": "48_compact-view.scribe",
+  "before": "ensure result in items",
+  "after": "ensure result \u2208 items",
+  "reason": "Doc inconsistency: the notation table says the compact view shows \u2208; bare `in` is ambiguous with the label `in` (FIX-5)"
+ },
+ {
+  "file": "48_compact-view.scribe",
+  "before": "invariant best in items",
+  "after": "invariant best \u2208 items",
+  "reason": "as above"
+ }
+]

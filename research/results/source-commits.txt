@@ -1,0 +1,12 @@
+cpython https://github.com/python/cpython d6f2129abdf14c2d653b8fc03a40d4a61674ec54
+go https://github.com/golang/go e60b4c37fa344513cdecfffe6efc3ca48c4a6cb2
+redis https://github.com/redis/redis 3228d82f49a976dd65e0f16125a6f822ad3f0416
+sqlite https://github.com/sqlite/sqlite 9919c36b55bf5d37ad8eb67270c001b1d00db0e9
+linux https://github.com/torvalds/linux 4056b3c9d3c92ea45955641dbafeb9b960e146ef
+ocaml https://github.com/ocaml/ocaml 63027193163b31d0398ed6d95f3fa61022fd87d5
+otp https://github.com/erlang/otp 02a27602e62c1551f7ffa462aa10c65d040486f9
+node https://github.com/nodejs/node 87db28b6bac0bb3e2919a7843c02ff798a31cd1f
+ripgrep https://github.com/BurntSushi/ripgrep 3fce3b5bb0236da2df6d99672afb8a719642eca7
+tokio https://github.com/tokio-rs/tokio 4890d027f8a566ccf081e7f019ed766f780df1af
+dafny https://github.com/dafny-lang/dafny 5f717bf447b19d38cad1b69b1bf9a9f102feccfb
+spark-by-example https://github.com/tofgarion/spark-by-example 2e4eb5a56e85c804dc48d58ea5ebb3fd46364c69
