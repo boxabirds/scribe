@@ -48,6 +48,7 @@ done; the parser is hand-written, by recursive descent.
     cargo test --workspace
     cargo run -q -p scribe-cli -- lex FILE...
     cargo run -q -p scribe-cli -- parse FILE...
+    cargo run -q -p scribe-cli -- impact OLD NEW --dependents FILE...
     python3 tools/compare_lexers.py
     python3 tools/compare_parsers.py
 
@@ -59,6 +60,13 @@ compiler embeds that file, so the two cannot disagree about which words are
 reserved. `compare_parsers.py` does the same for parsing: both parsers must
 give the same tree for every test, corpus file and spec block, or both reject
 it. CI runs all of this on every push.
+
+`scribe impact` compares two versions of a module and reports, function by
+function, what the change could break and for whom (spec Section 12). This
+first slice works from syntax alone, so where a rule needs the prover or the
+checker it says "needs review" or "unchecked" rather than guess.
+`tests/impact` holds a worked example: two versions of a Payments module, a
+Checkout module that depends on it, and the recorded report.
 
 ## Reference grammar
 

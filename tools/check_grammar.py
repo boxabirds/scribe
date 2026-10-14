@@ -6,8 +6,8 @@ usage: python3 tools/check_grammar.py            check
 Checks, in order:
   1. grammar/scribe.lark and grammar/keywords.txt are what tools/build_grammar.py
      builds from the template;
-  2. every file in tests/grammar/accept and tests/corpus parses with exactly
-     one reading;
+  2. every file in tests/grammar/accept, tests/corpus and tests/impact parses
+     with exactly one reading;
   3. every file in tests/grammar/reject is rejected;
   4. the code blocks of base-spec.md give the results recorded in
      tests/grammar/expected.json;
@@ -39,6 +39,8 @@ KEYWORDS = os.path.join(ROOT, "grammar", "keywords.txt")
 TESTS = os.path.join(ROOT, "tests", "grammar")
 # real code translated into Scribe; every file must parse with one reading
 CORPUS = os.path.join(ROOT, "tests", "corpus")
+# the worked example impact analysis is tested on
+IMPACT = os.path.join(ROOT, "tests", "impact")
 EXPECTED = os.path.join(TESTS, "expected.json")
 SPEC = os.path.join(ROOT, "base-spec.md")
 PORTING = os.path.join(ROOT, "docs", "porting-guide.md")
@@ -124,6 +126,8 @@ def main():
     accept = statuses(parser, expr_parser, scribe_files(os.path.join(TESTS, "accept")))
     accept.update({f"corpus/{k}": v for k, v in
                    statuses(parser, expr_parser, scribe_files(CORPUS)).items()})
+    accept.update({f"impact/{k}": v for k, v in
+                   statuses(parser, expr_parser, scribe_files(IMPACT)).items()})
     reject = statuses(parser, expr_parser, scribe_files(os.path.join(TESTS, "reject")))
     for name, status in accept.items():
         if status != "ok":

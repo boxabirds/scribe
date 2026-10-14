@@ -1,0 +1,10 @@
+module Checkout
+    requires
+        Payments as payments
+            uses charge, refund, total_charged_to
+    exports
+        function place_order(cart: Cart, customer: CustomerId, gateway: PaymentGateway) -> Order
+            can fail with Declined
+            uses gateway
+            let receipt = try payments.charge(customer, cart.total, gateway)
+            return Order(lines: cart.lines, receipt: receipt)

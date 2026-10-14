@@ -11,4 +11,5 @@ name = "scribe"
 path = "src/main.rs"
 
 [dependencies]
+scribe-impact = { path = "../impact" }
 scribe-syntax = { path = "../syntax" }

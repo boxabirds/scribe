@@ -1,0 +1,10 @@
+[package]
+name = "scribe-impact"
+version = "0.1.0"
+description = "Impact analysis: what a change to Scribe code could break, and for whom"
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+scribe-syntax = { path = "../syntax" }

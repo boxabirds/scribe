@@ -6,6 +6,14 @@ version = 4
 name = "scribe-cli"
 version = "0.1.0"
 dependencies = [
+ "scribe-impact",
+ "scribe-syntax",
+]
+
+[[package]]
+name = "scribe-impact"
+version = "0.1.0"
+dependencies = [
  "scribe-syntax",
 ]
 

@@ -43,12 +43,28 @@ with one reading, and the negative cases fail. (Draft 0.5 replaced the pilot's s
 Done when: the parser and the oracle agree on every test and spec block, and
 the formatter is idempotent on all of them.
 
+## Phase 2b. Impact analysis, first slice
+
+Straight after the parser, ahead of the checker, because impact analysis is
+the first aim and a useful part of it needs only syntax.
+
+| Task | Status |
+| --- | --- |
+| `scribe impact OLD NEW [--dependents FILE...]`: compare signatures, contracts, effects, trust blocks and bodies function by function, and apply the rules of Section 12.3 that need no prover | done |
+| Dependents from other modules' `requires` entries, named against each verdict | done |
+| A worked example with its recorded report (`tests/impact`) | done |
+
+What it cannot do yet, and says so in its verdicts: decide whether a changed
+precondition or guarantee is stronger or weaker (the prover, phase 4), check a
+changed body against its contract (the checker, phase 3), and find which
+callers handle every failure by name.
+
 ## Phase 3. Checker
 
 | Task | Status |
 | --- | --- |
 | Name resolution, including what `is` means (Section 5.7) | |
-| Types: records, choices, `maybe`, refinements, units | |
+| Types: records, enums, `or nothing`, refinements, units, typestate | |
 | Failures, effects and capabilities, checked completely | |
 | Ownership conventions: read, editable, consumed; linear resources | |
 | `example` lines evaluated by an interpreter, before there is a back end | |
@@ -64,8 +80,8 @@ only the checker.
 
 | Task | Status |
 | --- | --- |
-| Manifests and components (Section 11.1) | |
-| `scribe impact`: compare two versions and give the verdicts of Section 12 | |
+| Modules and their `requires` graph (Section 11.1) | done in phase 2b |
+| `scribe impact`: every verdict of Section 12, using the checker and the prover where phase 2b says "needs review" | |
 | Contract coverage, so unchecked changes are reported as such | |
 | Replay validation: re-express change-replay cases in Scribe and compare the tool's verdicts with the judges' | |
 

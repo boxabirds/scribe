@@ -1,0 +1,37 @@
+module Payments
+    exports
+        function charge(customer: CustomerId, amount: Money, gateway: PaymentGateway) -> Receipt
+            can fail with Declined
+            expect amount > 0
+            ensure on success, result.amount == amount
+            uses gateway
+            return try submit(gateway, customer, amount)
+
+        function refund(receipt: Receipt, gateway: PaymentGateway)
+            can fail with NotRefundable
+            ensure on success, is_refunded(receipt)
+            uses gateway
+            try submit_refund(gateway, receipt)
+
+        function total_charged_to(customer: CustomerId, ledger: Ledger) -> Money
+            expect is_known(customer, ledger)
+            uses ledger
+            return sum([c.amount for c in ledger.charges where c.customer == customer])
+
+        function receipt_text(receipt: Receipt) -> Text
+            ensure count(result) > 0
+            return "Paid {receipt.amount}"
+
+        function void(receipt: Receipt, gateway: PaymentGateway)
+            uses gateway
+            cancel(gateway, receipt)
+
+        function capture(receipt: Receipt, gateway: PaymentGateway)
+            expect receipt.amount > 0
+            expect receipt.is_authorised
+            uses gateway
+            settle(gateway, receipt)
+
+        function balance(customer: CustomerId, ledger: Ledger) -> Money
+            uses ledger
+            return ledger.balances[customer]

@@ -371,7 +371,7 @@ fn member_sexpr(m: &Member) -> String {
     }
 }
 
-fn clause_sexpr(c: &Clause) -> String {
+pub fn clause_sexpr(c: &Clause) -> String {
     match c {
         Clause::CanFail(n) => names("can-fail", n),
         Clause::Expect(lc) => list("expect", [line_condition_sexpr(lc)]),
@@ -393,7 +393,7 @@ fn clause_sexpr(c: &Clause) -> String {
     }
 }
 
-fn line_condition_sexpr(lc: &LineCondition) -> String {
+pub fn line_condition_sexpr(lc: &LineCondition) -> String {
     match lc {
         LineCondition::Condition(e) => expr_sexpr(e),
         LineCondition::Group(g) => group_sexpr(g),
@@ -418,11 +418,11 @@ fn condition_sexpr(c: &Condition) -> String {
     }
 }
 
-fn block_sexpr(stmts: &[Stmt]) -> String {
+pub fn block_sexpr(stmts: &[Stmt]) -> String {
     list("block", stmts.iter().map(stmt_sexpr))
 }
 
-fn stmt_sexpr(s: &Stmt) -> String {
+pub fn stmt_sexpr(s: &Stmt) -> String {
     match s {
         Stmt::Let { name, value, fallback } => {
             let mut parts = vec![name.clone(), value_sexpr(value)];
@@ -554,5 +554,185 @@ pub fn expr_sexpr(e: &Expr) -> String {
         Expr::Result => "result".into(),
         Expr::Nothing => "nothing".into(),
         Expr::Old(e) => list("old", [expr_sexpr(e)]),
+    }
+}
+
+// ---------------------------------------------------------------- source text
+//
+// The stored form of expressions, types and clauses, for reports and
+// diagnostics. Brackets are written only where arithmetic needs them.
+
+pub fn type_text(t: &TypeExpr) -> String {
+    let mut out = String::new();
+    for m in &t.modifiers {
+        out.push_str(m);
+        out.push(' ');
+    }
+    if let Some(s) = &t.state {
+        out.push_str(s);
+        out.push(' ');
+    }
+    out.push_str(&t.name);
+    if !t.args.is_empty() {
+        out.push('[');
+        out.push_str(&t.args.iter().map(type_text).collect::<Vec<_>>().join(", "));
+        out.push(']');
+    }
+    if t.or_nothing {
+        out.push_str(" or nothing");
+    }
+    out
+}
+
+pub fn signature_text(name: &str, params: &[Param], result: &Option<TypeExpr>) -> String {
+    let ps: Vec<String> = params.iter().map(|p| format!("{}: {}", p.name, type_text(&p.ty))).collect();
+    match result {
+        Some(r) => format!("{name}({}) -> {}", ps.join(", "), type_text(r)),
+        None => format!("{name}({})", ps.join(", ")),
+    }
+}
+
+fn precedence(e: &Expr) -> u8 {
+    match e {
+        Expr::Binary(op, _, _) if op == "+" || op == "-" => 1,
+        Expr::Binary(_, _, _) => 2,
+        _ => 3,
+    }
+}
+
+fn operand_text(e: &Expr, min: u8) -> String {
+    if precedence(e) < min { format!("({})", expr_text(e)) } else { expr_text(e) }
+}
+
+pub fn expr_text(e: &Expr) -> String {
+    match e {
+        Expr::ForAll { var, domain, condition } => {
+            let d = match domain.as_ref() {
+                Domain::Range(r) => format!("in {}", range_text(r)),
+                Domain::Expr(e) => format!("in {}", expr_text(e)),
+                Domain::Type(t) => format!(": {}", type_text(t)),
+            };
+            format!("for all {var} {d}, {}", expr_text(condition))
+        }
+        Expr::Exists { var, domain, condition } => {
+            format!("there is {var} in {} where {}", expr_text(domain), expr_text(condition))
+        }
+        Expr::Not(e) => format!("not {}", expr_text(e)),
+        Expr::And(es) => es.iter().map(expr_text).collect::<Vec<_>>().join(" and "),
+        Expr::Or(es) => es.iter().map(expr_text).collect::<Vec<_>>().join(" or "),
+        Expr::Compare(first, rest) => {
+            let mut out = expr_text(first);
+            for (op, e) in rest {
+                let op = match op.as_str() {
+                    "is-not" => "is not",
+                    "not-in" => "not in",
+                    o => o,
+                };
+                out.push_str(&format!(" {op} {}", expr_text(e)));
+            }
+            out
+        }
+        Expr::Binary(op, a, b) => {
+            let p = precedence(e);
+            // the right operand of `-`, `/` and `%` needs brackets at equal precedence
+            let right_min = if op == "+" || op == "*" { p } else { p + 1 };
+            format!("{} {op} {}", operand_text(a, p), operand_text(b, right_min))
+        }
+        Expr::Neg(e) => format!("-{}", operand_text(e, 3)),
+        Expr::Try(e) => format!("try {}", operand_text(e, 3)),
+        Expr::Field(e, n) => format!("{}.{n}", operand_text(e, 3)),
+        Expr::Call(f, args) => {
+            let a: Vec<String> = args
+                .iter()
+                .map(|a| match &a.name {
+                    Some(n) => format!("{n}: {}", expr_text(&a.value)),
+                    None => expr_text(&a.value),
+                })
+                .collect();
+            format!("{}({})", operand_text(f, 3), a.join(", "))
+        }
+        Expr::Index(e, i) => format!("{}[{}]", operand_text(e, 3), expr_text(i)),
+        Expr::Name(n) | Expr::Literal(n) => n.clone(),
+        Expr::List(es) => format!("[{}]", es.iter().map(expr_text).collect::<Vec<_>>().join(", ")),
+        Expr::Comprehension { element, var, source, filter } => {
+            let w = filter.as_ref().map_or(String::new(), |f| format!(" where {}", expr_text(f)));
+            format!("[{} for {var} in {}{w}]", expr_text(element), expr_text(source))
+        }
+        Expr::Result => "result".into(),
+        Expr::Nothing => "nothing".into(),
+        Expr::Old(e) => format!("old({})", expr_text(e)),
+    }
+}
+
+fn range_text(r: &Range) -> String {
+    format!("{} {} {}", expr_text(&r.low), r.word, expr_text(&r.high))
+}
+
+/// A group on one line, as `all of a, b`; nested groups in brackets of words.
+pub fn group_text(g: &Group) -> String {
+    let items: Vec<String> = g
+        .items
+        .iter()
+        .map(|i| match i {
+            GroupItem::Condition(e) => expr_text(e),
+            GroupItem::Group(g) => format!("({})", group_text(g)),
+        })
+        .collect();
+    format!("{} of {}", g.kind, items.join(", "))
+}
+
+pub fn line_condition_text(lc: &LineCondition) -> String {
+    match lc {
+        LineCondition::Condition(e) => expr_text(e),
+        LineCondition::Group(g) => group_text(g),
+        LineCondition::IfThen(a, b) => format!("if {} then {}", expr_text(a), expr_text(b)),
+    }
+}
+
+pub fn clause_text(c: &Clause) -> String {
+    match c {
+        Clause::CanFail(n) => format!("can fail with {}", n.join(", ")),
+        Clause::Expect(lc) => format!("expect {}", line_condition_text(lc)),
+        Clause::Ensure(e) => match e {
+            Ensure::Plain(x) => format!("ensure {}", expr_text(x)),
+            Ensure::OnSuccess(x) => format!("ensure on success, {}", expr_text(x)),
+            Ensure::OnFailure(n, x) if n.is_empty() => format!("ensure on failure, {}", expr_text(x)),
+            Ensure::OnFailure(n, x) => format!("ensure on failure {}, {}", n.join(" or "), expr_text(x)),
+            Ensure::If(a, b) => format!("ensure if {}, {}", expr_text(a), expr_text(b)),
+            Ensure::Group(g) => format!("ensure {}", group_text(g)),
+            Ensure::IfThen(a, b) => format!("ensure if {} then {}", expr_text(a), expr_text(b)),
+        },
+        Clause::Changes(es) => {
+            format!("changes only {}", es.iter().map(expr_text).collect::<Vec<_>>().join(", "))
+        }
+        Clause::Uses(n) => format!("uses {}", n.join(", ")),
+        Clause::Example(e) => format!("example {}", expr_text(e)),
+        Clause::Property(e) => format!("property {}", expr_text(e)),
+    }
+}
+
+#[cfg(test)]
+mod text_tests {
+    use super::*;
+    use crate::lexer::{LexOptions, lex};
+    use crate::parser::parse;
+
+    /// Parsing the printed text gives the same tree back.
+    fn round_trip(line: &str) {
+        let src = format!("let x = {line}\n");
+        let tree = parse(&lex(&src, LexOptions::default()).unwrap()).unwrap();
+        let Item::Stmt(Stmt::Let { value: Value::Expr(e), .. }) = &tree.items[0] else { panic!() };
+        assert_eq!(expr_text(e), line);
+    }
+
+    #[test]
+    fn expressions_print_as_written() {
+        round_trip("(a + b) * c - d / (e - f)");
+        round_trip("a - (b - c)");
+        round_trip("orders[0].lines[2].price + old(account.balance)");
+        round_trip("move(amount, from: source, to: target)");
+        round_trip("[o.total for o in orders where o.status is Paid]");
+        round_trip("0 <= low <= high");
+        round_trip("found is not nothing");
     }
 }

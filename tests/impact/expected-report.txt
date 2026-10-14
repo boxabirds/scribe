@@ -1,0 +1,35 @@
+scribe impact Payments: payments_old.scribe → payments_new.scribe
+
+Breaking (3)
+    refund
+        signature changed: refund(receipt: Receipt, gateway: PaymentGateway) became refund(receipt: Receipt, gateway: PaymentGateway, audit_log: AuditLog)
+        guarantee weakened or removed: ensure on success, is_refunded(receipt); breaking for Checkout, which relies on it
+        used by Checkout
+    total_charged_to
+        stronger precondition: expect ledger.is_open. Witness: any caller that does not establish it (not breaking if it follows from the other preconditions; the prover will decide)
+        used by Checkout
+    void
+        removed; every caller the change leaves untouched breaks
+
+Authority change (1)
+    now uses audit_log, in refund
+
+Needs review (1)
+    charge
+        new way to fail, RateLimited: breaking for callers that handle every failure by name
+        used by Checkout
+
+Unchanged, unchecked (1)
+    receipt_text
+        the body changed and the contract did not; nothing checks the new body against the contract yet
+
+Compatible (2)
+    authorise
+        new function
+    capture
+        weaker precondition: dropped expect receipt.amount > 0
+
+Identical (1)
+    balance
+
+Suggested version change: major (a breaking change)
