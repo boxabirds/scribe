@@ -111,7 +111,6 @@ make this easier than the list suggests:
 | `field` | A field of a record | Form fields, columns | `field_name`, `column`, `entry` |
 | `schema` | A versioned data schema | Database schemas | `record_schema`, `shape`, `layout` |
 | `migration` | A schema migration | Database migrations | `schema_change`, `upgrade` |
-| `system` | A system file | The operating system, a subsystem | `platform`, `host`, `subsystem` |
 | `component` | A unit of review and versioning | UI components, parts | `part`, `module`, `widget` |
 | `interface` | An interface's contract | APIs, network interfaces | `api`, `port`, `nic` |
 | `protocol` | A declared conversation | Wire protocols, scheme names | `wire_format`, `scheme`, `proto` |
@@ -119,21 +118,19 @@ make this easier than the list suggests:
 | `example` | An exact example in a contract | Samples, fixtures | `sample`, `specimen`, `fixture` |
 | `assert` | A condition the compiler proves at that point | Test assertions | `check`, `verify` |
 | `trust` | A block the checker does not verify | Trust levels, scores | `trust_level`, `confidence` |
-| `deadline` | A time limit monitored at run time | Due dates | `due`, `due_at`, `cutoff` |
 | `choice` | Declares a choice type | User selections | `selection`, `option`, `pick` |
 | `pipeline` | Stages joined by bounded queues | Build or data pipelines | `stages`, `chain`, `flow` |
 | `repeat` | `repeat while` loops | Repetition counts | `repeat_count`, `count` |
 | `when` | A branch of `choose` | Times and moments | `moment`, `at_time`, `occurred_at` |
 | `where` | Filters in comprehensions and quantifiers | Locations | `place`, `location`, `site` |
 | `while`, `until` | Loop and range words | End times | `end_time`, `due`, `limit` |
-| `before`, `after` | Time comparisons | Earlier and later values | `earlier`, `later`, `start_time` |
 | `from`, `to` | Argument labels | Senders and recipients, range ends | `sender`, `recipient`, `start`, `end`, `source`, `target` |
 | `in`, `into`, `onto`, `over`, `for`, `with`, `by`, `as`, `using`, `of` | Argument labels | Inputs, options, units | `input`, `options`, `unit`, a name for what it holds |
 | `it` | `if it succeeds` in contracts | Iterators, the current item | `item`, `current`, `element` |
 | `mod` | Remainder | Modules, modulus | `module_name`, `modulus` |
 | `some`, `nothing` | Present and absent values of a `maybe` | Rarely names; `some` in some query code | `any_of`, `empty` |
 | `let`, `var` | Bindings | Template variables | `variable`, `binding` |
-| `may` | `may block` | The month (lower case) | `month_may`, or the capitalised variant `May` |
+| `may` | A component's own authority: its `may` section | The month (lower case) | `month_may`, or the capitalised variant `May` |
 | `all`, `any`, `none` | Condition groups: `all of`, `any of`, `none of` | Collection helpers, flags | `everything`, `any_found`, `none_found`, `empty` |
 | `only` | `changes only`, `read only` | Filters and flags | `sole`, `exclusive`, `just_one` |
 | `labelled`, `matching`, `limited` | Type limits: `Text labelled untrusted`, `Text matching email_format` | Flags and filters | `has_label`, `is_match`, `capped` |
@@ -154,7 +151,7 @@ These are rarely names in other languages, so they seldom need renaming.
 | `through` | Ranges that include their end |
 | `given`, `produces` | Parameters and results in a contract |
 | `ensure` | A guarantee |
-| `idempotent`, `declassifies` | Contract clauses |
+| `declassifies` | Turns secret data public |
 | `invariant`, `decreases` | Loop and type reasoning |
 | `define` | Names a predicate |
 | `choose` | Matches every variant of a choice |

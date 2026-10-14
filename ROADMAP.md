@@ -104,7 +104,8 @@ Done when: wave 2 translates most functions without a gap.
 | Task | Status |
 | --- | --- |
 | Command-line programs that behave in a Unix pipeline: standard streams, exit codes, arguments, environment, files (`wasi:cli`, `wasi:filesystem`) | |
-| Collections, text, formatting, time and randomness as capabilities, JSON | |
+| Collections, text, formatting, time and randomness as capabilities, JSON. Time is library only: instants, calendar dates, time zones and time units, all read through a clock capability | |
+| A timeout operation on the clock capability, which cancels the work it is given and fails with `TimedOut` | |
 | HTTP client on `wasi:http`; TLS from the host | |
 | HTTP server written in Scribe, with its protocol declared (Section 11.4) | |
 | Interop with other components through WIT; hand-written manifests for foreign code, marked trusted | |

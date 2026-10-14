@@ -19,7 +19,7 @@
 start: (item)*
 
 ?item: operation | define | typedecl | choice | protocol
-     | schema | migration | component | system | example | property
+     | schema | migration | component | example | property
      | interface
      | stmt
 
@@ -30,8 +30,7 @@ operation: "to" signature _NL [_INDENT clause* stmt* _DEDENT]              // DO
 signature: name [name ("," name)*] ((label | "of") name)*              // DOC; FIX-3; SPEC 4.1 several unlabelled parameters
 
 ?clause: given | produces | fails | expect | ensure | changes | uses_clause
-       | idempotent | declassifies | deadline | holds
-       | example | property | may_block
+       | declassifies | holds | example | property
        | scoped
 
 given: "given" name "is" typeexpr _NL
@@ -47,11 +46,8 @@ ensure_body: expr
            | "if" logic "," expr                                             -> conditional   // SPEC 15
 changes: "changes" "only" place ("," place)* _NL                          // SPEC 13.2: several places
 uses_clause: "uses" name_list _NL
-idempotent: "idempotent" "by" name_list _NL
 declassifies: "declassifies" name "to" name _NL
-deadline: "deadline" expr _NL                                                // SPEC 1: any expression
 holds: "holds" "when" line_condition
-may_block: "may" "block" _NL                                                  // SPEC 8.2
 // SPEC 10.3: clauses that hold in one build mode only. Source never names a
 // platform: host differences are facts declared on capability interfaces
 scoped: "in" "build" name _NL _INDENT clause+ _DEDENT
@@ -99,9 +95,8 @@ predicate_phrase: name | article name ["of" name]
 
 example: "example" expr _NL
 // SPEC 11.2: an interface states contracts every implementation must meet
-interface: "interface" name _NL _INDENT [host_facts] operation+ _DEDENT
-// SPEC 10.3 (Proposed): the facts about a capability that vary by host
-host_facts: "varies" "by" "host" _NL _INDENT (name _NL)+ _DEDENT
+// SPEC 10.3: a fact that varies by host is an operation of the capability's interface
+interface: "interface" name _NL _INDENT operation+ _DEDENT
 property: "property" quantified _NL
 
 // ---------------------------------------------------------------- protocols
@@ -121,12 +116,6 @@ component: "component" name _NL _INDENT comp_section+ _DEDENT
 need: name "as" name _NL [_INDENT "uses" name_list _NL _DEDENT]
 ?may_line: "nothing" "of" "its" "own" _NL                         -> no_authority   // SPECIAL EX 28
          | cap_spec _NL
-
-// SPEC 11.5: a system states rules about the whole program; `main` builds it
-system: "system" name _NL _INDENT "rules" _NL _INDENT rule_line+ _DEDENT _DEDENT
-?rule_line: "only" name "can" "reach" cap_spec _NL                              -> reach_rule   // SPECIAL
-          | "no" "value" "labelled" name "leaves" name _NL                      -> flow_rule    // SPECIAL
-          | name "cannot" "write" "to" cap_spec _NL                             -> write_rule   // SPECIAL
 
 schema: "schema" name "version" INT _NL _INDENT schema_field+ _DEDENT
 ?schema_field: name "as" typeexpr ["added" "in" "version" INT] _NL
@@ -166,10 +155,15 @@ return_stmt: "return" value _NL
 fail: "fail" "with" value _NL
 // SPEC 4.2: a statement that does nothing, for a branch with nothing to do
 do_nothing: "do" "nothing" _NL
-if_stmt: "if" expr block ("otherwise" "if" expr block)* ["otherwise" block]
+// SPEC 5.2: a condition group as the condition is followed by `then` (for `if`) or
+// `do` (for `repeat while`) on its own line, so the two blocks are told apart
+if_stmt: "if" if_body ("otherwise" "if" if_body)* ["otherwise" block]
+if_body: expr block
+       | group "then" block
 for_each: FOR_EACH name "from" expr range_word expr block
         | FOR_EACH name "in" expr block                            -> for_each_in
 repeat_while: "repeat" "while" expr block
+            | "repeat" "while" group "do" block
 invariant: "invariant" line_condition
 decreases: "decreases" expr _NL
 choose: "choose" expr _NL _INDENT when+ _DEDENT
@@ -277,7 +271,6 @@ comp_op: "is" | "=" | "=="
        | "is" "at" "least" | ">=" | "≥"
        | "is" "in" | "∈"
        | "is" "not" "in"
-       | "is" "after" | "is" "not" "after" | "is" "before"
 
 // SPEC 14: `followed by` joins single terms; arithmetic in an operand takes brackets
 ?concat: sum
@@ -343,7 +336,7 @@ possessive: (name | atom) ("'s" name)+
      | "[" [comparison ("," comparison)*] "]"                   -> list
      | "result"                                                 -> result
      | "nothing"                                                -> nothing
-?literal: INT | DECIMAL | VERSION | STRING | QUANTITY | DATE | HEX | BINARY
+?literal: INT | DECIMAL | STRING | QUANTITY | HEX | BINARY
 
 
 // ---------------------------------------------------------------- terminals
@@ -355,11 +348,9 @@ _INDENT: "⇥"
 _DEDENT: "⇤"
 ELIDED: "⋯"
 STRING: /"([^"\\]|\\.)*"/
-DATE.3: /\d{4}-\d{2}-\d{2}/
 // SPEC 13: hex and binary literals, with `_` allowed between digits
 HEX.3: /0x[0-9A-Fa-f](_?[0-9A-Fa-f])*/
 BINARY.3: /0b[01](_?[01])*/
-VERSION.2: /\d+\.\d+\.\d+/
 DECIMAL.1: /\d+\.\d+/
 INT: /\d+/
 NAME: /[A-Za-z][A-Za-z0-9_]*/
@@ -368,11 +359,8 @@ NAME: /[A-Za-z][A-Za-z0-9_]*/
 // ---- generated
 name: NAME
     | "anything"
-    | "block"
     | "build"
     | "but"
-    | "can"
-    | "cannot"
     | "consumed"
     | "database"
     | "editable"
@@ -381,11 +369,9 @@ name: NAME
     | "files"
     | "host"
     | "its"
-    | "leaves"
     | "maybe"
     | "needs"
     | "network"
-    | "no"
     | "non_empty"
     | "one"
     | "own"
@@ -393,11 +379,9 @@ name: NAME
     | "positive"
     | "provides"
     | "queue"
-    | "reach"
     | "read"
     | "removed"
     | "reserved"
-    | "rules"
     | "sends"
     | "stage"
     | "stages"
@@ -407,11 +391,9 @@ name: NAME
     | "time"
     | "turning"
     | "under"
-    | "value"
-    | "varies"
     | "version"
     | "write"
-QUANTITY.4: /\d+(\.\d+)?[ ]+(?!(declassifies|attenuated|idempotent|component|decreases|decrement|increment|interface|invariant|migration|non_empty|otherwise|anything|consumed|database|deadline|editable|followed|labelled|matching|pipeline|positive|produces|property|protocol|provides|reserved|subtract|succeeds|together|changes|example|failure|implies|limited|network|nothing|removed|through|turning|version|assert|before|cannot|choice|choose|define|ensure|expect|handle|leaves|repeat|result|return|schema|stages|starts|system|varies|added|after|block|build|entry|every|fails|field|files|given|holds|least|maybe|model|needs|queue|reach|rules|sends|stage|state|there|trust|under|until|using|value|where|while|write|each|else|fail|from|hold|host|into|less|more|most|none|only|onto|over|port|read|skip|some|stop|than|that|then|time|type|uses|when|with|add|all|and|any|but|can|for|its|let|may|mod|not|one|own|set|the|try|var|an|as|at|be|by|do|if|in|is|it|no|of|on|or|to|a)(?![A-Za-z0-9_]))[A-Za-z][A-Za-z0-9_]*/
+QUANTITY.4: /\d+(\.\d+)?[ ]+(?!(declassifies|attenuated|component|decreases|decrement|increment|interface|invariant|migration|non_empty|otherwise|anything|consumed|database|editable|followed|labelled|matching|pipeline|positive|produces|property|protocol|provides|reserved|subtract|succeeds|together|changes|example|failure|implies|limited|network|nothing|removed|through|turning|version|assert|choice|choose|define|ensure|expect|handle|repeat|result|return|schema|stages|starts|added|build|entry|every|fails|field|files|given|holds|least|maybe|model|needs|queue|sends|stage|state|there|trust|under|until|using|where|while|write|each|else|fail|from|hold|host|into|less|more|most|none|only|onto|over|port|read|skip|some|stop|than|that|then|time|type|uses|when|with|add|all|and|any|but|for|its|let|may|mod|not|one|own|set|the|try|var|an|as|at|be|by|do|if|in|is|it|of|on|or|to|a)(?![A-Za-z0-9_]))[A-Za-z][A-Za-z0-9_]*/
 OR_ELSE.9: /,[ ]*or[ ]+else(?![A-Za-z0-9_])/
 COMMA_OR.8: /,[ ]*or(?![A-Za-z0-9_])/
 FOR_EACH.7: /for[ ]+each(?![A-Za-z0-9_])/

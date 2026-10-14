@@ -190,14 +190,11 @@ type Email is Text matching email_format
 
 A limit in a type (`with value … through …`, `less than`, `at most`) is one term: a name, an `of`-path, a literal or brackets, so the word after it always belongs to the type: `type Small is an Int less than (limit_of plan + 1)`.
 
-### 3.6 Units and time
+### 3.6 Units
 
-A number followed directly by a unit is a quantity: `30 seconds`, `5 kilometres`, `1 GiB`. Units are checked: adding a length to an area is an error, and a length divided by a time is a speed. An `Instant` and a `CalendarDate` are different types; converting between them needs a time zone, written out:
+A number followed directly by a unit is a quantity: `5 kilometres`, `1 GiB`, `30 seconds`. Units are checked: adding a length to an area is an error, and a length divided by a time is a speed. Units are defined by libraries, not by the language.
 
-```
-let london be time_zone "Europe/London"
-let closes be start_of due in london
-```
+The language has no concept of time: no time types, no date literals, no time comparisons and no time limits. Instants, calendar dates, time zones and timeouts are standard-library types and operations, and anything that reads the time does so through a clock capability (8.1). Values of those types are compared with the ordinary comparisons: `due < now`.
 
 ### 3.7 Ranges
 
@@ -317,7 +314,25 @@ return all of
 
 On one line, an item holds no word that covers the rest of the line (a quantifier, `where`, a comprehension), since it would take in the items after it; such an item goes on its own line. A comparison that ends in `where` or a comprehension is a whole condition, never one link of a chain. A comma at the end of a line in a group is optional. If one is written, another item of the same group must follow it, so a comma that disagrees with the indentation is an error. The formatter leaves these commas out of the stored text; the review view draws them, and draws a labelled rule beside each group. A group can follow `expect`, `ensure`, `invariant`, `holds when`, `let … be` and `return`.
 
-**Open:** a condition group or an `if` / `then` pair as the condition of an `if` or `repeat while` statement, whose own block follows (Section 14).
+A group can also be the condition of an `if` or a `repeat while`. Then `then` (for `if`) or `do` (for `repeat while`) stands on its own line between the condition's block and the statement's, so the two blocks are never confused:
+
+```
+if all of
+    account is open
+    balance of account ≥ amount
+then
+    subtract amount from balance of account
+otherwise
+    do nothing
+
+repeat while all of
+    balance of account < 0
+    retries of account > 0
+do
+    decrement retries of account
+```
+
+An `if` / `then` pair is not a statement's condition, because its `then` would read as the statement's; name it with `let` first.
 
 ### 5.3 Constructing records
 
@@ -397,7 +412,7 @@ A failure is a value. Failures are declared as variants of a `choice`, so a fail
 
 ### 7.1 Values, not references
 
-A variable holds its value, not a pointer to it. There are no references to write and no lifetime annotations. Safety comes from how each parameter may be used, stated in the contract:
+A variable holds its value, not a pointer to it. Each value has exactly one **owner**, the variable or field that holds it; when the owner goes out of scope the value is freed. There are no references to write and no lifetime annotations. Safety comes from how each parameter may be used, stated in the contract:
 
 | Convention | Written | The operation may | The caller afterwards |
 | --- | --- | --- | --- |
@@ -481,7 +496,6 @@ An operation's effects are what it may do beyond computing its result. They are 
 | --- | --- |
 | Use a capability (files, network, clock, database,    N  another component) | `uses files, clock` |
 | Request memory (**Proposed**) | `allocates` |
-| Block in the operating system | `may block` |
 | Turn secret data public | `declassifies secret to public` |
 
 An operation with none of these is pure, and calling an effectful operation from it is a compile error naming the call. Clocks are capabilities, so code that depends on the time says so, and tests pass a fake clock.
@@ -502,7 +516,6 @@ to load_dashboard user using services
     given services is the DashboardServices
     produces a Dashboard
     fails with DashboardUnavailable
-    deadline 800 milliseconds
     uses services
 
     together
@@ -512,7 +525,7 @@ to load_dashboard user using services
     return a Dashboard from profile, orders, alerts
 ```
 
-Everything inside `together` starts at once, and the block ends when every line has finished. If a required line fails, the others are cancelled and the failure goes up; `or else` marks a line whose failure is acceptable. Cancellation unwinds through `hold`, so resources are still released. A `deadline` is monitored at run time, not proven.
+Everything inside `together` starts at once, and the block ends when every line has finished. If a required line fails, the others are cancelled and the failure goes up; `or else` marks a line whose failure is acceptable. Cancellation unwinds through `hold`, so resources are still released. A time limit is not part of the language: it is a standard-library operation on a clock capability.
 
 ### 9.2 No shared mutation
 
@@ -536,7 +549,7 @@ Every queue is bounded, so a full queue makes the stage before it wait. A stage 
 
 ### 9.4 Work that survives a restart
 
-Removed from the language. Resuming work after a restart, running it at most once per key and remembering its progress are services of the platform a program runs on, not part of what the program means. Where a program needs them, they come from a library or a capability, used through ordinary operations. The `idempotent by` clause stays (Section 10.1): it is a contract that impact analysis compares, wherever it is used.
+Removed from the language. Resuming work after a restart, running it at most once per key and remembering its progress are services of the platform a program runs on, not part of what the program means. Where a program needs them, they come from a library or a capability, used through ordinary operations.
 
 ### 9.5 Waiting without `async`
 
@@ -555,12 +568,11 @@ A **contract** is what an operation requires and promises. It is the lines betwe
 | `given x is a T` | A parameter, its type and convention | Types |
 | `produces a T` | The result | Types |
 | `fails with A, B` | Every way it can fail | Compiler, completely |
-| `uses`, `allocates`, `may block` | Its effects and capabilities | Compiler, completely |
+| `uses`, `allocates` | Its effects and capabilities. Waiting needs a capability too, so it shows in `uses` (9.5) | Compiler, completely |
 | `expect condition` | What callers must ensure | Proof at call sites, or run-time check |
 | `ensure condition` | What it guarantees. Forms: `ensure if it succeeds, ...`, `ensure if it fails, ...`, `ensure if result is some p, ...` | Proof where the checker can; otherwise a run-time check, and reports say which (10.5) |
 | `changes only x, y` | Everything else is untouched | Compiler |
 | `example call is value` | An exact result for an exact input | Run on every build |
-| `idempotent by keys` | Repeating it with the same keys has no further effect | Proof where the checker can; otherwise tests |
 
 Every clause is a condition or a declaration the compiler checks. A quoted sentence is Text, not a condition, so it cannot be a clause; an explanation goes in a `note` line. Inside an `ensure`, `x at entry` is the value of `x` when the operation began.
 
@@ -581,20 +593,20 @@ Properties generalise examples and run as generated tests: `property for every i
 
 Source never names an operating system or a host. Everything that can behave differently from one host to another reaches code through a capability (Section 8.1), so a difference between hosts is a fact about a capability, and it is stated where the capability is declared.
 
-**Proposed:** a capability's interface lists the facts that vary by host. Each is a predicate a contract can test:
+A fact that varies by host needs no syntax of its own: it is an operation of the capability's interface, and a contract calls it like any other:
 
 ```
 interface Files
-    varies by host
-        names_ignore_case
-        rename_replaces_target
+    to replaces_existing of files
+        given files is a Self
+        produces a Bool
 
     to rename source to target in files
         given source is a Path
         given target is a Path
         given files is an editable Self
         fails with NotFound, TargetExists
-        ensure if rename_replaces_target of files, target is in names of files
+        ensure if it fails with anything but NotFound, not replaces_existing of files
 ```
 
 An operation whose contract tests a host-dependent fact holds wherever the fact has the value it tests for; a contract that tests none must hold on every host. Each host binding, the implementation of a capability's interface for one host, gives every fact its value. The toolchain supplies the host bindings, and they are the only place a particular operating system is named.
@@ -655,7 +667,7 @@ Impact analysis is only as good as contracts are complete (Appendix B), so the t
 - **Contract coverage** reports, for each operation, the observable outputs that no clause or example constrains: results, failure kinds and effects. It is shown in reviews as a figure per component.
 - An operation that provides results but has no `ensure` or `example` gets a weak-contract warning.
 
-## 11. Components, interfaces, manifests and systems
+## 11. Components, interfaces and manifests
 
 ### 11.1 Components and manifests
 
@@ -679,7 +691,6 @@ component Checkout
             fails with EmptyCart, OutOfStock, PaymentDeclined, RefundFailed
             expect cart is not empty
             ensure if it succeeds, status of result is Paid
-            idempotent by request_id
             uses payments, inventory
 
 ```
@@ -741,20 +752,9 @@ protocol Upload
 
 A new version of a protocol is accepted only if it refines the old one.
 
-### 11.5 Systems
+### 11.5 Systems (removed)
 
-A program is assembled in code: its entry point hands each component its capabilities and calls it (8.1), and each component's `needs` say what it calls. A system file adds only rules about the whole program, which the checker proves against that code:
-
-```
-system Shop
-    rules
-        only Payments can reach host "payments.example.com"
-        no value labelled card_data leaves Payments
-```
-
-The checker proves the rules on every build and reports any rule a change would break, naming the dependency path.
-
-**Proposed:** replace the fixed English rule templates with a small rule language of reach queries and flow queries, because every new template adds keywords (Appendix A).
+Removed from the language. A program is assembled in code: its entry point hands each component its capabilities and calls it (8.1), and each component's `needs` say what it calls. Whole-program questions, such as what can reach a host or where labelled data can flow, are answered from that code by `scribe query`; a project that wants one checked on every change runs the query in its own build.
 
 ## 12. Impact analysis
 
@@ -765,14 +765,13 @@ Impact analysis answers one question before a change is merged: **what could thi
 `scribe impact` compares two versions of a component: its manifest, every contract in it, its effects and authority, its schemas and protocols, and whether its implementation still meets its contracts. It then checks the result against:
 
 1. **every known dependent**, using the clauses that dependent's `needs` entry relies on (written or inferred from its code);
-2. **any possible caller**, using the public contract alone, because most users of a library are outside its repository;
-3. **every system rule** in every system file that includes the component.
+2. **any possible caller**, using the public contract alone, because most users of a library are outside its repository.
 
 Where a contract tests a host-dependent fact or has clauses scoped `in build <mode>` (Section 10.3), the comparison is made separately for each host binding and build mode, and a verdict names the bindings it applies to. A guarantee that weakens only where file names ignore case is reported as breaking there, not hidden in an average.
 
 ### 12.2 Verdicts
 
-Each provided operation, each dependent and each system rule gets exactly one verdict:
+Each provided operation and each dependent gets exactly one verdict:
 
 | Verdict | Meaning | Must carry |
 | --- | --- | --- |
@@ -886,25 +885,25 @@ These are the decisions this draft does not settle. Each names what blocks it. A
 | # | Decision | Status | Blocked by |
 | --- | --- | --- | --- |
 | 1 | Shared mutable state between tasks: forbid entirely, or allow through a single checked construct | Open | A worked corpus of real concurrent servers to test against (Section 9) |
-| 2 | No `async` keyword: blocking is declared with `may block` and the runtime schedules | Proposed | A prototype scheduler and a latency measurement |
+| 2 | No `async` keyword: waiting takes a capability, which shows in `uses`, and the runtime schedules | Proposed | A prototype scheduler and a latency measurement |
 | 3 | `allocates` as a contract clause, with the allocator passed as context | Proposed | Measuring how many contracts it adds lines to |
-| 4 | A small rule language for system files in place of fixed English templates | Proposed | Keyword count (Appendix A) |
+| 4 | ~~A rule language for system files~~ | Removed | System files are removed; `scribe query` answers reach and flow questions from the code (8.1) |
 | 5 | Possessive paths: `account's balance` | Settled | Allowed, never mixed with `of` in one path (5.1) |
-| 6 | Reduce the keyword set (now 106 hard, 44 soft) | Open | Experiment 1, the comprehension test, extended to compare candidate words for the same idea: for example `hold` against `with`, `using` and `lease` |
+| 6 | Reduce the keyword set (now 101 hard, 35 soft) | Open | Experiment 1, the comprehension test, extended to compare candidate words for the same idea: for example `hold` against `with`, `using` and `lease` |
 | 7 | Parser strategy: the grammar is LALR(1) with no conflicts (Appendix A); whether the compiler's parser is generated from it or written by hand | Open | Comparing the error messages each gives on the pilot's real mistakes |
 | 8 | Code generator for WebAssembly, the version 1 target: a back end of our own, or one built on LLVM or Cranelift | Open | A compile-time benchmark on the pilot corpus |
 | 9 | Solver for proving contracts | Open | Choosing a solver that is fast and gives stable results across versions |
 | 10 | Localized views beyond English | Open | Round-trip proof for at least one other language |
-| 11 | How host-dependent facts are declared (10.3), and which host bindings impact analysis compares by default | Proposed | Re-expressing the replay's platform-specific breakages with it |
+| 11 | Which host bindings impact analysis compares by default (10.3) | Open | Re-expressing the replay's platform-specific breakages with it |
 | 12 | Type rules for failures as values: how a failure `choice` relates to `fails with`, and how impact analysis compares a failure's fields | Open | Roadmap phase 5, with the translation wave that needs them |
 | 13 | ~~Cost bounds (`cost at most`)~~ | Removed | A cost bound is not an instruction the program carries out; speed is measured by tools outside the language |
-| 14 | A condition group, or an `if` / `then` pair, as the condition of an `if` or `repeat while` statement whose own block follows | Open | A layout that keeps the condition's block and the statement's block apart at a glance; until then, name the condition with `let` |
+| 14 | A condition group as the condition of an `if` or `repeat while` | Settled | `then` or `do` on its own line between the two blocks (5.2) |
 
 ## Appendix A: grammar notes
 
 The reference grammar is `grammar/scribe.lark` (version 0.3) in this project; `scribe-grammar-v0.2.lark` is the version the pilot measured. It is an Earley grammar: it states the language precisely but is not yet a production parser. `tools/check_grammar.py` tests it against a file per construct in this specification, a file per forbidden form, this specification's code blocks and the pilot corpora.
 
-**Vocabulary.** 150 reserved words: 106 hard keywords, which can never be names, and 44 soft keywords, which are names everywhere except in the position that gives them meaning. The articles `a`, `an` and `the` are hard. A few two-word phrases are read by the lexer as one token, so a parser looking one token ahead sees both words: `for each`, `at entry`, `, or else` and `, or`; a comma that ends a line is read with the line's end. None of this changes the text.
+**Vocabulary.** 136 reserved words: 101 hard keywords, which can never be names, and 35 soft keywords, which are names everywhere except in the position that gives them meaning. The articles `a`, `an` and `the` are hard. A few two-word phrases are read by the lexer as one token, so a parser looking one token ahead sees both words: `for each`, `at entry`, `, or else` and `, or`; a comma that ends a line is read with the line's end. None of this changes the text.
 
 **No special rules.** The grammar is unambiguous by construction. Converted to Bison it has no LALR(1) conflicts, which proves that no text has two readings, and `tools/check_lalr.py` fails the build if one appears. `tools/check_grammar.py` also parses every test, every code block in this specification and the pilot corpora with no disambiguation applied. The pilot's rules D1 and D2 are now the grammar's own structure (Section 5.5), mixing `and` with `or` is a condition group (Section 5.2), and a label word belongs to the outermost call on its line because an argument is one term: a labelled call inside an argument is in brackets.
 
@@ -982,6 +981,8 @@ What the replay changed in this specification:
 - The language describes programs, not organisations. Owners and teams are not part of it: a `trust` block marks what is unchecked, and the repository's own rules say who reviews it (10.5). Durable execution (`workflow`, `runs at most once per`, `survives restarts`) is a platform service, not language (9.4).
 - Source never names an operating system. A difference between hosts is a fact about a capability, declared in its interface; this replaces clauses scoped `on <platform>` (10.3).
 - Source text describes only the program's instructions and what is checked about them. Removed for that reason: cost bounds (`cost at most`); prose, whether a component's `about` section, a `because` reason, an informal quoted clause or an `assumes` fact (explanations go in `note` lines); a `corrects` line, which described an earlier version; assurance tiers and `proof` blocks (the compiler proves what it can and reports how each clause was held; `assert` and `trust` are body statements); version numbers and schema compatibility modes, which belong in the package file; and a system's `components`, `authority` and `wiring`, which repeated what the entry point does in code (10.1, 10.5, 10.6, 11.1, 11.3, 11.5).
+- Every contract feature must be enforceable, and the language has no concept of time. Removed for that reason: `idempotent by`, which nothing can enforce; `deadline`, time comparisons (`is after`, `is before`), date literals and built-in time types, which are standard-library operations on a clock capability; `may block`, which repeated what `uses` shows; `varies by host`, since a host-dependent fact is an ordinary operation of a capability's interface; and system files, whose questions `scribe query` answers from the code (3.6, 9.1, 10.1, 10.3, 11.5).
+- A condition group may be the condition of an `if` or `repeat while`, with `then` or `do` on its own line between the two blocks (5.2).
 - Scribe is not described as a systems language. Having no garbage collector is a choice about memory management, managed at compile time as in Rust, not about the kind of software Scribe is for (1, 7).
 
 ### B.4 Earlier documents

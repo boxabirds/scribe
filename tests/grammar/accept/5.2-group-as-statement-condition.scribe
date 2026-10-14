@@ -1,0 +1,20 @@
+to settle account for amount
+    given account is an editable Account
+    given amount is a positive Money
+    if all of
+        account is open
+        any of
+            balance of account ≥ amount
+            overdraft_allowed of account
+    then
+        subtract amount from balance of account
+    otherwise if none of account is frozen, account is closed
+    then
+        flag account
+    otherwise
+        do nothing
+    repeat while all of
+        balance of account < 0
+        retries of account > 0
+    do
+        decrement retries of account

@@ -1,7 +1,7 @@
 to wait_for_lock of file
     given file is a File
-    may block
+    uses locks
 
 to charge customer
     given customer is a CustomerId
-    idempotent by customer
+    changes only balance of customer

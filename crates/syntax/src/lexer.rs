@@ -19,8 +19,6 @@ pub enum TokenKind {
     Name,
     Int,
     Decimal,
-    Version,
-    Date,
     /// `0xFF`, with `_` allowed between digits.
     Hex,
     /// `0b1010`, with `_` allowed between digits.
@@ -45,8 +43,6 @@ impl TokenKind {
             TokenKind::Name => "name",
             TokenKind::Int => "int",
             TokenKind::Decimal => "decimal",
-            TokenKind::Version => "version",
-            TokenKind::Date => "date",
             TokenKind::Hex => "hex",
             TokenKind::Binary => "binary",
             TokenKind::Quantity => "quantity",
@@ -369,7 +365,7 @@ fn radix_digits(chars: &[char], k: usize, valid: fn(char) -> bool) -> Option<usi
 }
 
 /// The kind and end of the number starting at `k`, in the grammar's order of
-/// priority: quantity, then hex, binary and date, then version, decimal, integer.
+/// priority: hex and binary, then quantity, decimal, integer.
 fn number_at(chars: &[char], k: usize) -> (TokenKind, usize) {
     if chars[k] == '0' {
         match chars.get(k + 1) {
@@ -405,21 +401,7 @@ fn number_at(chars: &[char], k: usize) -> (TokenKind, usize) {
         }
     }
 
-    // Date: four digits, two, two.
-    if int_end - k == 4 && chars.get(int_end) == Some(&'-') {
-        let m = digits(chars, int_end + 1);
-        if m - (int_end + 1) == 2 && chars.get(m) == Some(&'-') {
-            let d = digits(chars, m + 1);
-            if d - (m + 1) == 2 {
-                return (TokenKind::Date, d);
-            }
-        }
-    }
-
     if let Some(minor) = fraction(chars, int_end) {
-        if let Some(patch) = fraction(chars, minor) {
-            return (TokenKind::Version, patch);
-        }
         return (TokenKind::Decimal, minor);
     }
     (TokenKind::Int, int_end)
@@ -472,27 +454,19 @@ mod tests {
 
     #[test]
     fn numbers() {
-        let k = kinds("let a be [1, 2.5, 3.0.0, 2026-10-14, 30 seconds, 4 of items]\n");
+        let k = kinds("let a be [1, 2.5, 2026-10-14, 30 seconds, 4 of items]\n");
         let numbers: Vec<_> = k
             .into_iter()
-            .filter(|(k, _)| {
-                matches!(
-                    k,
-                    TokenKind::Int
-                        | TokenKind::Decimal
-                        | TokenKind::Version
-                        | TokenKind::Date
-                        | TokenKind::Quantity
-                )
-            })
+            .filter(|(k, _)| matches!(k, TokenKind::Int | TokenKind::Decimal | TokenKind::Quantity))
             .collect();
         assert_eq!(
             numbers,
             vec![
                 (TokenKind::Int, "1".into()),
                 (TokenKind::Decimal, "2.5".into()),
-                (TokenKind::Version, "3.0.0".into()),
-                (TokenKind::Date, "2026-10-14".into()),
+                (TokenKind::Int, "2026".into()),
+                (TokenKind::Int, "10".into()),
+                (TokenKind::Int, "14".into()),
                 (TokenKind::Quantity, "30 seconds".into()),
                 (TokenKind::Int, "4".into()),
             ]

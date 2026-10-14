@@ -3,7 +3,6 @@
 hard a
 hard add
 hard added
-hard after
 hard all
 hard an
 hard and
@@ -13,13 +12,11 @@ hard assert
 hard at
 hard attenuated
 hard be
-hard before
 hard by
 hard changes
 hard choice
 hard choose
 hard component
-hard deadline
 hard declassifies
 hard decreases
 hard decrement
@@ -41,7 +38,6 @@ hard given
 hard handle
 hard hold
 hard holds
-hard idempotent
 hard if
 hard implies
 hard in
@@ -87,7 +83,6 @@ hard some
 hard starts
 hard stop
 hard subtract
-hard system
 hard than
 hard the
 hard then
@@ -107,11 +102,8 @@ hard where
 hard while
 hard with
 soft anything
-soft block
 soft build
 soft but
-soft can
-soft cannot
 soft consumed
 soft database
 soft editable
@@ -120,11 +112,9 @@ soft entry
 soft files
 soft host
 soft its
-soft leaves
 soft maybe
 soft needs
 soft network
-soft no
 soft non_empty
 soft one
 soft own
@@ -132,11 +122,9 @@ soft port
 soft positive
 soft provides
 soft queue
-soft reach
 soft read
 soft removed
 soft reserved
-soft rules
 soft sends
 soft stage
 soft stages
@@ -146,7 +134,5 @@ soft that
 soft time
 soft turning
 soft under
-soft value
-soft varies
 soft version
 soft write

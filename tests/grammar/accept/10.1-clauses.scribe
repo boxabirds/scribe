@@ -9,4 +9,3 @@ to charge customer for amount
     ensure if it fails, total_charged_to customer = total_charged_to customer at entry
     changes only balance of customer, charges of customer
     example charge alice for 10 is receipt_for 10
-    idempotent by customer, amount

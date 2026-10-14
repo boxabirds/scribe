@@ -1,5 +1,6 @@
 to write data into stream
-    given data is Bytes
+    given data is an editable Bytes
     given stream is an editable Stream
+    changes only stream
     in build race
-        ensure "buffers passed to write are overwritten after the call returns"
+        changes only stream, data

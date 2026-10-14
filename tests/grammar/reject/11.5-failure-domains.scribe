@@ -1,5 +1,0 @@
-system Shop version 12
-    components
-        Checkout 2.4
-    failure domains
-        checkout contains Checkout

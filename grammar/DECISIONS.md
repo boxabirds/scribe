@@ -71,3 +71,10 @@ Decisions from the review of readability and unambiguous presentation
 | 10 | Contracts (`expect`, `ensure`, `changes only`, `fails with`, `uses`, `example`, `property`, `idempotent by`, invariants, `decreases`, system rules) stay: they state what the instructions do and are checked against them | Approved |
 | 11 | Version numbers and schema compatibility modes move to the package file; schemas and migrations stay | Approved; done |
 | 12 | A system's `components`, `authority` and `wiring` are removed: they repeated what the entry point does in code. `deadline` stays, as a run-time time limit | Approved; done |
+| 13 | `idempotent by` is removed: nothing can enforce it | Approved; done |
+| 14 | The language has no concept of time: `deadline`, `is after` / `is before`, date literals and built-in time types are removed; time is a standard-library matter, read through a clock capability. Version literals (`3.0.0`) went with component versions | Approved; done |
+| 15 | `may block` is removed: waiting needs a capability, which `uses` already shows | Approved; done |
+| 16 | `varies by host` is removed: a host-dependent fact is an operation of the capability's interface | Approved; done |
+| 17 | System files are removed; `scribe query` answers reach and flow questions from the code | Approved; done |
+| 18 | A condition group as the condition of `if` / `repeat while`, with `then` / `do` on its own line | Approved; done |
+| 19 | "Owner" (memory) is defined in spec 7.1 | Approved; done |

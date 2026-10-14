@@ -82,9 +82,9 @@ one reading on its own (spec Section 1).
 
 | Check | Result |
 | --- | --- |
-| Conformance tests, one per construct (`tests/grammar/accept`) | 47 of 47 parse with one reading |
+| Conformance tests, one per construct (`tests/grammar/accept`) | 48 of 48 parse with one reading |
 | Forbidden forms (`tests/grammar/reject`) | 40 of 40 rejected |
-| Spec code blocks | 25 of 27; the other 2 are fragments, not whole programs |
+| Spec code blocks | 24 of 26; the other 2 are fragments, not whole programs |
 | Pilot doc examples, repaired | 29 of 42; the 13 others use forms the language has since changed: fields joined by `and` (05), a tier and a proof block (13), owners on escape hatches and assumptions (14, 29), a `because` reason (26), a field without `as` (30), a schema compatibility mode (31), failure domains (33), component version numbers (35, 38), `none` as a value (40), `workflow` (44), a list comprehension in round brackets (46) |
 | Pilot doc examples, as written | 22 of 42; examples 22 and 30 were two of the pilot's silent misreadings, and are now errors |
 | Pilot translations | 7 of 43; two parse as a logical `and` the checker must reject (`tests/checker`) |

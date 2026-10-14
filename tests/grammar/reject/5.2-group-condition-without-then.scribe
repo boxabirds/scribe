@@ -1,0 +1,6 @@
+to settle account
+    given account is an Account
+    if all of
+        account is open
+        account is funded
+        close account

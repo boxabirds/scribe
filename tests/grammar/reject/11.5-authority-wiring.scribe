@@ -1,5 +1,0 @@
-system Shop
-    authority
-        root gives Payments network host "payments.example.com" port 443
-    wiring
-        Checkout needs Payments

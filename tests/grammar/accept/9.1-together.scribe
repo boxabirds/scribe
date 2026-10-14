@@ -3,7 +3,6 @@ to load_dashboard user using services
     given services is the DashboardServices
     produces a Dashboard
     fails with DashboardUnavailable
-    deadline 800 milliseconds
     uses services
     together
         let profile be fetch profile of user from services
