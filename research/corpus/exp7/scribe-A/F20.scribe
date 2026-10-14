@@ -1,0 +1,56 @@
+note Translated from CPython Lib/shlex.py shlex.sourcehook (lines 277 to 285).
+note Hook called on a filename to be sourced.
+
+choice InputSource
+    note WORKAROUND: Python tests `isinstance(self.infile, str)`; infile may be a file name or None (or another object), so a choice stands in for the dynamic type test
+    Named with path as a Path
+    Unnamed
+
+type Shlex
+    field infile as an InputSource
+    note ... the other shlex fields
+
+note WORKAROUND: Python returns the tuple (newfile, open(newfile, "r")); the doc has no tuple, so a named record is declared
+type SourcedFile
+    field name as a Path
+    field stream as a TextFile
+
+to is_absolute path
+    given path is Text
+    produces a Bool
+
+to directory_of path
+    given path is a Path
+    produces a Path
+
+to join base with name
+    given base is a Path
+    given name is Text
+    produces Text
+
+note GAP: objects, methods and self - sourcehook is a method that subclasses override to change sourcing; the doc has no methods, no self and no overriding, so it is written as a plain operation taking the lexer
+to sourcehook newfile for lexer using files
+    given newfile is Text
+    given lexer is a Shlex
+    given files is a FileSystem
+    produces a SourcedFile
+    fails with FileError
+    uses files
+
+    var name starts at newfile
+    note UNCLEAR: Python indexes newfile[0], which raises IndexError on an empty string; the doc has no character type and no rule for an out-of-range index, so `first character of` is a guess
+    note GAP: characters and slicing - `newfile[0] == '"'` and `newfile[1:-1]` need a character literal and a slice with a negative end; the doc has neither
+    if first character of name is "\""
+        set name to characters 1 until (length of name - 1) of name
+    note This implements cpp-like semantics for relative-path inclusion.
+    choose infile of lexer
+        when Named with path
+            if not is_absolute name
+                set name to join (directory_of path) with name
+        when Unnamed
+            note nothing to adjust: the lexer was not reading from a named file
+            note UNCLEAR: the doc has no "do nothing" statement and does not say whether a when branch holding only a note is allowed
+    note GAP: an operation that returns an open file inside a record - the caller owns the stream and must close it; hold only covers scoped use, and the doc does not show a produces line that hands a linear resource to the caller
+    let stream be try open name for reading using files
+    note UNCLEAR: the doc has no general form for building a record; this follows `an Order from cart and receipt with status Paid` in example 29
+    give back a SourcedFile with name name and stream stream

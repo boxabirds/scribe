@@ -1,0 +1,29 @@
+{
+  "id": "F17",
+  "behaviour_preserved": "approximate",
+  "gaps": [
+    {"category": "closures and stored callbacks",
+     "construct": "nested def that captures `patterns` from ignore_patterns(*patterns) and is returned as a value to be called later by copytree",
+     "description": "The doc has no nested operations, no operation-valued parameters or results, and no capture. The captured variable became a parameter, which changes the function's arity and means copytree's `ignore` callback cannot be expressed at all.",
+     "kind": "gap"},
+    {"category": "collections and iteration",
+     "construct": "set(ignored_names) returning a Python set",
+     "description": "No Set type or conversion to one is in the doc; `Set of Text` and `set_of` were invented.",
+     "kind": "gap"},
+    {"category": "collections and iteration",
+     "construct": "list.extend",
+     "description": "No in-place extend; `followed by` is only shown in specs, so its use in code (and whether it allocates) is a guess.",
+     "kind": "workaround"},
+    {"category": "variadic arguments",
+     "construct": "*patterns in the enclosing ignore_patterns",
+     "description": "No variadic parameters; patterns is a List and callers must build one.",
+     "kind": "workaround"},
+    {"category": "collections and iteration",
+     "construct": "Python list/set building with implicit allocation",
+     "description": "Allocation must be visible, so a 5-line pure-looking helper gains an Allocator parameter, `uses memory` and OutOfMemory.",
+     "kind": "workaround"}
+  ],
+  "doc_rules_contradicted": [],
+  "invented_syntax": ["Set of Text", "set_of", "followed by used outside a spec"],
+  "notes": "This is the common Python idiom of a factory returning a configured callback; without first-class operations Scribe cannot express the shape, only the body. A designer should decide whether operation values (with capability-checked capture) are a goal or a non-goal with an alternative such as a choice of filter kinds."
+}

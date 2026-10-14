@@ -1,0 +1,84 @@
+note Source: Node.js lib/events.js, _listeners (backs emitter.listeners and rawListeners).
+
+note GAP: stored callbacks - listeners are JavaScript functions kept in a data structure and
+note called later. The doc has no function type, so an invented `Listener` type stands for one.
+note A `once` listener is a wrapper function with a `listener` property pointing at the user's
+note original function; that is modelled as a choice instead of a property on a function.
+choice Listener
+    Plain with handler as a Handler
+    Once_wrapper with wrapper as a Handler and listener as a Handler
+
+note WORKAROUND: Node stores either one function or an array of functions under each event
+note name, to save an array allocation in the common case. `typeof evlistener === 'function'`
+note is a run-time type test; Scribe needs the two shapes as a declared choice.
+choice EventSlot
+    Single with entry as a Listener
+    Many with entries as a List of Listener
+
+note GAP: dynamic objects as maps - target._events is a prototype-less object used as a map
+note from event name (a string or a Symbol) to an EventSlot, and it may be undefined. The doc has
+note no map type and no Symbol type; an invented `Map of EventName to EventSlot` is used and
+note lookup is written `lookup type in events`, returning a maybe.
+note GAP: duck typing - _listeners accepts any target that has an _events property (any
+note EventEmitter or subclass). There are no interfaces, so a concrete Emitter type is used.
+type Emitter
+    field events as a maybe Map of EventName to EventSlot
+
+to lookup name in table
+    given name is an EventName
+    given table is a Map of EventName to EventSlot
+    produces a maybe EventSlot
+
+to handler_of entry
+    given entry is a Listener
+    produces a Handler
+
+to unwrap_listeners entries using memory
+    given entries is a List of Listener
+    given memory is an Allocator
+    produces a List of Handler
+    fails with OutOfMemory
+    uses memory
+
+to array_clone entries using memory
+    given entries is a List of Listener
+    given memory is an Allocator
+    produces a List of Handler
+    fails with OutOfMemory
+    uses memory
+
+note WORKAROUND: `unwrap` is a plain JavaScript boolean flag; kept as a Bool parameter with a
+note label word, since the doc has no keyword or optional arguments.
+to listeners_of target for type unwrapped unwrap using memory
+    given target is an Emitter
+    given type is an EventName
+    given unwrap is a Bool
+    given memory is an Allocator
+    produces a List of Handler
+    fails with OutOfMemory
+    uses memory
+
+    note WORKAROUND: two `=== undefined` early returns become two nested `choose` blocks.
+    choose events of target
+        when nothing
+            give back []
+        when some events
+            choose lookup type in events
+                when nothing
+                    give back []
+                when some slot
+                    choose slot
+                        when Single with entry
+                            note `evlistener.listener || evlistener`: when unwrapping, a once
+                            note wrapper yields the user's original function.
+                            if unwrap
+                                choose entry
+                                    when Once_wrapper with wrapper and listener
+                                        give back [listener]
+                                    when Plain with handler
+                                        give back [handler]
+                            give back [handler_of entry]
+                        when Many with entries
+                            if unwrap
+                                give back try unwrap_listeners entries using memory
+                            give back try array_clone entries using memory

@@ -1,0 +1,9 @@
+to first_line_of path using files
+    given path is a Path
+    given files is a FileSystem limited to "/reports"
+    produces Text
+    fails with FileError
+    uses files
+
+    hold input as open path for reading using files
+        give back try read_line from input

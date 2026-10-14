@@ -1,0 +1,32 @@
+{
+  "id": "F47",
+  "behaviour_preserved": "approximate",
+  "gaps": [
+    {"category": "interfaces and dynamic dispatch",
+     "construct": "inst.update(msg) where inst is either an OpenSSL HMAC object or a hashlib hash object",
+     "description": "There is no interface, trait or method declaration, so 'anything with update' cannot be declared. Hasher is used as if it were one.",
+     "kind": "gap"},
+    {"category": "missing values",
+     "construct": "self._hmac or self._inner (truthiness-based fallback over None)",
+     "description": "There is no truthiness and no 'first present of' expression. It needs a nested choose, so a two-line method becomes nine body lines.",
+     "kind": "workaround"},
+    {"category": "error types and exceptions",
+     "construct": "AttributeError raised implicitly when both are None",
+     "description": "The implicit crash must become an explicit named failure in the header. That is better, but it adds a failure the original never declares.",
+     "kind": "workaround"},
+    {"category": "pointers and shared mutable references",
+     "construct": "mutating a hasher held inside a maybe field of an editable record",
+     "description": "The doc does not say whether `when some h` binds by reference, which an in-place update needs, or by copy.",
+     "kind": "unclear"},
+    {"category": "characters, bytes and strings",
+     "construct": "msg may be any bytes-like object (buffer protocol)",
+     "description": "Only Bytes exists, and there is no buffer protocol or view type.",
+     "kind": "unclear"}
+  ],
+  "doc_rules_contradicted": [],
+  "invented_syntax": [
+    "Hasher as an interface-like type with an update operation",
+    "update_hasher h with msg called on a value bound by choose, expecting in-place mutation"
+  ],
+  "notes": "This is the smallest function in the batch, but it hits the same wall as F38: Scribe cannot say 'one of several implementations of the same operation', which is a pervasive need in library code. A `first some of a, b` expression, or `or else` (already used in `together`) applied to maybe values, would remove the nested choose."
+}

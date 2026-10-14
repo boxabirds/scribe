@@ -1,0 +1,46 @@
+note Source: go/src/encoding/binary/varint.go, ReadUvarint (lines 130-151). Go, persistence and schemas.
+note ReadUvarint reads an encoded unsigned integer from r and returns it as a uint64.
+note The error is EOF only if no bytes were read. If an EOF happens after reading some but not all the bytes, ReadUvarint returns ErrUnexpectedEOF.
+
+note MaxVarintLen64 is 10 in varint.go
+let max_varint_len64 be 10
+
+note GAP: interface parameter - io.ByteReader is an interface (any type with ReadByte). The doc has no interfaces; ByteReader is used as a capability type, like FileSystem.
+note GAP: open error set - ReadByte can return any error value; Go passes it through unchanged. `fails with` needs a closed list of names. Invented: `ReadError` as a catch-all, plus EOF.
+to read_byte from r
+    given r is an editable ByteReader
+    produces a Byte
+    fails with EOF, ReadError
+    uses r
+
+note GAP: fixed-width unsigned integer - uint64. Invented: `UInt64`. The shift `uint64(b) << s` discards bits above 63; Go relies on that only in the overflow-checked last byte, so checked arithmetic happens to be safe here, but the type is still missing.
+note GAP: failure with a partial result - Go returns `(x, err)`: on error the bytes accumulated so far are still returned in x. Scribe failures carry no value (see F12), so the partial value is lost. Callers in the Go standard library ignore it, but the original API exposes it.
+to read_uvarint r
+    given r is an editable ByteReader
+    produces a UInt64
+    fails with EOF, UnexpectedEOF, ReadError, Overflow
+    uses r
+
+    note UNCLEAR: variable types - `var x starts at 0` must be a UInt64 and `var b` a Byte, but `var` has no type annotation in the doc and the literal 0 does not say which.
+    var x starts at 0
+    var s starts at 0
+    for each i from 0 until max_varint_len64
+        note WORKAROUND: error translation - Go inspects the error value (`err == io.EOF`) and replaces it. In Scribe that needs a nested handle with an on failure line per name, and a pass-through line for ReadError.
+        var b starts at 0
+        handle
+            set b to try read_byte from r
+        on failure EOF
+            if i is more than 0
+                fail with UnexpectedEOF
+            fail with EOF
+        on failure ReadError
+            fail with ReadError
+        note GAP: hex literal and bit operations - `0x80`, `0x7f`, `|`, `&`, `<<` have no form in the doc (see F24). 0x80 is written 128; 0x7f is 127. Invented: `bitand`, `bitor`, `shifted left by`.
+        note WORKAROUND: numeric conversion - `uint64(b)` widens a byte. The doc says there are no implicit conversions but shows no explicit conversion form. Invented: `b as a UInt64`.
+        if b is less than 128
+            if i is max_varint_len64 - 1 and b is more than 1
+                fail with Overflow
+            give back x bitor ((b as a UInt64) shifted left by s)
+        set x to x bitor (((b bitand 127) as a UInt64) shifted left by s)
+        set s to s + 7
+    fail with Overflow

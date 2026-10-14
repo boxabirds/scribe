@@ -1,0 +1,46 @@
+{
+  "id": "F24",
+  "behaviour_preserved": "exact",
+  "gaps": [
+    {"category": "bit operations",
+     "construct": "Shifts >> and <<, bitwise & and |",
+     "description": "The doc has no bitwise operators; rule 4 reserves symbols for arithmetic and comparison and `and`/`or` are logic words. Invented `shifted right by`, `shifted left by`, `bitand`, `bitor`.",
+     "kind": "gap"},
+    {"category": "integer overflow and wrapping",
+     "construct": "x << 8 on uint64 discards bits shifted out",
+     "description": "Scribe arithmetic is checked; there is no way to request modular / wrapping behaviour. Invented a `wrapping` suffix.",
+     "kind": "gap"},
+    {"category": "numeric types and conversions",
+     "construct": "uint64 fixed-width unsigned type",
+     "description": "Only Int and Nat appear; no fixed-width integer types. Invented `UInt64`.",
+     "kind": "gap"},
+    {"category": "numeric types and conversions",
+     "construct": "Hex literals 0x00ff00ff00ff00ff",
+     "description": "Only decimal literals are shown; masks were written in decimal, which hides the bit pattern a reviewer needs to see.",
+     "kind": "workaround"},
+    {"category": "global or module state",
+     "construct": "Package-level constants m3, m4",
+     "description": "The doc never shows a top-level constant declaration; top-level `let` was assumed.",
+     "kind": "unclear"},
+    {"category": "bit operations",
+     "construct": "Precedence of the invented bit operators",
+     "description": "The six precedence levels are not listed, so every bit expression was fully parenthesised.",
+     "kind": "unclear"},
+    {"category": "loop forms",
+     "construct": "Reassigning the parameter x in sequence",
+     "description": "No rebinding of parameters; each step gets a fresh let name (harmless, arguably clearer).",
+     "kind": "workaround"}
+  ],
+  "doc_rules_contradicted": [
+    "\"Words replace symbols wherever the word is no less clear. Symbols stay only for arithmetic and grouping.\" - in bit-twiddling code the word forms are markedly less clear than & | << >>, so the rule pushes toward the worse spelling"
+  ],
+  "invented_syntax": [
+    "UInt64",
+    "shifted right by",
+    "shifted left by ... wrapping",
+    "bitand",
+    "bitor",
+    "top-level `let` constants"
+  ],
+  "notes": "Bit manipulation is a whole missing sublanguage: fixed-width types, wrapping arithmetic, hex/binary literals and bitwise operators all need first-class forms. The words-over-symbols rule makes these lines roughly twice as long and harder to check against the well-known algorithm."
+}

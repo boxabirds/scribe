@@ -1,0 +1,29 @@
+{
+  "id": "F46",
+  "behaviour_preserved": "approximate",
+  "gaps": [
+    {"category": "bit operations",
+     "construct": "v |= x[i] ^ y[i] (bitwise OR and XOR on bytes)",
+     "description": "The doc lists only + - * / and mod; there are no bitwise operators. `bitwise_or` and `bitwise_xor` are invented word operators.",
+     "kind": "gap"},
+    {"category": "contracts and specifications",
+     "construct": "constant-time execution with respect to secret contents (the function's entire reason to exist)",
+     "description": "Information-flow labels cover where secret data may go, not whether control flow or timing depends on it. Nothing stops the compiler or a reader from replacing the loop with an early-exit comparison. Invented header `runs in constant time with respect to x and y`.",
+     "kind": "gap"},
+    {"category": "numeric types and conversions",
+     "construct": "byte type, byte arithmetic, and result int restricted to 0 or 1",
+     "description": "The doc names Bytes but no single Byte type or byte literal; `0` is used as a byte. The 0/1 result fits a refinement (`Int with value 0 through 1`), which works well.",
+     "kind": "unclear"},
+    {"category": "contracts and specifications",
+     "construct": "returning a derived boolean from secret inputs",
+     "description": "Unclear whether a comparison result derived from secret-labelled data must be declassified; a `declassifies` line is added to make the release explicit.",
+     "kind": "unclear"}
+  ],
+  "doc_rules_contradicted": [],
+  "invented_syntax": [
+    "bitwise_or, bitwise_xor",
+    "runs in constant time with respect to x and y (header line)",
+    "Byte type"
+  ],
+  "notes": "The arithmetic is trivial, but security-critical constant-time code needs a guarantee about timing that Scribe's information-flow labels do not cover; a checked 'secret-independent control flow' property would fit naturally next to `declassifies`. Bit operators are absent from the vocabulary entirely, which will block hashing, crypto, compression and wire-format code across the corpus."
+}

@@ -1,0 +1,54 @@
+note Source: otp/lib/stdlib/src/lists.erl, ufmerge2_2 (lines 4321-4329). Erlang, recursion.
+
+note GAP: function type for a parameter - `Fun` is an ordering function passed as a value. The doc has no way to write the type of an operation held in a parameter. Invented: `an Operation from T and T to Bool`.
+note GAP: boolean type - the doc never names the type of a condition and has no `true` or `false`. Invented: `Bool`.
+note UNCLEAR: type parameter `T` - example 9 uses `T` inside `type Queue of T`, but the doc never says how a stand-alone operation introduces a type parameter. Here `T` is used as if it were already in scope.
+note UNCLEAR: call syntax - the original has five positional arguments. Bare juxtaposition (`ufmerge2_2 h1 t1 fun t2 m`) would be ambiguous because `fun t2` reads as a call of `fun`, so label words are used, following `withdraw amount from account`.
+
+to ufmerge2_1 l1 against h2 by fun then t2 onto m after h2m using memory
+    given l1 is a List of T
+    given h2 is a T
+    given fun is an Operation from T and T to Bool
+    given t2 is a List of T
+    given m is a List of T
+    given h2m is a T
+    given memory is an Allocator
+    produces a List of T
+    fails with OutOfMemory
+    uses memory
+
+note lists:reverse/2: reverse `list` and put it in front of `tail`
+to reverse list onto tail using memory
+    given list is a List of T
+    given tail is a List of T
+    given memory is an Allocator
+    produces a List of T
+    fails with OutOfMemory
+    uses memory
+
+note GAP: effects of a passed operation - `fun` may have its own effects and failures (an Erlang fun can send messages or raise). The `uses` and `fails with` lines of ufmerge2_2 cannot say "whatever fun uses". This translation assumes fun is pure.
+note WORKAROUND: allocation - Erlang builds cons cells on a garbage-collected heap with no visible effect. The doc requires every allocating operation to take an Allocator and list `uses memory`, so the allocator is threaded through every recursive call and OutOfMemory becomes a declared failure (in Erlang it is a VM crash, not a value).
+to ufmerge2_2 h1 then t1 by fun against l2 onto m using memory
+    given h1 is a T
+    given t1 is a List of T
+    given fun is an Operation from T and T to Bool
+    given l2 is a List of T
+    given m is a List of T
+    given memory is an Allocator
+    produces a List of T
+    fails with OutOfMemory
+    uses memory
+
+    note WORKAROUND: clause selection - Erlang picks a clause by matching `[H2 | T2]` against `[]` in the head. The doc's `choose` works only on choices and maybe values, so the empty clause becomes an `if` that is tested first.
+    if l2 is empty
+        note UNCLEAR: `[h1] followed by m` builds a new list, but an expression has no place to name the allocator. The doc's `followed by` appears only in an ensure line.
+        give back try reverse t1 onto ([h1] followed by m) using memory
+    note WORKAROUND: list destructuring - there is no head and tail pattern. The head is `item 0 of l2`; the tail is rebuilt with a comprehension, which copies the list (O(n) per step, so the merge becomes O(n squared)) and allocates without naming the allocator.
+    let h2 be item 0 of l2
+    let t2 be item i of l2 for each i from 1 until count of l2
+    note GAP: calling an operation held in a parameter - the doc has no call form for a value of operation type. Invented: `apply fun to h1 and h2`, where `and` also collides with logical and.
+    if apply fun to h1 and h2
+        give back try ufmerge2_1 t1 against h2 by fun then t2 onto ([h1] followed by m) after h1 using memory
+    otherwise
+        note UNCLEAR: recursion - the doc has no recursive example, does not say whether a recursive operation needs a `decreases` line, and does not promise that a call in `give back` position uses no stack (Erlang relies on last-call optimisation here).
+        give back try ufmerge2_2 h1 then t1 by fun against t2 onto ([h2] followed by m) using memory

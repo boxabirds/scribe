@@ -1,0 +1,4 @@
+component Checkout version 2.4.1
+    needs
+        Notifications from 1.7 as notifications
+            uses send_confirmation

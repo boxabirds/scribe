@@ -1,0 +1,39 @@
+component Checkout version 3.0.0
+
+    about
+        Turns a cart into a paid order. Charges a customer at most once per request.
+
+    needs
+        Payments from 3.1 as payments
+            uses charge, refund, total_charged_to
+        Inventory from 2.0 as inventory
+            uses reserve, release
+        Orders_store from 1.2 as store
+            uses save
+
+    may
+        nothing of its own
+
+    assumes
+        "payments answers within 2 seconds for 99 percent of calls"    assumed owner payments_team monitor sampling 1 percent
+        "charging with the same key twice charges once"    assumed owner payments_team monitor checking
+
+    provides
+        to place_order cart for customer with request_id
+            given cart is a Cart
+            given customer is a CustomerId
+            given request_id is a RequestId
+            produces an Order
+            fails with EmptyCart, OutOfStock, PaymentDeclined, StoreUnavailable, RefundFailed
+            expect cart is not empty because "an order needs at least one line"
+            ensure if it succeeds, status of result is Paid
+            ensure if it succeeds, total of result is total of cart
+            ensure if it fails with anything but RefundFailed, total_charged_to customer is total_charged_to customer at entry
+            idempotent by request_id
+            uses payments, inventory, store
+
+    failure
+        domain checkout
+        retry charge at most 3 times with backoff 1 second because "charge is idempotent by key"
+
+    tier proven for contracts, checked for everything else

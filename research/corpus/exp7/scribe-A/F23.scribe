@@ -1,0 +1,50 @@
+note Translation of sqlite3_strnicmp from SQLite (src/util.c).
+note Case-insensitive comparison of at most n bytes of two NUL-terminated strings, either of which may be a null pointer.
+
+type Byte is an Int with value 0 through 255
+
+note UNCLEAR: UpperToLower is a 256-entry global constant table in SQLite. Example 7 shows `let` outside an operation, but the doc never says whether a module-level constant is allowed, so the lookup is declared as a pure operation.
+to upper_to_lower b
+    given b is a Byte
+    produces a Byte
+
+note WORKAROUND: C strings end at the first 0 byte and pointers are advanced with a++. Scribe has neither pointers nor terminators, so a string is Bytes with a count, and this helper reads a position at or past the end as the terminating 0.
+to byte_at position of text
+    given position is a Nat
+    given text is Bytes
+    produces a Byte
+
+    if position is less than count of text
+        give back item position of text
+    give back 0
+
+to sqlite3_strnicmp z_left and z_right up_to n
+    note GAP: a C pointer that may be null - `maybe Bytes` captures null versus present, but not that the bytes are borrowed from the caller with no length.
+    given z_left is a maybe Bytes
+    given z_right is a maybe Bytes
+    given n is an Int
+    produces an Int
+
+    choose z_left
+        when nothing
+            choose z_right
+                when some right
+                    give back -1
+                when nothing
+                    give back 0
+        when some left
+            choose z_right
+                when nothing
+                    give back 1
+                when some right
+                    note WORKAROUND: the C loop `while( N-- > 0 && *a!=0 && ... )` decrements N even on the test that ends the loop, and the result then reads `N<0`. The post-decrement is unrolled into an explicit counter: remaining is the value of N before the test.
+                    var i starts at 0
+                    var remaining starts at n
+                    repeat while remaining is more than 0 and byte_at i of left is not 0 and upper_to_lower (byte_at i of left) is upper_to_lower (byte_at i of right)
+                        decreases remaining
+                        set remaining to remaining - 1
+                        set i to i + 1
+                    note When the loop stops because remaining reached 0 or less, C's N is now below 0 and the result is 0.
+                    if remaining is at most 0
+                        give back 0
+                    give back upper_to_lower (byte_at i of left) - upper_to_lower (byte_at i of right)

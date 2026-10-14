@@ -1,0 +1,33 @@
+{
+  "id": "F27",
+  "behaviour_preserved": "approximate",
+  "gaps": [
+    {"category": "pattern matching",
+     "construct": "multi-clause function heads matching literal strings (\"Z\", \"z\") and list destructuring [Sign, H1, H2 | MinutesDiff] = Tz",
+     "description": "The doc's only matching form is `choose` over variants and maybe values; there is no list, cons or string pattern, so the clause heads become if tests and the destructure becomes explicit length checks and indexing.",
+     "kind": "gap"},
+    {"category": "characters, bytes and strings",
+     "construct": "taking characters and substrings of a string ($:, [H1, H2])",
+     "description": "No character type, character literal or substring operation exists; `character i of tz` and `characters i until j of tz` are invented.",
+     "kind": "gap"},
+    {"category": "error types and exceptions",
+     "construct": "let-it-crash: badmatch, case_clause and badarg exceptions on malformed input",
+     "description": "Scribe requires every failure to be named in `fails with`; the three implicit crash kinds collapse into one invented BadOffset, which changes the failure surface the original exposes.",
+     "kind": "workaround"},
+    {"category": "error types and exceptions",
+     "construct": "converting the callee's failure into a different failure name",
+     "description": "`handle` wraps a whole block; renaming NotANumber to BadOffset for one expression needed a separate helper operation.",
+     "kind": "workaround"},
+    {"category": "default, optional and keyword arguments",
+     "construct": "unused parameters _Time and _Unit",
+     "description": "The doc does not say whether unused parameters are allowed or need marking.",
+     "kind": "unclear"},
+    {"category": "numeric types and conversions",
+     "construct": "unary negation -Adjustment",
+     "description": "Unary minus is not shown; written as 0 - adjustment.",
+     "kind": "unclear"}
+  ],
+  "doc_rules_contradicted": [],
+  "invented_syntax": ["character i of tz", "characters i until j of tz", "choice used as a set of failure names (OffsetError)"],
+  "notes": "Erlang's crash-on-mismatch style has no counterpart: Scribe forces malformed-input handling to be written out, which made the translation longer but arguably more honest. The doc never shows how failure names are declared (as a `choice`, a `type`, or implicitly), so the `choice OffsetError` wrapper is a guess. `characters 3 until count of tz of tz` shows the `of` chain problem: the range end and the source both use `of`."
+}

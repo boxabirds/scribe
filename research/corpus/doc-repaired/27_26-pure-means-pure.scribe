@@ -1,0 +1,6 @@
+to price_with_tax price
+    given price is Money
+    produces Money
+
+    let rate be try fetch_tax_rate
+    give back price * (1 + rate)

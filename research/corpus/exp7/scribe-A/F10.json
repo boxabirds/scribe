@@ -1,0 +1,52 @@
+{
+  "id": "F10",
+  "behaviour_preserved": "approximate",
+  "gaps": [
+    {"category": "error types and exceptions",
+     "construct": "return (clamped value, ErrRange): a failure that also delivers a usable result",
+     "description": "Scribe failures are bare names with no payload and an operation either gives back or fails. The clamped value is carried in an invented failure payload (`fail with RangeError with nearest_value X`, read as `nearest_value of problem`).",
+     "kind": "gap"},
+    {"category": "error types and exceptions",
+     "construct": "err from ParseUint is inspected, ErrRange is tolerated and execution continues with the returned value",
+     "description": "Recovering a value from a failure and continuing needs `set` inside an `on failure` line; the doc only says such a line must give back, fail or call something, so assigning there is not clearly allowed.",
+     "kind": "workaround"},
+    {"category": "characters, bytes and strings",
+     "construct": "s[0] compared with rune literals '+' and '-'; s = s[1:]",
+     "description": "No character or byte type, no character literal and no substring/slice form in the doc. `item 0 of text` compared with one-letter Text and `part of text from 1 until count of text` are invented.",
+     "kind": "gap"},
+    {"category": "bit operations",
+     "construct": "1 << uint(bitSize-1)",
+     "description": "No shift operator and no exponent operator; `2 to the power (size - 1)` is invented.",
+     "kind": "gap"},
+    {"category": "numeric types and conversions",
+     "construct": "int64, uint64, uint(...), int64(...) casts and a run-time bitSize choosing the width",
+     "description": "The doc has Int and Nat with no sized integers and no explicit conversion syntax; conversions go through a declared helper `int_from`. The bit width is a runtime parameter in Go, which a refinement type cannot express directly, so the result type is plain Int with the range enforced only by the body.",
+     "kind": "workaround"},
+    {"category": "integer overflow and wrapping",
+     "construct": "-int64(cutoff) where cutoff is 2^63 relies on two's-complement wrap to yield MinInt64",
+     "description": "The doc promises checked arithmetic but never says whether Int is bounded; if Int is 64-bit, `0 - int_from cutoff` would fail at int_from for size 64; if unbounded, it is exact. The doc does not settle which.",
+     "kind": "unclear"},
+    {"category": "global or module state",
+     "construct": "IntSize, a platform-dependent package constant",
+     "description": "Top-level `let` appears in example 17 but nothing says how a binding that depends on the compilation target is written.",
+     "kind": "unclear"},
+    {"category": "numeric types and conversions",
+     "construct": "unary minus (n = -n) and boolean literals",
+     "description": "The doc never shows unary minus or the literals true and false; `0 - x`, `true` and `false` are assumed.",
+     "kind": "unclear"}
+  ],
+  "doc_rules_contradicted": [
+    "An `on failure` line may not be empty: it must give back a value, fail, or call something. (the RangeError handler only sets a variable)"
+  ],
+  "invented_syntax": [
+    "fail with RangeError with nearest_value X",
+    "nearest_value of problem (reading a failure payload)",
+    "on failure RangeError as problem (binding a single named failure; the doc shows `as` only after an `or` list)",
+    "item 0 of text compared with \"+\" (character access on Text)",
+    "part of text from 1 until count of text",
+    "2 to the power (size - 1)",
+    "true / false literals",
+    "0 - x for negation"
+  ],
+  "notes": "Go's (value, error) convention where both are meaningful is common in parsing and I/O code (e.g. partial reads), and Scribe's either-give-back-or-fail model has no room for it; failures with payloads would cover most cases. Sized integer types and explicit casts are absent, which matters for any parser or wire-format code. Text is treated as opaque, so even a one-character prefix check needs invented syntax."
+}

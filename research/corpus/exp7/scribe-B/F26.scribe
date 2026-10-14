@@ -1,0 +1,111 @@
+note Translated from cpython Lib/_pydatetime.py, datetime.replace.
+note Return a new datetime with new values for the specified fields.
+
+note GAP: tzinfo is an abstract base class that user code subclasses (utcoffset, dst, tzname); the doc has no interface or trait, so it is left opaque
+type TzInfo
+
+type Datetime
+    field year as an Int
+    field month as an Int
+    field day as an Int
+    field hour as an Int
+    field minute as an Int
+    field second as an Int
+    field microsecond as an Int
+    field tzinfo as a maybe TzInfo
+    field fold as an Int
+
+note The constructor checks every field's range (and that fold is 0 or 1) and fails if one is out of range.
+to new_datetime year and month and day and hour and minute and second and microsecond and tzinfo and fold
+    given year is an Int
+    given month is an Int
+    given day is an Int
+    given hour is an Int
+    given minute is an Int
+    given second is an Int
+    given microsecond is an Int
+    given tzinfo is a maybe TzInfo
+    given fold is an Int
+    produces a Datetime
+    fails with ValueError, TypeError
+
+note WORKAROUND: Python uses True as a third value for tzinfo, because None already means "no time zone". Keep versus replace-with-a-maybe needs its own choice type.
+choice TzinfoChange
+    Keep
+    Replace with new_tzinfo as a maybe TzInfo
+
+note GAP: objects, methods and self - replace is a method called as dt.replace(...); here self is an ordinary first parameter
+note UNCLEAR: the doc never shows an operation with more than four parameters; `and` between parameter names is borrowed from `a Dashboard from profile and orders and alerts`
+to replace self with year and month and day and hour and minute and second and microsecond and tzinfo and fold
+    given self is a Datetime
+    note GAP: default and keyword-only arguments - every argument defaults to None (tzinfo to True) and fold is keyword-only; Scribe callers must pass all nine, writing nothing or Keep for each field they do not change
+    given year is a maybe Int
+    given month is a maybe Int
+    given day is a maybe Int
+    given hour is a maybe Int
+    given minute is a maybe Int
+    given second is a maybe Int
+    given microsecond is a maybe Int
+    given tzinfo is a TzinfoChange
+    given fold is a maybe Int
+    note GAP: interfaces and dynamic dispatch - Python returns type(self), so a subclass of datetime gets an instance of that subclass back; Scribe can only promise the declared type
+    produces a Datetime
+    fails with ValueError, TypeError
+
+    note WORKAROUND: no "value or default" expression for a maybe, and choose is a statement, so each field is a var set in both branches. Nine Python two-line ifs become nine six-line blocks.
+    var new_year starts at year of self
+    choose year
+        when some given_year
+            set new_year to given_year
+        when nothing
+            set new_year to year of self
+    var new_month starts at month of self
+    choose month
+        when some given_month
+            set new_month to given_month
+        when nothing
+            set new_month to month of self
+    var new_day starts at day of self
+    choose day
+        when some given_day
+            set new_day to given_day
+        when nothing
+            set new_day to day of self
+    var new_hour starts at hour of self
+    choose hour
+        when some given_hour
+            set new_hour to given_hour
+        when nothing
+            set new_hour to hour of self
+    var new_minute starts at minute of self
+    choose minute
+        when some given_minute
+            set new_minute to given_minute
+        when nothing
+            set new_minute to minute of self
+    var new_second starts at second of self
+    choose second
+        when some given_second
+            set new_second to given_second
+        when nothing
+            set new_second to second of self
+    var new_microsecond starts at microsecond of self
+    choose microsecond
+        when some given_microsecond
+            set new_microsecond to given_microsecond
+        when nothing
+            set new_microsecond to microsecond of self
+    var new_tzinfo starts at tzinfo of self
+    choose tzinfo
+        when Keep
+            set new_tzinfo to tzinfo of self
+        when Replace with new_tzinfo_value
+            set new_tzinfo to new_tzinfo_value
+    note UNCLEAR: example 5 binds a payload by its field name (`when Circle with radius`); renaming it here (new_tzinfo_value for new_tzinfo) is not shown, and binding the field name would clash with the var
+    var new_fold starts at fold of self
+    choose fold
+        when some given_fold
+            set new_fold to given_fold
+        when nothing
+            set new_fold to fold of self
+    give back try new_datetime new_year and new_month and new_day and new_hour and new_minute and new_second and new_microsecond and new_tzinfo and new_fold

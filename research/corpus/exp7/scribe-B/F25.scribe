@@ -1,0 +1,47 @@
+note Translated from go src/time/format.go, parseSignedOffset.
+note parse_signed_offset gives back the length of a signed hour offset such as "+07" at the start of value, or 0 if there is none.
+
+note Go's leadingInt returns three values (x, rem, err); the number and the rest are returned as one record and the error as a failure.
+type LeadingInt
+    field number as a Nat
+    field rem as Text
+
+to leading_int text
+    given text is Text
+    produces a LeadingInt
+    fails with LeadingIntOverflow
+
+note WORKAROUND: the doc has no way to slice text (Go's value[1:]) or take its first byte (value[0]). These two helpers are declared so the body needs no invented syntax.
+to text_until position of text
+    given position is a Nat
+    given text is Text
+    produces Text
+
+to text_after position of text
+    given position is a Nat
+    given text is Text
+    produces Text
+
+to parse_signed_offset value
+    given value is Text
+    produces an Int
+
+    note UNCLEAR: Go panics if value is empty (value[0] is out of range). The original states no precondition, so none is added, and the doc does not say what text_until does past the end.
+    note WORKAROUND: no character literals, so the sign is compared as a one-character Text
+    let sign be text_until 1 of value
+    if sign is not "-" and sign is not "+"
+        give back 0
+    let rest be text_after 1 of value
+    note UNCLEAR: the doc never shows code after a handle block, so the rest of the operation sits inside it
+    handle
+        let parsed be try leading_int rest
+        let x be number of parsed
+        let remainder be rem of parsed
+        note fail if nothing consumed by leadingInt
+        if remainder is rest
+            give back 0
+        if x is more than 23
+            give back 0
+        give back count of value - count of remainder
+    on failure LeadingIntOverflow
+        give back 0

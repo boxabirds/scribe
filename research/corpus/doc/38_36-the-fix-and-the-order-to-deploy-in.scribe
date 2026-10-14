@@ -1,0 +1,28 @@
+component Storefront version 5.2.0
+    needs
+        Checkout from 3.0 as checkout
+            uses place_order
+        Support from 1.0 as support
+            uses raise_ticket
+
+to checkout_button cart for customer with request_id
+    given cart is a Cart
+    given customer is a CustomerId
+    given request_id is a RequestId
+    produces a CustomerMessage
+    uses checkout, support
+
+    handle
+        let order be try place_order cart for customer with request_id in checkout
+        give back message "Thank you. Your order {id of order} is confirmed."
+    on failure EmptyCart
+        give back message "Your basket is empty."
+    on failure OutOfStock
+        give back message "An item in your basket is no longer available."
+    on failure PaymentDeclined
+        give back message "Your payment was declined."
+    on failure StoreUnavailable
+        give back message "We could not save your order. You have not been charged."
+    on failure RefundFailed
+        try raise_ticket "refund failed for request {request_id}" in support
+        give back message "Your payment needs manual review. We will email you today."

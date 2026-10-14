@@ -1,0 +1,16 @@
+type Queue of T
+    field capacity as a Count
+    field items as a Ring of T
+    model contents as sequence_of items
+    invariant count of contents is at most capacity because "never holds more than capacity"
+
+to push value onto queue
+    given value is a T
+    given queue is an editable Queue of T
+    fails with QueueFull
+    ensure if it succeeds, contents of queue is contents of queue at entry followed by value
+    ensure if it fails, contents of queue is contents of queue at entry
+
+    if count of contents of queue is capacity of queue
+        fail with QueueFull
+    append value to items of queue

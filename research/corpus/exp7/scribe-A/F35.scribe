@@ -1,0 +1,41 @@
+note Translation of scheduler.__init__ from CPython (Lib/sched.py).
+note Initialize a new instance, passing the time and delay functions.
+
+note WORKAROUND: Python's default timefunc is time.monotonic and delayfunc is time.sleep, both global functions with ambient access to the clock. Scribe has no ambient authority and no defaults, so the caller must always pass both.
+
+type Event
+    field time as an Instant
+    field priority as an Int
+    field sequence as a Nat
+    note GAP: an event's action is a stored callable with stored arguments. The doc has no type for an operation value, so `Action` stands for one.
+    field action as an Action
+
+note GAP: stored callbacks - timefunc and delayfunc are functions supplied by the caller and kept in fields, to be called later by run(). The doc has no function type and no way to store or call an operation value. `TimeFunction` and `DelayFunction` are placeholder types.
+note GAP: threading.RLock - a re-entrant lock held as a field. Big example 3 says values are never shared mutably between tasks, so there is nothing for a lock to protect. A scheduler shared between threads, which sched supports, has no form in the doc. `ReentrantLock` is a placeholder.
+note GAP: itertools.count() - a stateful generator held in a field, advanced by next() each time an event is entered. The doc has no generators. It is modelled as a plain counter, which assumes every later use goes through an editable Scheduler.
+type Scheduler
+    field queue as a List of Event
+    field lock as a ReentrantLock
+    field timefunc as a TimeFunction
+    field delayfunc as a DelayFunction
+    field next_sequence as a Nat
+
+note WORKAROUND: Python's __init__ fills in a new object through self. Scribe has no constructors or self, so this is an operation that builds and gives back a Scheduler.
+note WORKAROUND: timefunc and delayfunc have defaults and may be passed by keyword. Scribe has neither, so both are required.
+note UNCLEAR: the doc shows `an Order from cart and receipt with status Paid` (example 29) as record construction, but not the general form. Field-by-field `with ... and ...` is used here.
+to new_scheduler with timefunc and delayfunc using memory
+    given timefunc is a TimeFunction
+    given delayfunc is a DelayFunction
+    given memory is an Allocator
+    produces a Scheduler
+    fails with OutOfMemory
+    uses memory
+
+    let lock be try new_reentrant_lock using memory
+    give back a Scheduler with queue as [] and lock as lock and timefunc as timefunc and delayfunc as delayfunc and next_sequence as 0
+
+to new_reentrant_lock using memory
+    given memory is an Allocator
+    produces a ReentrantLock
+    fails with OutOfMemory
+    uses memory

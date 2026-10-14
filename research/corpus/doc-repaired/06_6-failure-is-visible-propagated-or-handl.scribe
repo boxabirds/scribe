@@ -1,0 +1,18 @@
+to parse_port text
+    given text is Text
+    produces a Port
+    fails with NotANumber, OutOfRange
+
+    let number be try parse_int text
+    if number is less than 1 or number is more than 65535
+        fail with OutOfRange
+    give back number
+
+to port_or_default text
+    given text is Text
+    produces a Port
+
+    handle
+        give back try parse_port text
+    on failure NotANumber or OutOfRange
+        give back 8080

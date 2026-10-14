@@ -1,0 +1,47 @@
+{
+  "id": "F35",
+  "behaviour_preserved": "approximate",
+  "gaps": [
+    {"category": "default, optional and keyword arguments",
+     "construct": "timefunc=_time, delayfunc=time.sleep",
+     "description": "The doc has no default or optional parameters, so every caller must pass both functions.",
+     "kind": "gap"},
+    {"category": "global or module state",
+     "construct": "defaults reach time.monotonic and time.sleep with no capability passed in",
+     "description": "A default that reads the clock or sleeps would need a capability the caller never handed over. Example 22 says authority enters only at main, so such a default cannot be expressed even if defaults existed.",
+     "kind": "gap"},
+    {"category": "closures and stored callbacks",
+     "construct": "self.timefunc / self.delayfunc stored in the instance",
+     "description": "There is no type for an operation held in a field or variable; `an Operation producing a Number` is invented.",
+     "kind": "gap"},
+    {"category": "concurrency, threads and locks",
+     "construct": "threading.RLock() stored in the object",
+     "description": "The doc removes locks by design (example 38) and has no lock type, so the lock that guards the queue across threads cannot be expressed.",
+     "kind": "gap"},
+    {"category": "loop forms",
+     "construct": "itertools.count() lazy generator",
+     "description": "There are no generators or iterators that hold state. A Nat counter field stands in for it, and every use must read it and then increase it by hand.",
+     "kind": "workaround"},
+    {"category": "objects, methods and self",
+     "construct": "__init__ that mutates self",
+     "description": "There are no classes or constructors. The constructor becomes an operation that produces a new record, which works but changes the API shape.",
+     "kind": "workaround"},
+    {"category": "objects, methods and self",
+     "construct": "building a record value field by field",
+     "description": "The only record construction shown is `an Order from cart and receipt with status Paid`. The doc gives no general field-by-field literal.",
+     "kind": "unclear"},
+    {"category": "unsafe and raw memory",
+     "construct": "[] and RLock() allocate implicitly",
+     "description": "Example 21 says allocation must use an Allocator, but the doc does not say how a list literal or a library object names its allocator.",
+     "kind": "unclear"}
+  ],
+  "doc_rules_contradicted": [
+    "Because values are never shared mutably between tasks, there is nothing for a lock to protect, and no way to forget one. (The original's lock exists so other threads can share the scheduler's queue.)"
+  ],
+  "invented_syntax": [
+    "an Operation producing a Number / an Operation taking a Number (function types)",
+    "ReentrantLock type and new_reentrant_lock",
+    "a Scheduler with queue [] and lock new_lock and timefunc timefunc and ... (record literal with one with-clause per field)"
+  ],
+  "notes": "The constructor itself is trivial; every gap comes from what the object is designed to do: hold injectable callbacks, be shared between threads under a lock, and default to ambient clock authority. Scribe's capability model would replace 'timefunc defaults to the wall clock' with 'pass a Clock', which is arguably better, but the injected-function design (used for testing with fake clocks) has no equivalent until function values exist."
+}

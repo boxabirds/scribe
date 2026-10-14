@@ -1,0 +1,42 @@
+{
+  "id": "F13",
+  "behaviour_preserved": "approximate",
+  "gaps": [
+    {"category": "characters, bytes and strings",
+     "construct": "pattern[i] indexing a string by byte",
+     "description": "The doc never says whether Text is bytes or characters or whether it can be indexed; `bytes of pattern` is invented to get a byte view.",
+     "kind": "gap"},
+    {"category": "characters, bytes and strings",
+     "construct": "bytealg.LastIndexByteString(pattern, '*') returning -1 when absent",
+     "description": "No search-from-end operation on Text is shown; `last position of \"*\" in pattern` returning a maybe Position is invented. Using maybe is cleaner than Go's -1 sentinel.",
+     "kind": "gap"},
+    {"category": "characters, bytes and strings",
+     "construct": "pattern[:pos] and pattern[pos+1:] (substring slicing)",
+     "description": "No slicing form exists for Text or List; `slice of pattern from 0 until pos` is invented, reusing the doc's `until` range convention.",
+     "kind": "gap"},
+    {"category": "characters, bytes and strings",
+     "construct": "rune/byte literal '*'",
+     "description": "The doc has no character or byte literal, only double-quoted Text, so the single byte is written as a one-character Text.",
+     "kind": "unclear"},
+    {"category": "error types and exceptions",
+     "construct": "multiple return values (prefix, suffix string, err error)",
+     "description": "Scribe has one result plus a failure channel, so the two strings need a helper record type declared just for this function.",
+     "kind": "workaround"},
+    {"category": "objects, methods and self",
+     "construct": "constructing a record value with named fields",
+     "description": "The doc shows record construction only once (`an Order from cart and receipt with status Paid`) without a general rule; the `with field as value and field as value` form is borrowed from choice declarations.",
+     "kind": "unclear"},
+    {"category": "characters, bytes and strings",
+     "construct": "len(pattern) is the byte length",
+     "description": "`count of` on Text is not defined as bytes or characters.",
+     "kind": "unclear"}
+  ],
+  "doc_rules_contradicted": [],
+  "invented_syntax": [
+    "bytes of pattern",
+    "last position of \"*\" in pattern",
+    "slice of pattern from 0 until pos",
+    "a Prefix_and_suffix with prefix as ... and suffix as ..."
+  ],
+  "notes": "The control flow is easy and reads better than Go (the -1 sentinel becomes a maybe that must be chosen on). All the friction is a missing Text and byte vocabulary: indexing, searching and slicing, which nearly every text-handling function needs. The doc should decide whether Text is a byte sequence, a code-point sequence, or opaque with explicit views."
+}

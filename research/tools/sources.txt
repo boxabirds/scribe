@@ -1,0 +1,12 @@
+python/cpython Lib/bisect.py Lib/heapq.py Lib/json/decoder.py Lib/tempfile.py Lib/shutil.py Lib/shlex.py Lib/statistics.py Lib/_pydatetime.py Lib/http/client.py Lib/sched.py Lib/concurrent/futures/_base.py Lib/dbm/dumb.py Lib/configparser.py Lib/hmac.py
+golang/go src/sort/search.go src/path/match.go src/strconv/atoi.go src/os/tempfile.go src/bufio/scanner.go src/encoding/csv/reader.go src/math/bits/bits.go src/time/format.go src/net/textproto/reader.go src/encoding/json/encode.go src/sync/once.go src/encoding/binary/varint.go src/flag/flag.go src/crypto/subtle/constant_time.go
+redis/redis src/adlist.c src/rio.c src/sds.c src/networking.c src/ae.c src/rdb.c src/config.c
+sqlite/sqlite src/util.c
+torvalds/linux include/linux/overflow.h
+ocaml/ocaml stdlib/list.ml stdlib/map.ml
+erlang/otp lib/stdlib/src/lists.erl lib/stdlib/src/calendar.erl
+nodejs/node lib/events.js
+BurntSushi/ripgrep crates/globset/src/glob.rs crates/matcher/src/lib.rs
+tokio-rs/tokio tokio/src/sync/oneshot.rs
+dafny-lang/dafny Source/DafnyStandardLibraries/src/Std/Collections/Seq.dfy
+tofgarion/spark-by-example

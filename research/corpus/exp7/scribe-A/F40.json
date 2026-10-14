@@ -1,0 +1,33 @@
+{
+  "id": "F40",
+  "behaviour_preserved": "approximate",
+  "gaps": [
+    {"category": "collections and iteration",
+     "construct": "iter(self._index) - a lazy iterator over a live dict",
+     "description": "No iterator, generator or lazy sequence type. A List of keys is returned instead, which allocates a copy of every key and drops Python's 'dictionary changed size during iteration' detection.",
+     "kind": "gap"},
+    {"category": "collections and iteration",
+     "construct": "self._index is a dict from key to (pos, siz)",
+     "description": "No map type in the doc; `Map of Key to Position` and `keys of index` are invented.",
+     "kind": "gap"},
+    {"category": "error types and exceptions",
+     "construct": "except TypeError: raise error('DBM object has already been closed') from None",
+     "description": "Exception translation with a message and suppressed cause. Scribe failures have no message and no cause chain; the closed check is made explicitly and the message becomes the failure name DatabaseClosed.",
+     "kind": "workaround"},
+    {"category": "resource lifetime",
+     "construct": "use-after-close detected at run time via _index = None",
+     "description": "Expressible with `maybe`; the doc's typestate (`in state Closed or Open`) would make it a compile-time error but would change the API, since Python callers can hold a closed database. The doc does not say which to prefer when an object is shared after close.",
+     "kind": "unclear"},
+    {"category": "objects, methods and self",
+     "construct": "method on self",
+     "description": "Receiver becomes a read-only parameter; works.",
+     "kind": "workaround"}
+  ],
+  "doc_rules_contradicted": [],
+  "invented_syntax": [
+    "Map of Key to Position",
+    "keys of index using memory",
+    "a maybe Map of ... as a field type"
+  ],
+  "notes": "A 5-line function, but its return value is an iterator and Scribe has no lazy sequence, so the translation changes complexity and safety properties. Iterators and maps both look like core-library needs rather than syntax gaps, but the doc should name them. The Python idiom of detecting misuse by catching an incidental TypeError disappears entirely in Scribe, which is an improvement."
+}

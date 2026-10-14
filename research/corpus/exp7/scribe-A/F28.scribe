@@ -1,0 +1,128 @@
+note Source: Go net/textproto/reader.go, (*Reader).readContinuedLineSlice.
+note It reads a logical header line, joining RFC 5322 continuation lines (lines that start
+note with a space or tab) into one, with each fold replaced by a single space.
+
+note WORKAROUND: Go's receiver r *Reader becomes an editable parameter (no methods).
+note R is the wrapped bufio.Reader, a capability because reading it is I/O.
+type Reader
+    field r as a BufferedReader
+    field buf as a Bytes
+
+note GAP: function-typed parameter - validateFirstLine is a callback func([]byte) error that
+note can also be nil. The doc has no function type and no stored callbacks. An invented
+note `Validator` type with a `maybe` wrapper is used, and the call is written like an operation.
+note GAP: open error set - the callback may fail with any error, which the original passes up
+note unchanged. `fails with` needs a closed list of names, so the callback's failures are
+note collapsed into one invented name InvalidLine.
+to read_line_slice from reader within lim
+    given reader is an editable Reader
+    given lim is an Int
+    produces Bytes
+    fails with ReadError, MessageTooLarge
+    uses r of reader
+
+to skip_space in reader
+    given reader is an editable Reader
+    produces a Nat
+    uses r of reader
+
+to trim line
+    given line is Bytes
+    produces Bytes
+
+to buffered_count of source
+    given source is a BufferedReader
+    produces a Nat
+
+to peek_bytes n from source
+    given n is a Nat
+    given source is a BufferedReader
+    produces Bytes
+    uses source
+
+to is_ascii_letter b
+    given b is a Byte
+    produces a Bool
+
+to read_continued_line_slice from reader within lim checked by validate_first_line using memory
+    given reader is an editable Reader
+    given lim is an Int
+    given validate_first_line is a maybe Validator
+    given memory is an Allocator
+    produces Bytes
+    fails with MissingValidator, ReadError, MessageTooLarge, InvalidLine, OutOfMemory
+    note UNCLEAR: the doc shows `uses` naming parameters, not a field of a parameter. The
+    note capability here is the wrapped reader inside the editable Reader.
+    uses r of reader, memory
+
+    note WORKAROUND: Go returns fmt.Errorf("missing validateFirstLine func"), a formatted error
+    note value. Scribe failures carry no message, so the text is lost; a named failure is used.
+    var validator starts at nothing
+    choose validate_first_line
+        when nothing
+            fail with MissingValidator
+        when some given_validator
+            set validator to some given_validator
+
+    let line be try read_line_slice from reader within lim
+    if count of line is 0
+        note blank line - no continuation
+        give back line
+
+    note UNCLEAR: the maybe was already opened above, but the doc gives no way to keep the
+    note unwrapped value outside the `when` block, so the call is made inside a second choose.
+    choose validator
+        when some check
+            try check line
+        when nothing
+            fail with MissingValidator
+
+    note Optimistically assume that the next line is already buffered and starts with an
+    note ASCII letter (the next header key) or is blank, so no copy is needed.
+    note GAP: peeking at buffered input - bufio.Reader.Buffered and Peek(2) have no counterpart
+    note and are declared as invented operations on the BufferedReader capability. The error
+    note from Peek is ignored in the original (`peek, _ :=`); here peek_bytes does not fail.
+    if buffered_count of r of reader is more than 1
+        let peek be peek_bytes 2 from r of reader
+        note WORKAROUND: Go compares bytes with rune literals '\n' and '\r'. The doc has no
+        note byte or character literal, so named constants newline_byte and return_byte are
+        note assumed to exist.
+        let starts_key_or_blank be count of peek is more than 0 and (is_ascii_letter (item 0 of peek) or item 0 of peek is newline_byte)
+        let starts_crlf be count of peek is 2 and item 0 of peek is return_byte and item 1 of peek is newline_byte
+        if starts_key_or_blank or starts_crlf
+            give back trim line
+
+    note ReadByte or the next read_line_slice will flush the read buffer; copy the slice into buf.
+    note GAP: aliasing - Go's `line` is a slice into the bufio buffer that the next read will
+    note overwrite, and r.buf[:0] reuses buf's storage. The doc has no slice or borrow concept,
+    note so this copy, which exists only because of aliasing, has no visible meaning in Scribe.
+    set buf of reader to trim line
+
+    var remaining starts at lim
+    note GAP: platform integer limit - math.MaxInt64 has no counterpart; `max_int64` is assumed.
+    if remaining is less than 0
+        set remaining to max_int64
+    set remaining to remaining - count of buf of reader
+
+    note WORKAROUND: Go's loop condition `r.skipSpace() > 0` both consumes input and tests it.
+    note The doc forbids side effects inside expressions only for assignment, but a `repeat while`
+    note condition that calls an effectful operation is not shown, so the call is moved into the
+    note body with an explicit stop.
+    note WORKAROUND: the doc has no unconditional loop, so a variable that never changes
+    note (`more`) stands in for `repeat while true`, with `stop` as the real exit.
+    note The `decreases` measure works only because buf grows by at least one byte per pass and
+    note the pass fails once buf reaches remaining.
+    var more starts at true
+    repeat while more
+        decreases remaining - count of buf of reader
+        let skipped be skip_space in reader
+        if skipped is 0
+            stop
+        note GAP: appending bytes to a byte buffer - the doc's `append value to items` adds one
+        note element; `followed by` joins sequences only in ensure lines. Used here in a body.
+        set buf of reader to buf of reader followed by space_byte
+        if count of buf of reader is at least remaining
+            fail with MessageTooLarge
+        let next_line be try read_line_slice from reader within remaining - count of buf of reader
+        set buf of reader to buf of reader followed by trim next_line
+    give back buf of reader

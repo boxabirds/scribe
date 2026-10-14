@@ -1,0 +1,107 @@
+note Translation of matchChunk from Go's path package (go/src/path/match.go).
+note Go strings are byte sequences, so chunk and s are Bytes here, not Text.
+note UNCLEAR: the doc never says what `item i of` gives for Bytes, or how one byte is typed. Read here as a Byte, an Int with value 0 through 255.
+
+type Byte is an Int with value 0 through 255
+type Rune is an Int with value 0 through 1114111
+
+note WORKAROUND: getEsc and utf8.DecodeRuneInString each return two values. Scribe has no tuples or multiple results, so each pair is a record.
+type Escape
+    field value as a Rune
+    field next as a Nat
+
+type DecodedRune
+    field value as a Rune
+    field width as a Nat
+
+note getEsc: reads one possibly escaped character of a class starting at position.
+to get_esc chunk from position
+    given chunk is Bytes
+    given position is a Nat
+    produces an Escape
+    fails with BadPattern
+
+note utf8.DecodeRuneInString applied to the part of s starting at position.
+to decode_rune_in_string s from position
+    given s is Bytes
+    given position is a Nat
+    produces a DecodedRune
+
+to match_chunk chunk against s using memory
+    given chunk is Bytes
+    given s is Bytes
+    given memory is an Allocator
+    produces a maybe Bytes
+    fails with BadPattern, OutOfMemory
+    uses memory
+    note Go returns (rest, ok, err). Here ok false is `nothing`, ok true is `some rest`, and err is a failure.
+    note WORKAROUND: Go returns rest as a slice of s, which allocates nothing. Scribe has no slice or view, so rest is copied, and a function that is allocation-free in Go gains `uses memory` and OutOfMemory.
+
+    note failed records whether the match has failed.
+    note After the match fails, the loop continues on processing chunk,
+    note checking that the pattern is well-formed but no longer reading s.
+    note UNCLEAR: the doc never shows boolean literals. `false` and `true` are assumed.
+    note WORKAROUND: Go re-slices chunk and s (chunk = chunk[1:]). Parameters cannot be changed and there is no slicing, so cursors ci and si mark where the remaining chunk and s begin.
+    var failed starts at false
+    var ci starts at 0
+    var si starts at 0
+    repeat while ci is less than count of chunk
+        decreases count of chunk - ci
+        set failed to failed or si is count of s
+        let c be item ci of chunk
+        note WORKAROUND: Go switches on a byte value. `choose` is shown only for choice variants and maybe, so the switch is an if chain, and the backslash case's fallthrough into default is folded into the last branch.
+        note GAP: byte literal - the doc has no character or byte literal, so `byte "["` is invented.
+        if c is byte "["
+            note character class
+            var r starts at 0
+            if not failed
+                let decoded be decode_rune_in_string s from si
+                set r to value of decoded
+                set si to si + width of decoded
+            set ci to ci + 1
+            note possibly negated
+            var negated starts at false
+            if ci is less than count of chunk and item ci of chunk is byte "^"
+                set negated to true
+                set ci to ci + 1
+            note parse all ranges
+            var match starts at false
+            var nrange starts at 0
+            note WORKAROUND: Go's `for { ... break }` becomes `repeat while true` with `stop`. The decreases line holds only if get_esc always moves past position, which Go never states.
+            repeat while true
+                decreases count of chunk - ci
+                if ci is less than count of chunk and item ci of chunk is byte "]" and nrange is more than 0
+                    set ci to ci + 1
+                    stop
+                let low be try get_esc chunk from ci
+                let lo be value of low
+                var hi starts at lo
+                set ci to next of low
+                if item ci of chunk is byte "-"
+                    let high be try get_esc chunk from ci + 1
+                    set hi to value of high
+                    set ci to next of high
+                set match to match or lo <= r <= hi
+                set nrange to nrange + 1
+            set failed to failed or match is negated
+        otherwise if c is byte "?"
+            if not failed
+                set failed to item si of s is byte "/"
+                let decoded be decode_rune_in_string s from si
+                set si to si + width of decoded
+            set ci to ci + 1
+        otherwise
+            note UNCLEAR: the doc gives no escape rules for text literals, so how to write a backslash is a guess.
+            if c is byte "\\"
+                set ci to ci + 1
+                if ci is count of chunk
+                    fail with BadPattern
+            if not failed
+                set failed to item ci of chunk is not item si of s
+                set si to si + 1
+            set ci to ci + 1
+    if failed
+        give back nothing
+    note UNCLEAR: whether a comprehension over a range is allowed, which allocator it uses, and whether its allocation failure needs `try`.
+    let rest be item i of s for each i from si until count of s
+    give back some rest

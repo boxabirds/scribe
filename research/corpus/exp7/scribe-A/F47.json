@@ -1,0 +1,29 @@
+{
+  "id": "F47",
+  "behaviour_preserved": "approximate",
+  "gaps": [
+    {"category": "interfaces and dynamic dispatch",
+     "construct": "inst.update(msg) on whichever object is present, relying on duck typing across OpenSSL/HACL* HMAC objects and any hashlib hash",
+     "description": "No interfaces, traits or dynamic dispatch; the two cases became a closed choice with an explicit `choose`. The digestmod can be any hash constructor, so `Hash` is a placeholder for an open set of types the doc cannot name.",
+     "kind": "gap"},
+    {"category": "missing values",
+     "construct": "self._hmac or self._inner, where exactly one field is None",
+     "description": "Expressible better than the original as a choice, but this redesigns the object's state rather than translating its two nullable fields.",
+     "kind": "workaround"},
+    {"category": "pointers and shared mutable references",
+     "construct": "mutating an object reached through a field of self (an aliased reference)",
+     "description": "The doc does not say whether a payload bound by `when` on an editable record is itself editable, or whether mutating a field's referent needs `uses`.",
+     "kind": "unclear"},
+    {"category": "objects, methods and self",
+     "construct": "method on self",
+     "description": "Became an operation taking the object as editable.",
+     "kind": "workaround"},
+    {"category": "interfaces and dynamic dispatch",
+     "construct": "msg accepts any bytes-like object (buffer protocol)",
+     "description": "No interface to say 'anything that exposes bytes'; narrowed to Bytes.",
+     "kind": "workaround"}
+  ],
+  "doc_rules_contradicted": [],
+  "invented_syntax": ["NativeHmac", "Hash"],
+  "notes": "A two-line method exposes the main structural gap: no way to call 'update' on a value whose type is only known by what it can do. The choice-based rewrite is arguably safer (no None, exhaustive), but it closes a set that Python keeps open for any digestmod."
+}

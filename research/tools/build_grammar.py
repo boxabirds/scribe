@@ -1,0 +1,58 @@
+"""Build grammar/scribe.lark from grammar/scribe.lark.tmpl.
+
+The language has two kinds of keyword:
+
+HARD  reserved everywhere. A HARD word can never be a name. These are the words
+      that start statements and clauses, the operator and comparison words, the
+      argument labels, and the articles. Each one must be HARD because, if it
+      were allowed as a name, a line could be read both as a statement and as a
+      call (measured in experiment 3, see results/).
+SOFT  every other word that appears in a fixed phrase ("survives", "network",
+      "queue", "version" ...). A SOFT word is a keyword only inside its own
+      phrase and an ordinary name everywhere else, like Python's `match`.
+
+QUANTITY is a number followed by a word that is not a keyword: `30 seconds`.
+The lexer knows the fixed keyword list of the language, so this needs no
+symbol table.
+"""
+import re
+import sys
+
+HARD = set("""
+to given produces fails expect ensure changes uses tier idempotent declassifies
+deadline runs survives holds because
+let be var starts set give back fail try handle on failure if otherwise for each
+from until through repeat while invariant decreases stop skip choose when hold
+together pipeline trust proof
+type choice define component system protocol schema migration workflow example
+property field model
+is not and or implies mod of every there where result it some nothing at
+less more than most least after before followed attenuated
+with in into onto over using by as
+a an the
+""".split())
+
+
+def build(tmpl_path, out_path):
+    text = open(tmpl_path).read()
+    # literal words used in the grammar, ignoring comments
+    body = "\n".join(line.split("//")[0] for line in text.split("\n"))
+    words = set(re.findall(r'"([A-Za-z_][A-Za-z0-9_]*)"', body))
+    soft = sorted(words - HARD)
+    missing_hard = sorted(HARD - words)
+    keywords = sorted(words | HARD, key=len, reverse=True)
+    lookahead = "|".join(keywords)
+    name_rule = "name: NAME\n    | " + "\n    | ".join(f'"{w}"' for w in soft) + "\n"
+    quantity = ("QUANTITY.4: /\\d+(\\.\\d+)?[ ]+(?!(" + lookahead +
+                ")(?![A-Za-z0-9_]))[A-Za-z][A-Za-z0-9_]*/\n")
+    out = text + "\n// ---- generated\n" + name_rule + quantity
+    open(out_path, "w").write(out)
+    return sorted(HARD & words), soft, missing_hard
+
+
+if __name__ == "__main__":
+    hard, soft, missing = build(sys.argv[1], sys.argv[2])
+    print(f"hard keywords used: {len(hard)}")
+    print(f"soft keywords: {len(soft)}")
+    if missing:
+        print("listed as HARD but unused:", missing)

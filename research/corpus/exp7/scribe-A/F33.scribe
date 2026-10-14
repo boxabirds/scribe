@@ -1,0 +1,73 @@
+note Translation of Go encoding/json typeEncoder
+
+note GAP: reflection - the key is a reflect.Type, a run-time description of an arbitrary Go type; the doc has no type-as-value, so `TypeDescription` is declared as an opaque type with no way to obtain one from a value
+type TypeDescription
+
+type EncodeState
+type ReflectedValue
+type EncodeOptions
+
+note GAP: function values - encoderFunc is func(*encodeState, reflect.Value, encOpts); the doc has no function type, no way to store an operation in a map and no way to call a stored one, so `Operation from ... to nothing` and `call f with a, b, c` are invented
+type EncoderFunc is an Operation from an editable EncodeState and a ReflectedValue and an EncodeOptions to nothing
+
+note GAP: global shared mutable state - encoderCache is a package-level sync.Map read and written by every goroutine that encodes; the doc forbids values shared mutably between tasks (example 38) and has no module-level var, so the cache is modelled as a capability passed in
+type EncoderCache
+    note opaque: a concurrent map from TypeDescription to EncoderFunc, safe for racing callers
+
+to load type_key from cache
+    given type_key is a TypeDescription
+    given cache is an EncoderCache
+    produces a maybe EncoderFunc
+    uses cache
+
+to load_or_store type_key with candidate in cache
+    given type_key is a TypeDescription
+    given candidate is an EncoderFunc
+    given cache is an EncoderCache
+    produces a maybe EncoderFunc
+    uses cache
+    note Go returns (actual, loaded); `some f` means another caller stored f first, `nothing` means candidate was stored
+
+to store type_key with encoder in cache
+    given type_key is a TypeDescription
+    given encoder is an EncoderFunc
+    given cache is an EncoderCache
+    uses cache
+
+to new_type_encoder type_key allowing_address using encoder_cache
+    given type_key is a TypeDescription
+    given allowing_address is a Bool
+    given encoder_cache is an EncoderCache
+    produces an EncoderFunc
+    uses encoder_cache
+    note recursive with type_encoder through the encoders it builds for field and element types
+
+to type_encoder type_key using encoder_cache
+    given type_key is a TypeDescription
+    given encoder_cache is an EncoderCache
+    produces an EncoderFunc
+    uses encoder_cache
+
+    choose load type_key from encoder_cache
+        when some found
+            give back found
+        when nothing
+            note fall through to building a new encoder
+            note UNCLEAR: a `when` arm that does nothing; the doc says an `on failure` line may not be empty but does not say the same of `when`
+
+    note To deal with recursive types, populate the map with an indirect func before we build it. If the type is recursive, the second lookup for the type will return the indirect func. This indirect func is only used for recursive types, and briefly during racing calls to type_encoder.
+    note GAP: a lazily computed value shared between callers (sync.OnceValue) and a closure that captures it - `indirect` is built once, on first call, by whichever goroutine calls it first, and every caller sees the same result; the doc has no closures, no lazy values and no once-only initialisation, so `once ... computing` and `operation given ... doing` are invented
+    let indirect be once computing new_type_encoder type_key allowing_address true using encoder_cache
+    let placeholder be operation given state, value and options doing
+        call (value_of indirect) with state, value and options
+    choose load_or_store type_key with placeholder in encoder_cache
+        when some already_there
+            give back already_there
+        when nothing
+            note we stored the placeholder; build the real encoder and replace it
+
+    let real_encoder be value_of indirect
+    store type_key with real_encoder in encoder_cache
+    give back real_encoder
+
+note The concurrency in the original (racing callers, one of which wins load_or_store, the rest getting the placeholder until store runs) cannot be shown in Scribe: `together` is structured and a task cannot see another task's writes, so this translation is correct only for a single caller.

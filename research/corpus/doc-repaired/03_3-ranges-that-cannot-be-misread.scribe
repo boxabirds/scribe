@@ -1,0 +1,12 @@
+note 1 through 10 includes 10. 1 until 10 stops at 9.
+
+to sum_up_to limit
+    given limit is a Nat
+    produces a Nat
+    ensure result is limit * (limit + 1) / 2
+
+    var total starts at 0
+    for each n from 1 through limit
+        invariant total is (n - 1) * n / 2
+        set total to total + n
+    give back total

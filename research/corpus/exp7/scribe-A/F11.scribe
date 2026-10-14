@@ -1,0 +1,84 @@
+note Translation of Glob::required_ext from ripgrep (crates/globset/src/glob.rs).
+
+note UNCLEAR: the doc has no Char type. Rust's char is assumed to be `Char`, with literals written as one-character text.
+note Token as defined in globset: every variant is listed because the match below must handle each one.
+choice Token
+    Literal with c as a Char
+    Any
+    ZeroOrMore
+    RecursivePrefix
+    RecursiveSuffix
+    RecursiveZeroOrMore
+    Class with negated as a Bool and ranges as a List of CharRange
+    Alternates with branches as a List of List of Token
+
+type CharRange
+    field start as a Char
+    field end as a Char
+
+type GlobOptions
+    field case_insensitive as a Bool
+
+type Glob
+    field opts as a GlobOptions
+    field tokens as a List of Token
+
+note WORKAROUND: a Rust method on &self becomes an operation taking the Glob as an ordinary read-only argument.
+to required_ext of glob using memory
+    given glob is a Glob
+    given memory is an Allocator
+    produces a maybe Text
+    fails with OutOfMemory
+    uses memory
+    note WORKAROUND: Rust aborts when allocation fails, so the original has no failure. Scribe makes allocation visible, so the Vec and String building adds `uses memory` and OutOfMemory.
+
+    let opts be opts of glob
+    if case_insensitive of opts
+        give back nothing
+    note We don't care at all about the beginning of this pattern. All we
+    note need to check for is if it ends with a literal of the form `.ext`.
+    note built in reverse
+    var ext starts at []
+    let tokens be tokens of glob
+    note WORKAROUND: the doc has no reverse iteration, so `.iter().rev()` becomes an index loop counting from the end.
+    for each k from 0 until count of tokens
+        let t be item (count of tokens - 1 - k) of tokens
+        note WORKAROUND: Rust matches the literal pattern Token::Literal('/') before Token::Literal(c). `when` lines bind payloads but cannot test a payload against a value, so the '/' case is an if inside the Literal branch.
+        note UNCLEAR: whether `choose` needs every variant listed or whether there is a catch-all `when` line. The doc shows none, so every other variant is listed by name.
+        choose t
+            when Literal with c
+                if c is "/"
+                    give back nothing
+                note GAP: no operation to append to a growable list is in the vocabulary table. `append value to list` appears only in example 9 and is used here.
+                append c to ext
+                if c is "."
+                    stop
+            when Any
+                give back nothing
+            when ZeroOrMore
+                give back nothing
+            when RecursivePrefix
+                give back nothing
+            when RecursiveSuffix
+                give back nothing
+            when RecursiveZeroOrMore
+                give back nothing
+            when Class with negated and ranges
+                give back nothing
+            when Alternates with branches
+                give back nothing
+    note WORKAROUND: Rust compares ext.last() with Some(&'.'), which also covers the empty case. Scribe needs the empty check written out.
+    if count of ext is 0
+        give back nothing
+    if item (count of ext - 1) of ext is not "."
+        give back nothing
+    note GAP: building Text from a list of characters (ext.reverse() then collect) has no form in the doc. `text_from` is a guessed operation, and the reversal is a comprehension over indices.
+    let ordered be item (count of ext - 1 - k) of ext for each k from 0 until count of ext
+    give back some try text_from ordered using memory
+
+to text_from chars using memory
+    given chars is a List of Char
+    given memory is an Allocator
+    produces Text
+    fails with OutOfMemory
+    uses memory

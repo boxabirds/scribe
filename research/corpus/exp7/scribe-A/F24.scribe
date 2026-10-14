@@ -1,0 +1,24 @@
+note Source: go/src/math/bits/bits.go, ReverseBytes64 (lines 292-297). Go, numerics.
+note ReverseBytes64 returns the value of x with its bytes in reversed order.
+
+note GAP: fixed-width unsigned integer type - Go's uint64 wraps modulo 2^64. The doc has Int and Nat with checked arithmetic and no fixed widths. Invented: `a UInt64`.
+note GAP: hexadecimal literals - the doc shows only decimal literals. Written in decimal with the hex value in a note.
+note UNCLEAR: package-level constants - m3 and m4 are package constants in bits.go. The doc shows `let` only inside an operation body (example 7 is a bare fragment); top-level `let` is used here.
+note m3 is 0x00ff00ff00ff00ff
+let m3 be 71777214294589695
+note m4 is 0x0000ffff0000ffff
+let m4 be 281470681808895
+
+note GAP: bit operations - shifts (`>>`, `<<`), bitwise and (`&`) and bitwise or (`|`) have no form in the doc. Rule 4 allows symbols only for arithmetic and comparison, and `and` / `or` are logic words, so reusing them would collide. Invented word operators: `shifted right by`, `shifted left by`, `bitand`, `bitor`.
+note GAP: wrapping shift-left - in Go `x << 8` silently drops bits shifted past bit 63. Scribe's arithmetic is checked, so a left shift that overflows would fail. Invented: `shifted left by ... wrapping` to say the high bits are discarded.
+note WORKAROUND: `const m = 1<<64 - 1` exists only to make `m3&m` a typed uint64 constant in Go. With an explicit UInt64 type it is unnecessary, so it is dropped.
+note UNCLEAR: precedence - the doc allows at most six precedence levels and lists none for bit operators; every sub-expression is parenthesised.
+to reverse_bytes64 x
+    given x is a UInt64
+    produces a UInt64
+
+    let swapped_bytes be ((x shifted right by 8) bitand m3) bitor ((x bitand m3) shifted left by 8 wrapping)
+    let swapped_halves be ((swapped_bytes shifted right by 16) bitand m4) bitor ((swapped_bytes bitand m4) shifted left by 16 wrapping)
+    give back (swapped_halves shifted right by 32) bitor (swapped_halves shifted left by 32 wrapping)
+
+note WORKAROUND: Go reassigns the parameter `x` three times. Scribe parameters are read by default and the doc shows no rebinding, so each step gets a new `let` name.

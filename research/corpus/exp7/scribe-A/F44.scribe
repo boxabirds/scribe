@@ -1,0 +1,16 @@
+note Translated from Go src/flag/flag.go newInt64Value (lines 180 to 183).
+
+note GAP: a named type that shares its representation with another and can be converted by pointer cast - Go's `type int64Value int64` lets `(*int64Value)(p)` reuse the same memory; the doc has no type alias or newtype form, so a guess is written
+type Int64Value is a reference to an Int64
+
+note GAP: pointers and shared mutable references - p is a *int64 owned by the caller (often a field of the caller's config struct); the flag package keeps it and writes to it later when flags are parsed. `editable` lends exclusive access for one call only, so a stored, long-lived reference has no form
+to new_int64_value val into p
+    note UNCLEAR: the doc shows Int and Nat but no fixed-width integer; Int64 is assumed to be a refinement of Int with value -2^63 through 2^63 - 1
+    given val is an Int64
+    given p is a shared Reference to an Int64
+    produces an Int64Value
+
+    note GAP: writing through a pointer - `*p = val`; the doc has no dereference, so `target of p` is invented
+    set target of p to val
+    note WORKAROUND: Go returns the same pointer re-typed; the doc has no cast, so the conversion is written as a constructor call that wraps the same reference
+    give back an Int64Value from p

@@ -1,0 +1,14 @@
+to largest items
+    given items is a List of Int
+    expect count of items >= 1
+    produces an Int
+    ensure result ∈ items
+    ensure for every x in items, x <= result
+
+    var best starts at item 0 of items
+    for each i from 1 until count of items
+        invariant best ∈ items
+        invariant for every j from 0 through i - 1, item j of items <= best
+        if item i of items > best
+            set best to item i of items
+    give back best

@@ -1,0 +1,77 @@
+note Source: Go internal/strconv/atoi.go, ParseInt.
+note The original's unused local constant fnParseInt is left out.
+
+note GAP: failure that carries a value - Go returns (clamped value, ErrRange) together, and
+note the doc for ParseInt promises the clamped value to callers. Scribe failures are bare names.
+note The phrase `fail with RangeError with nearest_value X` and the field read
+note `nearest_value of problem` are invented, by analogy with choice payloads (example 16).
+
+to parse_uint text in base with bit_size
+    given text is Text
+    given base is an Int
+    given bit_size is an Int
+    produces a Nat
+    fails with SyntaxError, RangeError, BaseError, BitSizeError
+
+note UNCLEAR: IntSize is a platform constant (32 or 64). The doc shows top-level `let`
+note (example 17) but not whether a module-level binding may vary by target.
+let int_size be 64
+
+note WORKAROUND: no conversion syntax between Nat and Int (the doc forbids implicit conversion
+note but shows no explicit form), so a helper does it.
+to int_from n
+    given n is a Nat
+    produces an Int
+
+to parse_int text in base with bit_size
+    given text is Text
+    given base is an Int
+    given bit_size is an Int
+    produces an Int
+    fails with SyntaxError, RangeError, BaseError, BitSizeError
+
+    if text is ""
+        fail with SyntaxError
+
+    note GAP: characters and string slicing - Go reads the byte s[0] and compares it with the
+    note rune literal '+'. The doc has no character type, no character literal and no substring
+    note form. `item 0 of text` compared with the one-letter Text "+" and the slice
+    note `part of text from 1 until count of text` are invented.
+    note UNCLEAR: the doc never shows a boolean literal; `false` and `true` are assumed.
+    var negative starts at false
+    var digits starts at text
+    let sign be item 0 of text
+    if sign is "+"
+        set digits to part of text from 1 until count of text
+    otherwise if sign is "-"
+        set digits to part of text from 1 until count of text
+        set negative to true
+
+    note WORKAROUND: Go keeps going after ErrRange with the clamped value. In Scribe a handled
+    note failure must be turned back into a value by setting a variable from inside `on failure`,
+    note which the doc's rule for on failure lines does not list as allowed.
+    var magnitude starts at 0
+    handle
+        set magnitude to try parse_uint digits in base with bit_size
+    on failure RangeError as problem
+        set magnitude to nearest_value of problem
+    on failure SyntaxError or BaseError or BitSizeError as problem
+        fail with problem
+
+    var size starts at bit_size
+    if size is 0
+        set size to int_size
+
+    note GAP: bit operations - Go computes 1 << (bitSize - 1). The doc has no shift operator and
+    note no power operator; `2 to the power (size - 1)` is invented.
+    let cutoff be 2 to the power (size - 1)
+    if not negative and magnitude is at least cutoff
+        fail with RangeError with nearest_value int_from (cutoff - 1)
+    note UNCLEAR: the doc shows no unary minus; `0 - X` is used. Go relies on int64 wrapping for
+    note -int64(cutoff) when cutoff is 2^63. Whether Scribe's Int is bounded (and so whether
+    note this line is checked arithmetic that cannot overflow) is not stated.
+    if negative and magnitude is more than cutoff
+        fail with RangeError with nearest_value 0 - int_from cutoff
+    if negative
+        give back 0 - int_from magnitude
+    give back int_from magnitude

@@ -1,0 +1,29 @@
+note Translated from go src/sync/once.go, Once.Do (lines 52 to 71).
+
+note GAP: atomic values and mutexes - Once holds `done atomic.Bool` and `m Mutex`; the doc says "values are never shared mutably between tasks, there is nothing for a lock to protect", so it has no Atomic or Mutex type. Both are invented below
+type Once
+    field done as an Atomic Bool
+    field m as a Mutex
+
+note GAP: shared mutable receiver - many goroutines call Do on the same *Once at the same time; the doc's `editable` gives one caller exclusive access, and `together` forbids two branches changing one value (example 38), so there is no convention for a value that is changed by several tasks at once. `shared` is invented
+note GAP: operation-typed parameter - f is a func(); `an operation` is invented because the doc has no type for an operation
+note GAP: effect polymorphism - Do has exactly the effects of f plus the lock; `uses f` is invented to mean "whatever f uses"
+note GAP: method receiver - Go's (o *Once) Do is a method; Scribe has no methods, so o is the first named parameter and `do` is called as `do f with o`
+to do f with o
+    given o is a shared Once
+    given f is an operation
+    uses f, o
+    note UNCLEAR: Go's documented guarantee ("when Do returns, f has finished", and f runs at most once per Once) is a statement about all concurrent calls, not about one call's entry and exit; the doc's `ensure` and `at entry` only speak about a single call, so the guarantee cannot be written as an ensure line and is left as this note
+
+    note GAP: an atomic load with acquire ordering - `atomically load done of o` is invented; the doc has no memory-ordering vocabulary
+    if not atomically load done of o
+        note "Outlined slow-path to allow inlining of the fast-path."
+        note WORKAROUND: the Go comment is about inlining; Scribe has no inlining control, so the split into do_slow is kept only to match the original line for line
+        do_slow f with o
+
+note doSlow, declared for completeness: it takes o.m, checks done again, and after f returns stores true into done (`defer o.done.Store(true)`), then releases the lock
+note GAP: `defer` - the store must happen even if f panics; `hold` releases a resource on every exit, but there is no general form for "run this statement on every exit from the block"
+to do_slow f with o
+    given o is a shared Once
+    given f is an operation
+    uses f, o

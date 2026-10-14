@@ -1,0 +1,21 @@
+{
+  "id": "F19",
+  "behaviour_preserved": "exact",
+  "gaps": [
+    {"category": "characters, bytes and strings",
+     "construct": "rune (Unicode code point) type",
+     "description": "The doc has Text and Bytes but no character or code point type, and no literal for one such as U+FFFD, so Rune is assumed.",
+     "kind": "gap"},
+    {"category": "error types and exceptions",
+     "construct": "r, _ := utf8.DecodeRune(b) (two results, one discarded)",
+     "description": "No multiple results, tuple destructuring or discard; a helper record is declared and one field read.",
+     "kind": "workaround"},
+    {"category": "characters, bytes and strings",
+     "construct": "Go's []byte slice versus Scribe Bytes",
+     "description": "The doc uses `Bytes` both as a type of data (example 20) and as a unit of size (`size as Bytes at most 1 GiB`, `offset as Bytes`), so it is unclear whether Bytes is a byte sequence or a quantity.",
+     "kind": "unclear"}
+  ],
+  "doc_rules_contradicted": [],
+  "invented_syntax": [],
+  "notes": "Behaviour is exact provided decode_rune keeps Go's no-failure, replacement-character semantics. A Scribe library would likely make invalid UTF-8 a `fails with` or a maybe, which would be a different contract from Go's; the doc gives no guidance on sentinel-value conventions like RuneError. Example 27 uses Bytes as a size unit and example 20 as data, which is a naming collision worth resolving."
+}

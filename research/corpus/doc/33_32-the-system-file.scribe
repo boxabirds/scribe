@@ -1,0 +1,36 @@
+system Shop version 12
+
+    components
+        Storefront 5.1
+        Checkout 2.4
+        Payments 3.1
+        Inventory 2.0
+        Orders_store 1.2
+        Notifications 1.7
+        Reporting 4.0
+
+    authority
+        root gives Payments       network host "payments.example.com" port 443
+        root gives Inventory      database "stock" read and write
+        root gives Orders_store   database "orders" read and write
+        root gives Notifications  network host "mail.example.com" port 587
+        root gives Reporting      database "orders" read only
+        nothing else holds authority
+
+    wiring
+        Storefront needs Checkout
+        Checkout needs Payments, Inventory, Orders_store
+        Notifications needs Orders_store (read operations only)
+        Reporting needs Orders_store (read operations only)
+
+    failure domains
+        checkout contains Checkout, Payments, Inventory, Orders_store
+        comms contains Notifications
+        analytics contains Reporting
+        a failure in comms must not stop checkout
+        a failure in analytics must not stop checkout
+
+    rules
+        only Payments can reach host "payments.example.com"
+        no value labelled card_data leaves Payments
+        Reporting cannot write to database "orders"

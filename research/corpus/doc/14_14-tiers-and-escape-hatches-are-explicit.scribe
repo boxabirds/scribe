@@ -1,0 +1,8 @@
+to roll_die generator
+    given generator is a RandomSource
+    produces an Int with value 1 through 6
+    tier checked
+    uses generator
+
+    trust "hardware generator returns uniform bits" owner security_team
+    give back 1 + bits_from generator mod 6

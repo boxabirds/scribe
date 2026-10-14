@@ -1,0 +1,7 @@
+to main root
+    given root is the Authority
+    uses root
+
+    let reports be root attenuated to files under "/reports" read only
+    let partner be root attenuated to network host "export.partner.example" port 443
+    run ReportExporter with [reports, partner]

@@ -1,0 +1,148 @@
+note Source: CPython Lib/statistics.py, _sum.
+note _sum(data) -> (type, sum, count): a high-precision sum of numeric data as a fraction,
+note with the type the result should be converted to and the count of items.
+
+note GAP: reflection - Python groups data by type(x) and returns the class object itself.
+note Scribe has no runtime type values and no `type of x`. A closed choice of the four numeric
+note kinds Python's statistics module accepts stands in for an arbitrary numeric object, and a
+note second choice names the kind to return.
+choice Number
+    Whole with value as an Int
+    Float with value as a Float
+    Ratio with value as a Fraction
+    Exact_decimal with value as a Decimal
+
+choice NumberKind
+    Int_kind
+    Float_kind
+    Fraction_kind
+    Decimal_kind
+
+note UNCLEAR: the doc has Int, Nat and Money but never names a floating-point, rational or
+note decimal type. Float, Fraction and Decimal are assumed to exist in a standard vocabulary.
+
+note GAP: missing values used as a dictionary key - Python keys partials by denominator and
+note uses None as the key for non-finite values (NaN, infinity). Scribe has no map type, and
+note maybe values as keys are not discussed. The two roles are split: a list of
+note (denominator, numerator) pairs plus a separate maybe for the non-finite total.
+type Partial
+    field denominator as a Nat
+    field numerator as an Int
+
+choice ExactRatio
+    Finite with numerator as an Int and denominator as a Nat
+    Not_finite with value as a Float
+
+type SumResult
+    field kind as a NumberKind
+    field total as an ExactTotal
+    field count as a Nat
+
+choice ExactTotal
+    Exact with value as a Fraction
+    Special with value as a Float
+
+to exact_ratio x
+    given x is a Number
+    produces an ExactRatio
+
+to kind_of x
+    given x is a Number
+    produces a NumberKind
+
+to coerce first and second
+    given first is a NumberKind
+    given second is a NumberKind
+    produces a NumberKind
+    fails with TypeError
+
+to fraction_from numerator over denominator
+    given numerator is an Int
+    given denominator is a Nat
+    produces a Fraction
+
+to is_finite value
+    given value is a Float
+    produces a Bool
+
+note GAP: allocation - the original builds a set and a dict. The doc says allocating operations
+note name an Allocator in uses, but no example shows a collection being created or grown with
+note one, so the allocator is declared and the growth sites do not mention it.
+to sum_of data using memory
+    given data is a List of Number
+    given memory is an Allocator
+    produces a SumResult
+    fails with TypeError, OutOfMemory
+    uses memory
+
+    var count starts at 0
+    note WORKAROUND: Python's set of types becomes a List with a membership test before adding.
+    note UNCLEAR: the doc shows `append value to items of queue` (example 9) only for a field of
+    note a record; appending to a local `var` list is assumed to be written the same way.
+    var types starts at []
+    var partials starts at []
+    note UNCLEAR: `var special starts at nothing` gives no element type. The doc does not say
+    note whether a var's type can be written or must be inferred from later `set` lines.
+    var special starts at nothing
+
+    note WORKAROUND: itertools.groupby(data, type) groups consecutive items of the same type; the
+    note only use of the grouping is to add each type to a set, so a plain loop with a
+    note membership check gives the same set.
+    for each x in data
+        let kind be kind_of x
+        if kind is not in types
+            append kind to types
+        set count to count + 1
+        choose exact_ratio x
+            when Finite with numerator and denominator
+                note WORKAROUND: partials.get(d, 0) + n on a dict becomes a linear search of a
+                note list of records with a found flag, because Scribe has no map type and no
+                note early-exit search expression.
+                var found starts at false
+                for each i from 0 until count of partials
+                    let entry be item i of partials
+                    if denominator of entry is denominator
+                        note GAP: replacing one element of a list. The doc has `item i of items`
+                        note for reading but no form for writing an element, so
+                        note `set item i of partials to ...` is invented by analogy with
+                        note `set balance of account to ...`.
+                        note UNCLEAR: record construction syntax is not shown except in
+                        note `an Order from cart and receipt with status Paid` (example 29).
+                        note UNCLEAR: the field label `numerator` and the bound name `numerator`
+                        note are the same word, so the parser must tell a label from a value by
+                        note position alone.
+                        set item i of partials to a Partial with denominator denominator and numerator numerator of entry + numerator
+                        set found to true
+                        stop
+                if not found
+                    append a Partial with denominator denominator and numerator numerator to partials
+            when Not_finite with value
+                note Python: partials[None] = partials.get(None, 0) + n, where n is a float
+                note NaN or infinity. Adding a float to the int 0 keeps the float.
+                choose special
+                    when nothing
+                        set special to some value
+                    when some earlier
+                        set special to some earlier + value
+
+    note WORKAROUND: the dict lookup `None in partials` becomes a choose on the maybe.
+    var total starts at Exact with value fraction_from 0 over 1
+    choose special
+        when some value
+            note The original asserts the special total is not finite.
+            note UNCLEAR: `expect` is shown only in headers and `assert` only inside a proof
+            note block. Neither is shown as a run-time check in a body; `expect` is used here.
+            expect not is_finite value
+            set total to Special with value value
+        when nothing
+            var exact_sum starts at fraction_from 0 over 1
+            for each entry in partials
+                set exact_sum to exact_sum + fraction_from numerator of entry over denominator of entry
+            set total to Exact with value exact_sum
+
+    note WORKAROUND: reduce(_coerce, types, int) becomes an explicit fold loop starting from
+    note Int_kind. The doc's comprehension form has no fold or reduce.
+    var result_kind starts at Int_kind
+    for each kind in types
+        set result_kind to try coerce result_kind and kind
+    give back a SumResult with kind result_kind and total total and count count

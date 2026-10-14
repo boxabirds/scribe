@@ -1,0 +1,51 @@
+note F38: CPython Lib/concurrent/futures/_base.py, Future.set_result
+note "Should only be used by Executor implementations and unit tests." is a usage rule in the docstring; the doc has no visibility or "friend" construct, so it is kept as this note only
+
+choice FutureState
+    Pending
+    Running
+    Cancelled
+    Cancelled_and_notified
+    Finished
+
+type Future
+    field state as a FutureState
+    note GAP: dynamic typing of the result - the original stores any Python object; the doc has no "any" type, so Value stands for an unconstrained type parameter that the doc cannot declare on Future
+    field result as a maybe Value
+    note GAP: shared mutable state guarded by a condition variable - a Future is written by a worker thread and read by waiting threads; the doc forbids values shared mutably between tasks (example 38) and has no lock or condition type, so Condition is invented
+    field condition as a Condition
+    note GAP: interfaces and dynamic dispatch - waiters are objects of several classes (_FirstCompletedWaiter, _AllCompletedWaiter, ...) that each implement add_result differently; Waiter is used as if it were an interface
+    field waiters as a List of Waiter
+    note GAP: stored callbacks - done callbacks are functions added by users and called later; there is no type for an operation held as a value
+    field done_callbacks as a List of Operation taking a Future
+
+to add_result of future to waiter
+    note GAP: an operation with one body per kind of waiter, chosen at run time; the doc has no interface or method declaration, so this header stands for that dispatch
+    given future is a Future
+    given waiter is an editable Waiter
+
+to invoke_callbacks of future
+    given future is a Future
+    uses callbacks of future
+
+to set_result result on future
+    given result is a Value
+    note GAP: shared reference - future must be visible to other threads while this operation changes it; `editable` gives exclusive ownership, which is the opposite of what a Future is for
+    given future is an editable Future
+    fails with InvalidStateError
+    note UNCLEAR: the waiters and callbacks may do anything; the doc gives no way to say "uses whatever the waiters and callbacks use"
+    uses condition of future, callbacks of future
+
+    note GAP: locks - `with self._condition:` acquires the condition's lock for the block and releases it on every exit; `hold` (example 19) releases a resource on every exit, so it is borrowed here, but the doc defines `hold` only for opening resources, not for acquiring a lock
+    hold guard as acquire condition of future
+        if state of future is Cancelled or state of future is Cancelled_and_notified or state of future is Finished
+            note WORKAROUND: the failure carries the message '{state}: {future!r}' in Python; the doc's `fail with` shows only bare failure names, so the message text cannot be attached; the repr of the future also has no Scribe equivalent
+            fail with InvalidStateError
+        set result of future to some result
+        set state of future to Finished
+        note GAP: shared mutable references - iterating the waiters and changing each one through the list; `for each` binds read-only items in every doc example, so whether a loop variable can be changed is not covered
+        for each waiter in waiters of future
+            add_result of future to waiter
+        note GAP: condition variables - notify_all wakes every thread waiting on the condition; the doc's structured concurrency has no way to wait for, or signal, another task
+        notify_all condition of future
+    invoke_callbacks of future

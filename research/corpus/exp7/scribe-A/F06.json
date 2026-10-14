@@ -1,0 +1,53 @@
+{
+  "id": "F06",
+  "behaviour_preserved": "approximate",
+  "gaps": [
+    {"category": "closures and stored callbacks",
+     "construct": "Fun parameter: an ordering function passed as a value and called as Fun(H1, H2)",
+     "description": "The doc has no type for an operation held in a parameter and no syntax to call one. Invented `an Operation from T and T to Bool` and `apply fun to h1 and h2`.",
+     "kind": "gap"},
+    {"category": "contracts and specifications",
+     "construct": "Effects and failures of the passed Fun",
+     "description": "uses/fails with lines are fixed per operation; there is no way to say the operation's effects are those of its function argument (effect polymorphism). Translation assumes Fun is pure.",
+     "kind": "gap"},
+    {"category": "numeric types and conversions",
+     "construct": "Boolean result type of Fun (true/false clauses)",
+     "description": "The doc never names a boolean type or the literals true/false; invented `Bool`.",
+     "kind": "gap"},
+    {"category": "generics and type parameters",
+     "construct": "Polymorphic list element type",
+     "description": "`T` appears only inside `type Queue of T`; the doc does not say how an operation declares a type parameter. Used T as if in scope.",
+     "kind": "unclear"},
+    {"category": "pattern matching",
+     "construct": "Multi-clause function head matching [H2 | T2] versus []",
+     "description": "choose only matches choices and maybe values; clause selection rewritten as `if l2 is empty` followed by the cons case.",
+     "kind": "workaround"},
+    {"category": "collections and iteration",
+     "construct": "Head/tail destructuring of a cons list",
+     "description": "No head/tail pattern or tail operation. Tail rebuilt with a comprehension over indices, which copies the list and changes complexity from O(n) to O(n^2) per merge.",
+     "kind": "workaround"},
+    {"category": "resource lifetime",
+     "construct": "Implicit allocation of cons cells on a GC heap",
+     "description": "Doc example 21 requires an explicit Allocator and `uses memory` for any allocating operation, so an allocator is threaded through all recursive calls and OutOfMemory becomes a declared failure; list literals and `followed by` inside expressions have no place to name the allocator.",
+     "kind": "workaround"},
+    {"category": "loop forms",
+     "construct": "Tail-recursive self call (last-call optimisation)",
+     "description": "The doc has no recursion example; it does not say whether recursive operations need `decreases` or whether a call in `give back` position is a tail call.",
+     "kind": "unclear"},
+    {"category": "default, optional and keyword arguments",
+     "construct": "Five positional arguments",
+     "description": "Bare juxtaposition `ufmerge2_2 h1 t1 fun t2 m` is ambiguous (`fun t2` reads as a call), so label words were invented per operation; the doc does not say how operations with many unlabelled arguments are written.",
+     "kind": "unclear"}
+  ],
+  "doc_rules_contradicted": [
+    "\"Every operation that allocates must say so in `uses`, and the allocator is a value passed in. There is no hidden allocation\" - the list literal `[h1]`, `followed by` and the tail comprehension allocate inside expressions with no allocator named"
+  ],
+  "invented_syntax": [
+    "an Operation from T and T to Bool",
+    "Bool",
+    "apply fun to h1 and h2",
+    "`followed by` used in a code expression (doc shows it only in ensure lines)",
+    "label words `then`, `by`, `against`, `onto`, `after` in the operation headers"
+  ],
+  "notes": "Higher-order functions are the core of this function and Scribe has neither function types nor a way to propagate a callback's effects into the caller's header. Cons-list idioms (head/tail match, O(1) prepend, reverse-onto) have no direct vocabulary, and the obvious index-based rewrite silently changes complexity."
+}

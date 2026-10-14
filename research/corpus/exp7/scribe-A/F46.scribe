@@ -1,0 +1,39 @@
+note Source: Go crypto/internal/fips140/subtle/constant_time.go, ConstantTimeCompare.
+note Returns 1 if x and y have equal contents and 0 otherwise. The time taken depends on the
+note length of the slices and is independent of the contents. If the lengths differ, it
+note returns 0 immediately.
+
+note GAP: timing guarantee - the whole purpose is that running time does not depend on the
+note contents. The doc has information-flow labels (`labelled secret`) but no way to state or
+note check that control flow and timing are independent of a secret, and a checked-arithmetic,
+note optimising compiler could legally short-circuit the loop. An invented header line
+note `runs in constant time with respect to x and y` marks the requirement.
+
+to byte_eq a and b
+    given a is a Byte
+    given b is a Byte
+    produces an Int with value 0 through 1
+    runs in constant time with respect to a and b
+
+to constant_time_compare x and y
+    given x is Bytes labelled secret
+    given y is Bytes labelled secret
+    produces an Int with value 0 through 1
+    note UNCLEAR: the result is derived from secret inputs and returned unlabelled. The doc does
+    note not say whether returning a comparison outcome counts as declassification (example 25),
+    note so the `declassifies` line is written to make the release visible.
+    declassifies secret to public because "only whether the two values are equal is revealed"
+    runs in constant time with respect to x and y
+
+    note The length check is allowed to leak: Go's contract says timing depends on length.
+    if count of x is not count of y
+        give back 0
+
+    note UNCLEAR: the doc has no Byte type or byte literal; a Byte with value 0 is written 0.
+    var v starts at 0
+    for each i from 0 until count of x
+        note GAP: bit operations - Go uses v |= x[i] ^ y[i] (bitwise OR and XOR on bytes).
+        note The doc has no bitwise operators. `bitwise_or` and `bitwise_xor` are invented words,
+        note following the rule that words replace symbols.
+        set v to v bitwise_or (item i of x bitwise_xor item i of y)
+    give back byte_eq v and 0

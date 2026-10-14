@@ -1,0 +1,7 @@
+let timeout be 30 seconds
+let distance be 5 kilometres
+let speed be distance / 2 hours
+let cutoff be started_at + 2 hours
+let due be date 2026-10-14
+let closes be start_of due in zone Europe_London
+let wrong be due + started_at

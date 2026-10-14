@@ -1,0 +1,6 @@
+to masked_card card
+    given card is a CardNumber labelled secret
+    produces Text labelled public
+    declassifies secret to public because "only the last four digits are shown"
+
+    give back "**** {last 4 digits of card}"

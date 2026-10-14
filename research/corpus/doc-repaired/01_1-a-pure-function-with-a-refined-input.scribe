@@ -1,0 +1,5 @@
+to greet name
+    given name is Text with length 1 through 100
+    produces Text
+
+    give back "Hello, {name}"

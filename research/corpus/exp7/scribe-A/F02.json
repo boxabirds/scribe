@@ -1,0 +1,25 @@
+{
+  "id": "F02",
+  "behaviour_preserved": "approximate",
+  "gaps": [
+    {"category": "closures and stored callbacks",
+     "construct": "parameter f of type func(int) bool, called inside the loop",
+     "description": "The doc has no type for an operation value and no form for calling one held in a variable; 'an Operation from Int to Bool' and the call 'f h' are guesses.",
+     "kind": "gap"},
+    {"category": "contracts and specifications",
+     "construct": "effects of a passed-in function",
+     "description": "No uses line means pure, but Go's f may have effects; the doc has no effect-polymorphic header ('uses whatever f uses'), so either every effectful f is rejected or the header lies.",
+     "kind": "gap"},
+    {"category": "bit operations",
+     "construct": "int(uint(i+j) >> 1) to compute the midpoint without overflow",
+     "description": "No shift and no unsigned reinterpretation; replaced by i + (j - i) / 2, which is equivalent for 0 <= i <= j.",
+     "kind": "workaround"},
+    {"category": "contracts and specifications",
+     "construct": "invariants f(i-1) == false and f(j) == true with the virtual values f(-1) == false and f(n) == true",
+     "description": "The doc has no way to define a value at a virtual index for spec purposes; written as 'i is 0 or not f (i - 1)', and calling a possibly impure f inside an invariant is not settled by the doc.",
+     "kind": "unclear"}
+  ],
+  "doc_rules_contradicted": [],
+  "invented_syntax": ["given f is an Operation from Int to Bool", "f h (calling a parameter as an operation)", "not f (i - 1) (precedence of not over a call)"],
+  "notes": "The algorithm itself translates line for line, and the Go comment invariants become checkable invariant lines, which is a win. Everything hard is about the higher-order parameter: its type, its call syntax, and its effects. Every higher-order standard-library function (sort, search, filter with a predicate) will hit the same three gaps."
+}

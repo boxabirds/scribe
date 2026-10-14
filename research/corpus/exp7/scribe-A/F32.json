@@ -1,0 +1,25 @@
+{
+  "id": "F32",
+  "behaviour_preserved": "approximate",
+  "gaps": [
+    {"category": "interfaces and dynamic dispatch",
+     "construct": "trait Captures with a required method get and a provided method as_match",
+     "description": "The doc has no trait or interface declaration and no way to write an operation over 'any type that provides get'; an 'interface' block with 'given captures is a Self' is invented.",
+     "kind": "gap"},
+    {"category": "objects, methods and self",
+     "construct": "default method body (as_match) inherited by every implementer, callable as self.get(0)",
+     "description": "No default bodies, no Self type and no method-call form; the call on self becomes 'get 0 from captures', resolved by an unspecified dispatch rule.",
+     "kind": "gap"},
+    {"category": "error types and exceptions",
+     "construct": "Option::unwrap, which panics on None",
+     "description": "No panic or unwrap; the doc has only declared failures, so the panic becomes a declared failure NoOverallMatch, which changes the signature (callers must handle or propagate it) and does not match Rust's abort-on-bug behaviour.",
+     "kind": "workaround"},
+    {"category": "contracts and specifications",
+     "construct": "implicit precondition that group 0 always exists for a successful match",
+     "description": "The original relies on, but never states, this invariant; the honest Scribe form would be an invariant on the interface, which the doc cannot attach to a trait.",
+     "kind": "unclear"}
+  ],
+  "doc_rules_contradicted": [],
+  "invented_syntax": ["interface Captures", "given captures is a Self", "an operation with a body nested inside an interface block"],
+  "notes": "The doc needs a distinction between 'declared failure the caller must handle' and 'bug that aborts' (Rust panic, assertion failure); without it, every unwrap or expect in Rust becomes a visible failure that ripples into every caller's header. Traits with provided methods are the core of Rust's generic style and have no counterpart at all."
+}

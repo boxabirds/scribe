@@ -1,0 +1,18 @@
+type Order
+    field id as an OrderId
+    field customer as a CustomerId
+    field lines as a List of OrderLine
+    field placed_at as an Instant
+    field status as an OrderStatus
+    invariant lines is not empty or status is Draft because "only drafts may be empty"
+
+type OrderLine
+    field product as a ProductId
+    field quantity as a positive Int
+    field unit_price as Money
+
+choice OrderStatus
+    Draft
+    Paid with paid_at as an Instant
+    Shipped with tracking as Text
+    Cancelled with reason as Text

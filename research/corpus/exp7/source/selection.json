@@ -1,0 +1,722 @@
+[
+ {
+  "id": "F01",
+  "category": "control flow and loops",
+  "adversarial": false,
+  "repo": "cpython",
+  "path": "cpython/Lib/bisect.py",
+  "language": "python",
+  "name": "bisect_right",
+  "lines": [
+   21,
+   54
+  ],
+  "line_count": 34,
+  "candidates_in_file": 4
+ },
+ {
+  "id": "F02",
+  "category": "control flow and loops",
+  "adversarial": false,
+  "repo": "go",
+  "path": "go/src/sort/search.go",
+  "language": "go",
+  "name": "Search",
+  "lines": [
+   58,
+   73
+  ],
+  "line_count": 16,
+  "candidates_in_file": 2
+ },
+ {
+  "id": "F03",
+  "category": "control flow and loops",
+  "adversarial": false,
+  "repo": "spark-by-example",
+  "path": "spark-by-example/numeric/adjacent_difference_p.adb",
+  "language": "ada-spark",
+  "name": "Adjacent_Difference",
+  "lines": [
+   5,
+   30
+  ],
+  "line_count": 26,
+  "candidates_in_file": 1
+ },
+ {
+  "id": "F04",
+  "category": "recursion",
+  "adversarial": false,
+  "repo": "ocaml",
+  "path": "ocaml/stdlib/list.ml",
+  "language": "ocaml",
+  "name": "rev_merge",
+  "lines": [
+   401,
+   409
+  ],
+  "line_count": 9,
+  "candidates_in_file": 55
+ },
+ {
+  "id": "F05",
+  "category": "recursion",
+  "adversarial": false,
+  "repo": "go",
+  "path": "go/src/path/match.go",
+  "language": "go",
+  "name": "matchChunk",
+  "lines": [
+   121,
+   194
+  ],
+  "line_count": 74,
+  "candidates_in_file": 4
+ },
+ {
+  "id": "F06",
+  "category": "recursion",
+  "adversarial": false,
+  "repo": "otp",
+  "path": "otp/lib/stdlib/src/lists.erl",
+  "language": "erlang",
+  "name": "ufmerge2_2",
+  "lines": [
+   4321,
+   4329
+  ],
+  "line_count": 9,
+  "candidates_in_file": 165
+ },
+ {
+  "id": "F07",
+  "category": "data structures",
+  "adversarial": true,
+  "repo": "redis",
+  "path": "redis/src/adlist.c",
+  "language": "c",
+  "name": "listRewind",
+  "lines": [
+   209,
+   212
+  ],
+  "line_count": 4,
+  "candidates_in_file": 21
+ },
+ {
+  "id": "F08",
+  "category": "data structures",
+  "adversarial": false,
+  "repo": "cpython",
+  "path": "cpython/Lib/heapq.py",
+  "language": "python",
+  "name": "_siftdown",
+  "lines": [
+   221,
+   233
+  ],
+  "line_count": 13,
+  "candidates_in_file": 17
+ },
+ {
+  "id": "F09",
+  "category": "data structures",
+  "adversarial": false,
+  "repo": "dafny",
+  "path": "dafny/Source/DafnyStandardLibraries/src/Std/Collections/Seq.dfy",
+  "language": "dafny",
+  "name": "MergeSortedWith",
+  "lines": [
+   1048,
+   1070
+  ],
+  "line_count": 23,
+  "candidates_in_file": 86
+ },
+ {
+  "id": "F10",
+  "category": "error handling",
+  "adversarial": false,
+  "repo": "go",
+  "path": "go/src/internal/strconv/atoi.go",
+  "language": "go",
+  "name": "ParseInt",
+  "lines": [
+   172,
+   212
+  ],
+  "line_count": 41,
+  "candidates_in_file": 5
+ },
+ {
+  "id": "F11",
+  "category": "error handling",
+  "adversarial": false,
+  "repo": "ripgrep",
+  "path": "ripgrep/crates/globset/src/glob.rs",
+  "language": "rust",
+  "name": "required_ext",
+  "lines": [
+   390,
+   415
+  ],
+  "line_count": 26,
+  "candidates_in_file": 37
+ },
+ {
+  "id": "F12",
+  "category": "error handling",
+  "adversarial": false,
+  "repo": "cpython",
+  "path": "cpython/Lib/json/decoder.py",
+  "language": "python",
+  "name": "decode",
+  "lines": [
+   353,
+   362
+  ],
+  "line_count": 10,
+  "candidates_in_file": 8
+ },
+ {
+  "id": "F13",
+  "category": "resource handling",
+  "adversarial": false,
+  "repo": "go",
+  "path": "go/src/os/tempfile.go",
+  "language": "go",
+  "name": "prefixAndSuffix",
+  "lines": [
+   64,
+   76
+  ],
+  "line_count": 13,
+  "candidates_in_file": 5
+ },
+ {
+  "id": "F14",
+  "category": "resource handling",
+  "adversarial": false,
+  "repo": "cpython",
+  "path": "cpython/Lib/tempfile.py",
+  "language": "python",
+  "name": "TemporaryFile",
+  "lines": [
+   703,
+   776
+  ],
+  "line_count": 74,
+  "candidates_in_file": 45
+ },
+ {
+  "id": "F15",
+  "category": "resource handling",
+  "adversarial": false,
+  "repo": "redis",
+  "path": "redis/src/rio.c",
+  "language": "c",
+  "name": "rioFdFlush",
+  "lines": [
+   387,
+   391
+  ],
+  "line_count": 5,
+  "candidates_in_file": 26
+ },
+ {
+  "id": "F16",
+  "category": "input and output",
+  "adversarial": false,
+  "repo": "go",
+  "path": "go/src/bufio/scan.go",
+  "language": "go",
+  "name": "setErr",
+  "lines": [
+   257,
+   261
+  ],
+  "line_count": 5,
+  "candidates_in_file": 13
+ },
+ {
+  "id": "F17",
+  "category": "input and output",
+  "adversarial": false,
+  "repo": "cpython",
+  "path": "cpython/Lib/shutil.py",
+  "language": "python",
+  "name": "_ignore_patterns",
+  "lines": [
+   554,
+   558
+  ],
+  "line_count": 5,
+  "candidates_in_file": 49
+ },
+ {
+  "id": "F18",
+  "category": "input and output",
+  "adversarial": true,
+  "repo": "node",
+  "path": "node/lib/events.js",
+  "language": "javascript",
+  "name": "EventEmitter.init",
+  "lines": [
+   332,
+   354
+  ],
+  "line_count": 23,
+  "candidates_in_file": 27
+ },
+ {
+  "id": "F19",
+  "category": "text processing and parsing",
+  "adversarial": false,
+  "repo": "go",
+  "path": "go/src/encoding/csv/reader.go",
+  "language": "go",
+  "name": "nextRune",
+  "lines": [
+   292,
+   295
+  ],
+  "line_count": 4,
+  "candidates_in_file": 8
+ },
+ {
+  "id": "F20",
+  "category": "text processing and parsing",
+  "adversarial": false,
+  "repo": "cpython",
+  "path": "cpython/Lib/shlex.py",
+  "language": "python",
+  "name": "sourcehook",
+  "lines": [
+   277,
+   285
+  ],
+  "line_count": 9,
+  "candidates_in_file": 10
+ },
+ {
+  "id": "F21",
+  "category": "text processing and parsing",
+  "adversarial": false,
+  "repo": "redis",
+  "path": "redis/src/sds.c",
+  "language": "c",
+  "name": "sdssplitargs",
+  "lines": [
+   1066,
+   1174
+  ],
+  "line_count": 109,
+  "candidates_in_file": 37
+ },
+ {
+  "id": "F22",
+  "category": "numerics",
+  "adversarial": false,
+  "repo": "cpython",
+  "path": "cpython/Lib/statistics.py",
+  "language": "python",
+  "name": "_sum",
+  "lines": [
+   1452,
+   1505
+  ],
+  "line_count": 54,
+  "candidates_in_file": 65
+ },
+ {
+  "id": "F23",
+  "category": "numerics",
+  "adversarial": false,
+  "repo": "sqlite",
+  "path": "sqlite/src/util.c",
+  "language": "c",
+  "name": "sqlite3_strnicmp",
+  "lines": [
+   442,
+   453
+  ],
+  "line_count": 12,
+  "candidates_in_file": 63
+ },
+ {
+  "id": "F24",
+  "category": "numerics",
+  "adversarial": false,
+  "repo": "go",
+  "path": "go/src/math/bits/bits.go",
+  "language": "go",
+  "name": "ReverseBytes64",
+  "lines": [
+   292,
+   297
+  ],
+  "line_count": 6,
+  "candidates_in_file": 35
+ },
+ {
+  "id": "F25",
+  "category": "time and dates",
+  "adversarial": false,
+  "repo": "go",
+  "path": "go/src/time/format.go",
+  "language": "go",
+  "name": "parseSignedOffset",
+  "lines": [
+   1508,
+   1523
+  ],
+  "line_count": 16,
+  "candidates_in_file": 29
+ },
+ {
+  "id": "F26",
+  "category": "time and dates",
+  "adversarial": false,
+  "repo": "cpython",
+  "path": "cpython/Lib/_pydatetime.py",
+  "language": "python",
+  "name": "replace",
+  "lines": [
+   2091,
+   2114
+  ],
+  "line_count": 24,
+  "candidates_in_file": 140
+ },
+ {
+  "id": "F27",
+  "category": "time and dates",
+  "adversarial": false,
+  "repo": "otp",
+  "path": "otp/lib/stdlib/src/calendar.erl",
+  "language": "erlang",
+  "name": "offset_string_adjustment",
+  "lines": [
+   998,
+   1015
+  ],
+  "line_count": 18,
+  "candidates_in_file": 27
+ },
+ {
+  "id": "F28",
+  "category": "state machines and protocols",
+  "adversarial": false,
+  "repo": "go",
+  "path": "go/src/net/textproto/reader.go",
+  "language": "go",
+  "name": "readContinuedLineSlice",
+  "lines": [
+   136,
+   188
+  ],
+  "line_count": 53,
+  "candidates_in_file": 24
+ },
+ {
+  "id": "F29",
+  "category": "state machines and protocols",
+  "adversarial": false,
+  "repo": "cpython",
+  "path": "cpython/Lib/http/client.py",
+  "language": "python",
+  "name": "_parse_header_lines",
+  "lines": [
+   249,
+   261
+  ],
+  "line_count": 13,
+  "candidates_in_file": 61
+ },
+ {
+  "id": "F30",
+  "category": "state machines and protocols",
+  "adversarial": false,
+  "repo": "redis",
+  "path": "redis/src/networking.c",
+  "language": "c",
+  "name": "getClientCachedKeyResult",
+  "lines": [
+   6108,
+   6116
+  ],
+  "line_count": 9,
+  "candidates_in_file": 181
+ },
+ {
+  "id": "F31",
+  "category": "polymorphism and generics",
+  "adversarial": true,
+  "repo": "ocaml",
+  "path": "ocaml/stdlib/map.ml",
+  "language": "ocaml",
+  "name": "iter",
+  "lines": [
+   312,
+   315
+  ],
+  "line_count": 4,
+  "candidates_in_file": 43
+ },
+ {
+  "id": "F32",
+  "category": "polymorphism and generics",
+  "adversarial": true,
+  "repo": "ripgrep",
+  "path": "ripgrep/crates/matcher/src/lib.rs",
+  "language": "rust",
+  "name": "get",
+  "lines": [
+   390,
+   399
+  ],
+  "line_count": 10,
+  "candidates_in_file": 52
+ },
+ {
+  "id": "F33",
+  "category": "polymorphism and generics",
+  "adversarial": true,
+  "repo": "go",
+  "path": "go/src/encoding/json/encode.go",
+  "language": "go",
+  "name": "typeEncoder",
+  "lines": [
+   382,
+   406
+  ],
+  "line_count": 25,
+  "candidates_in_file": 39
+ },
+ {
+  "id": "F34",
+  "category": "callbacks and events",
+  "adversarial": true,
+  "repo": "node",
+  "path": "node/lib/events.js",
+  "language": "javascript",
+  "name": "_listeners",
+  "lines": [
+   791,
+   806
+  ],
+  "line_count": 16,
+  "candidates_in_file": 26
+ },
+ {
+  "id": "F35",
+  "category": "callbacks and events",
+  "adversarial": true,
+  "repo": "cpython",
+  "path": "cpython/Lib/sched.py",
+  "language": "python",
+  "name": "__init__",
+  "lines": [
+   53,
+   60
+  ],
+  "line_count": 8,
+  "candidates_in_file": 7
+ },
+ {
+  "id": "F36",
+  "category": "callbacks and events",
+  "adversarial": true,
+  "repo": "redis",
+  "path": "redis/src/ae.c",
+  "language": "c",
+  "name": "aeCreateEventLoop",
+  "lines": [
+   47,
+   81
+  ],
+  "line_count": 35,
+  "candidates_in_file": 15
+ },
+ {
+  "id": "F37",
+  "category": "concurrency and async",
+  "adversarial": true,
+  "repo": "go",
+  "path": "go/src/sync/once.go",
+  "language": "go",
+  "name": "Do",
+  "lines": [
+   52,
+   71
+  ],
+  "line_count": 20,
+  "candidates_in_file": 2
+ },
+ {
+  "id": "F38",
+  "category": "concurrency and async",
+  "adversarial": true,
+  "repo": "cpython",
+  "path": "cpython/Lib/concurrent/futures/_base.py",
+  "language": "python",
+  "name": "set_result",
+  "lines": [
+   543,
+   556
+  ],
+  "line_count": 14,
+  "candidates_in_file": 32
+ },
+ {
+  "id": "F39",
+  "category": "concurrency and async",
+  "adversarial": true,
+  "repo": "tokio",
+  "path": "tokio/tokio/src/sync/oneshot.rs",
+  "language": "rust",
+  "name": "poll_closed",
+  "lines": [
+   820,
+   868
+  ],
+  "line_count": 49,
+  "candidates_in_file": 28
+ },
+ {
+  "id": "F40",
+  "category": "persistence and schemas",
+  "adversarial": false,
+  "repo": "cpython",
+  "path": "cpython/Lib/dbm/dumb.py",
+  "language": "python",
+  "name": "iterkeys",
+  "lines": [
+   260,
+   264
+  ],
+  "line_count": 5,
+  "candidates_in_file": 17
+ },
+ {
+  "id": "F41",
+  "category": "persistence and schemas",
+  "adversarial": false,
+  "repo": "redis",
+  "path": "redis/src/rdb.c",
+  "language": "c",
+  "name": "rdbLoadLzfStringObject",
+  "lines": [
+   403,
+   454
+  ],
+  "line_count": 52,
+  "candidates_in_file": 93
+ },
+ {
+  "id": "F42",
+  "category": "persistence and schemas",
+  "adversarial": false,
+  "repo": "go",
+  "path": "go/src/encoding/binary/varint.go",
+  "language": "go",
+  "name": "ReadUvarint",
+  "lines": [
+   130,
+   151
+  ],
+  "line_count": 22,
+  "candidates_in_file": 8
+ },
+ {
+  "id": "F43",
+  "category": "configuration",
+  "adversarial": false,
+  "repo": "cpython",
+  "path": "cpython/Lib/configparser.py",
+  "language": "python",
+  "name": "_handle_rest",
+  "lines": [
+   1123,
+   1135
+  ],
+  "line_count": 13,
+  "candidates_in_file": 68
+ },
+ {
+  "id": "F44",
+  "category": "configuration",
+  "adversarial": false,
+  "repo": "go",
+  "path": "go/src/flag/flag.go",
+  "language": "go",
+  "name": "newInt64Value",
+  "lines": [
+   180,
+   183
+  ],
+  "line_count": 4,
+  "candidates_in_file": 48
+ },
+ {
+  "id": "F45",
+  "category": "configuration",
+  "adversarial": false,
+  "repo": "redis",
+  "path": "redis/src/config.c",
+  "language": "c",
+  "name": "rewriteConfigUserOption",
+  "lines": [
+   1513,
+   1542
+  ],
+  "line_count": 30,
+  "candidates_in_file": 172
+ },
+ {
+  "id": "F46",
+  "category": "security checks",
+  "adversarial": false,
+  "repo": "go",
+  "path": "go/src/crypto/internal/fips140/subtle/constant_time.go",
+  "language": "go",
+  "name": "ConstantTimeCompare",
+  "lines": [
+   17,
+   29
+  ],
+  "line_count": 13,
+  "candidates_in_file": 3
+ },
+ {
+  "id": "F47",
+  "category": "security checks",
+  "adversarial": false,
+  "repo": "cpython",
+  "path": "cpython/Lib/hmac.py",
+  "language": "python",
+  "name": "update",
+  "lines": [
+   161,
+   164
+  ],
+  "line_count": 4,
+  "candidates_in_file": 16
+ },
+ {
+  "id": "F48",
+  "category": "security checks",
+  "adversarial": true,
+  "repo": "linux",
+  "path": "linux/include/linux/overflow.h",
+  "language": "c",
+  "name": "range_end_overflows",
+  "lines": [
+   282,
+   289
+  ],
+  "line_count": 8,
+  "candidates_in_file": 21
+ }
+]
