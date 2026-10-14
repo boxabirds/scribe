@@ -84,7 +84,7 @@ Symbols are used only where school mathematics has already taught them to most r
 | Arithmetic | `+ - * /`, `mod` |  | same |
 | Less than, more than | `<`, `>` | `is less than`, `is more than` | `<`, `>` |
 | At most, at least | `<=`, `>=` | `≤`, `≥`, `is at most`, `is at least` | `≤`, `≥` |
-| Equal, not equal | `=`, `!=` | `==`, `≠`, `is not` | `=`, `≠` |
+| Equal, not equal | `=`, `!=` | `==`, `≠` | `=`, `≠` |
 | And, or, not | `and`, `or`, `not` | `∧`, `&&`, `∨`, `\|\|`, `¬`, `!` | words |
 | Member of | `is in` | `∈` | `is in` |
 | For all, there is | `for every`, `there is` | `∀`, `∃` | words |
@@ -94,8 +94,9 @@ Rules:
 
 - Comparisons chain as in mathematics: `0 ≤ low ≤ high ≤ count of items`.
 - There is no assignment symbol, so `=` is always equality.
-- `is` is reserved for tests that are not plain equality: a variant (`status is Paid`), a missing value (`result is nothing`), a predicate (`items is sorted`), membership (`x is in items`).
-- Mixing `and` with `or` needs parentheses. There are six precedence levels.
+- Equality is only `=` and `≠`. `is` only introduces a test: a variant (`status is Paid`), a missing value (`result is nothing`), a predicate (`items is sorted`), membership (`x is in items`); `is not` negates the test.
+- `and` and `or` never mix on one line. A condition that combines them is written as a condition group (Section 5.2).
+- The only precedence a reader needs is what school arithmetic teaches (Section 5.2).
 - Symbols that exist only in programming (`!`, `&&`, `||`) are accepted on input, so machine authors are never rejected for spelling, and never displayed.
 
 ### 2.4 Names
@@ -120,6 +121,7 @@ A reserved word is judged by what it costs readers, not authors. Scribe is writt
 - Blocks are opened by a header line and four spaces of indentation. Tabs are a syntax error. There are no braces, colons or semicolons.
 - A line starting with `note` is a comment.
 - Every statement and every clause is one whole line, and nothing continues onto the next line. A view may wrap a long line on screen; that wrapping is never part of the text.
+- A block indented under a line is part of that line's structure, for conditions as for statements: a condition group's items sit in the block under its header (Section 5.2).
 - No assignment inside an expression.
 - Lists of parts are separated by commas. `and` is only logic.
 
@@ -129,7 +131,9 @@ A reserved word is judged by what it costs readers, not authors. Scribe is writt
 
 Integers (`Int`, `Nat`, and fixed widths), decimals, `Bool`, `Text`, `Bytes`, lists, and units of measure. There are no implicit conversions: a conversion is always a named operation.
 
-**Open:** the exact numeric tower, fixed-width names, whether `Text` is bytes or characters, character and byte literals, and bit operations (Section 14).
+Bit operations are named operations on the fixed-width unsigned types, never symbols and never on `Int`: `bitwise_and flags with mask`, `bitwise_or`, `bitwise_xor`, `bitwise_not`, `shift_left value by 1`, `shift_right`, `rotate_left`, `rotate_right`, and `bit 3 of flags`. A shift by the width or more is a contract violation, proven or checked like any other. Integers can be written in hex and binary, with `_` between digits: `0xFF`, `0xFFFF_FFFF`, `0b1010_0001`.
+
+**Open:** the exact numeric tower, fixed-width names, whether `Text` is bytes or characters, and character and byte literals (Section 14).
 
 ### 3.2 Records
 
@@ -173,7 +177,7 @@ A choice is used through `choose`, which must handle every variant. Adding a var
 
 ### 3.4 Missing values
 
-There is no null. A value that may be absent has type `maybe T`, with values `some x` and `nothing`. A `maybe` value must go through `choose` before the value inside it is used. `some` applies to the whole arithmetic expression after it: `some total + tax` is `some (total + tax)`.
+There is no null. A value that may be absent has type `maybe T`, with values `some x` and `nothing`. A `maybe` value must go through `choose` before the value inside it is used. `some` applies to the next term, as a minus sign does: `some (total + tax)`. Written without brackets, `some total + tax` adds a number to a `maybe`, which is a type error, not a different reading.
 
 ### 3.5 Refinements
 
@@ -272,9 +276,46 @@ A call is the operation's name, its first argument, then label words with furthe
 - A call with several unlabelled arguments, `gcd a, b`, stands bare only as a whole statement or as the whole value of `let`, `var`, `set`, `return` or `fail`. Anywhere else it goes in parentheses, `[(gcd 12, 18), 6]` or `if (gcd a, b) = 1`, because a comma also separates list items, parts and quantifier ranges.
 - `account's balance` is another spelling of `balance of account`, and possessives chain: `user's manager's name` is `name of manager of user`. A path uses possessives or `of`, never both, so `name of user's manager` is an error: each direction is clear alone, but mixed, the reader would need a precedence rule to know which applies first. The formatter chooses the clearer spelling for each path.
 
-### 5.2 Precedence
+### 5.2 Precedence and grouping
 
-From loosest to tightest: `implies`; a chain of `and` or a chain of `or` (never mixed); `not`; comparisons (which chain); `followed by` (joining sequences); `+` and `-`; `*`, `/` and `mod`; calls, `of` and `at entry`.
+Every line has exactly one reading (Section 1), and the only precedence a reader needs is what school arithmetic teaches:
+
+| From tightest to loosest | Example | Why a reader already knows it |
+| --- | --- | --- |
+| Calls, `of`, `at entry` | `total of cart + tax` is `(total of cart) + tax` | Like `sin x + 1` |
+| `-`, `some`, `try` before a term | `-a + b`, `(try parse_int text) + 1` | A minus sign applies to the next term |
+| `*`, `/`, `mod`, then `+`, `-` | `a + b * c` | School arithmetic |
+| Comparisons, which chain | `0 ≤ i < n` | School arithmetic |
+| A chain of `and`, or a chain of `or` | `x > 0 and y > 0` | Plain English |
+
+Brackets group arithmetic only: `(a + b) * c`. They never group logic.
+
+`and` and `or` never mix on one line, and `not` negates a whole condition, never one link of a chain: `not paid and shipped` is an error. `followed by` joins single terms: `a followed by (b + c)`. `implies` joins two conditions on one line, or is written across two aligned lines as `if` and `then`:
+
+```
+ensure for every x in items, x > 0 implies x < limit
+ensure
+    if for every x in items, x > 0
+    then count of items < limit
+```
+
+Anything else is grouped by layout. A **condition group** is `all of`, `any of` or `none of` followed by its conditions, one per line in the block beneath, or several on one line separated by commas. Groups nest; a line inside a group holds one condition, with no `and` or `or`, so the group's header is the only thing joining its lines:
+
+```
+return all of
+    status of order is in [Paid, Shipped]
+    customer is active
+    none of
+        order is disputed
+        customer is suspended
+    any of
+        days_since_payment of order ≤ 30
+        all of customer is premium, days_since_payment of order ≤ 90
+```
+
+A comma at the end of a line in a group is optional. If one is written, another item of the same group must follow it, so a comma that disagrees with the indentation is an error. The formatter leaves these commas out of the stored text; the review view draws them, and draws a labelled rule beside each group. A group can follow `expect`, `ensure`, `invariant`, `holds when`, `let … be` and `return`.
+
+**Open:** a condition group or an `if` / `then` pair as the condition of an `if` or `repeat while` statement, whose own block follows (Section 14).
 
 ### 5.3 Constructing records
 
@@ -294,7 +335,7 @@ One comprehension form, used in code and in contracts:
 let paid be sum of total_of order for each order in orders where status of order is Paid
 ```
 
-A comprehension may only follow `of`, or sit in parentheses. There is no `map`, `filter` or `reduce`.
+A comprehension follows `of`, as above, or stands alone as a list in list brackets: `[price of item for each item in items]`. Like `where`, it covers the rest of its line (Section 5.5), so a comprehension is the whole value of its line, the last operand of a comparison, or in brackets. There is no `map`, `filter` or `reduce`.
 
 ### 5.5 Quantifiers and conditions
 
@@ -304,10 +345,7 @@ for every j from 0 until low, item j of items < target
 there is an item in items where price of item > limit
 ```
 
-Two rules settle scope:
-
-- `where` takes the rest of its line.
-- A quantifier (`for every x, ...`) takes the rest of its line.
+A word that opens a scope covers the rest of its line: `for every`, `there is`, `where`, a comprehension's `for each`, and `if …,` in an `ensure`. This is the same rule a statement header follows, and the only one: there is no other way for a scope to end. Any other grouping is written with a block (Section 5.2), so a quantifier is never one operand among others on a line.
 
 ### 5.6 Strings
 
@@ -468,7 +506,7 @@ to load_dashboard user using services
     together
         let profile be fetch profile of user from services
         let orders be fetch orders of user from services
-        let alerts be fetch alerts of user from services, or else none
+        let alerts be fetch alerts of user from services, or else nothing
     return a Dashboard from profile, orders, alerts
 ```
 
@@ -898,7 +936,7 @@ These are the decisions this draft does not settle. Each names what blocks it. A
 | 3 | `allocates` as a contract clause, with the allocator passed as context | Proposed | Measuring how many contracts it adds lines to |
 | 4 | A small rule language for system files in place of fixed English templates | Proposed | Keyword count (Appendix A) |
 | 5 | Possessive paths: `account's balance` | Settled | Allowed, never mixed with `of` in one path (5.1) |
-| 6 | Reduce the keyword set (now 103 hard, 80 soft) | Open | Experiment 1, the comprehension test, extended to compare candidate words for the same idea: for example `hold` against `with`, `using` and `lease` |
+| 6 | Reduce the keyword set (now 107 hard, 78 soft) | Open | Experiment 1, the comprehension test, extended to compare candidate words for the same idea: for example `hold` against `with`, `using` and `lease` |
 | 7 | Parser strategy: the grammar is not LALR(1) | Open | Deciding between a hand-written parser that follows the grammar, and changing the grammar until a generator accepts it |
 | 8 | Code generator for WebAssembly, the version 1 target: a back end of our own, or one built on LLVM or Cranelift | Open | A compile-time benchmark on the pilot corpus |
 | 9 | Solver and proof format for `proven` clauses | Open | Choosing a solver that is fast and gives stable results across versions |
@@ -906,25 +944,19 @@ These are the decisions this draft does not settle. Each names what blocks it. A
 | 11 | How host-dependent facts are declared (10.3), and which host bindings impact analysis compares by default | Proposed | Re-expressing the replay's platform-specific breakages with it |
 | 12 | Type rules for failures as values: how a failure `choice` relates to `fails with`, and how impact analysis compares a failure's fields | Open | Roadmap phase 5, with the translation wave that needs them |
 | 13 | How a cost that grows with an input is written (`cost at most`, 10.1), so impact analysis can compare orders of growth (12.3) | Open | A vocabulary of growth (constant, logarithmic, linear, `n log n`, quadratic) in terms of a named input; if it is not ready, version 1 has amounts only |
+| 14 | A condition group, or an `if` / `then` pair, as the condition of an `if` or `repeat while` statement whose own block follows | Open | A layout that keeps the condition's block and the statement's block apart at a glance; until then, name the condition with `let` |
 
 ## Appendix A: grammar notes
 
 The reference grammar is `grammar/scribe.lark` (version 0.3) in this project; `scribe-grammar-v0.2.lark` is the version the pilot measured. It is an Earley grammar: it states the language precisely but is not yet a production parser. `tools/check_grammar.py` tests it against a file per construct in this specification, a file per forbidden form, this specification's code blocks and the pilot corpora.
 
-**Vocabulary.** 183 reserved words: 103 hard keywords, which can never be names, and 80 soft keywords, which are names everywhere except in the position that gives them meaning. The articles `a`, `an` and `the` are hard. Reducing this count is open decision 6.
+**Vocabulary.** 185 reserved words: 107 hard keywords, which can never be names, and 78 soft keywords, which are names everywhere except in the position that gives them meaning. The articles `a`, `an` and `the` are hard. Reducing this count is open decision 6.
 
-**Special rules.** Twelve rules resolve what the grammar alone leaves ambiguous. The four that most affect readers:
-
-| Rule | Says |
-| --- | --- |
-| D1 | `where` takes the rest of its line |
-| D2 | A quantifier (`for every`, `there is`) takes the rest of its line |
-| Labels | A label word attaches to the outermost call on its line; `of` may appear at most once in a call and only first; labels are single words |
-| Mixing | `and` and `or` in one expression need parentheses; a comprehension may appear only after `of` or in parentheses |
+**No special rules for expressions.** Every accepted text has exactly one parse with no disambiguation applied: `tools/check_grammar.py` parses every test, every code block in this specification and the pilot corpora with the rules switched off, and fails on any text with two readings. The pilot's rules D1 and D2 (`where` and a quantifier take the rest of the line) are now the grammar's own structure (Section 5.5), and mixing `and` with `or` is a condition group (Section 5.2). One rule remains, pending a trial on the pilot's translations: a label word attaches to the outermost call on its line, and `of` may appear at most once in a call, and first.
 
 Constructions list their parts with commas, never `and`, so `and` is always logical.
 
-**Parser class.** Converted to Bison, the grammar has 206 shift/reduce and 20 reduce/reduce conflicts (version 0.2: 172 and 20), so it is not LALR(1). One ambiguity is real, not an artefact of the conversion. Open decision 7 settles the parser strategy; the requirement whichever way it goes is that every accepted text has exactly one tree, and that `scribe check --explain` shows it.
+**Parser class.** Converted to Bison, the grammar has 253 shift/reduce and 20 reduce/reduce conflicts (version 0.2: 172 and 20), so it is not LALR(1). Most are on label words and on type suffixes; the conflicts on scope words fell from 20 to 4 when quantifiers and comprehensions came to cover the rest of their line. One ambiguity is real, not an artefact of the conversion. Open decision 7 settles the parser strategy; the requirement whichever way it goes is that every accepted text has exactly one tree, and that `scribe check --explain` shows it.
 
 ## Appendix B: evidence and history
 
@@ -978,7 +1010,13 @@ What the replay changed in this specification:
 - Possessive paths are allowed and never mixed with `of` in one path, the same rule that keeps `and` and `or` apart (5.1).
 - Records can be built with fields by name: `a Point with x as 1, y as 2` (5.3). One element can be set: `set item i of heap to x`. `do nothing` fills a branch with nothing to do (4.2).
 - Every statement and every clause is one line; no clause continues onto the next (2.6, 10.6, 12.3).
-- A line that can be read two ways is not readable. Where a reading would otherwise depend on a rule, the language must make the structure visible instead (1). How it does so for expressions is being settled; until then, Appendix A's special rules stand.
+- A line that can be read two ways is not readable. Where a reading would otherwise depend on a rule, the language makes the structure visible instead (1):
+    - conditions that mix `and` and `or` are condition groups, `all of`, `any of` and `none of`, one condition per line, nesting like statement blocks; commas at the ends of their lines are optional, checked if present, and drawn by the review view (2.6, 5.2);
+    - a word that opens a scope covers the rest of its line, replacing the pilot's rules D1 and D2 (5.5);
+    - brackets group arithmetic only, and a comprehension standing alone is a list in list brackets (5.2, 5.4);
+    - `-`, `some` and `try` apply to the next term; `not` negates only a whole condition; `followed by` joins single terms (5.2);
+    - equality is only `=` and `≠`, and `is` only introduces a test (2.3);
+    - bit operations are named operations, with hex and binary literals (3.1).
 - Any expression goes wherever a value goes. A grammar rule that takes only a name or a literal needs a stated reason; otherwise types decide what fits, and mistakes the grammar no longer catches are the checker's to report (1).
 - A failure is a value, and `fail with` takes any expression (6).
 - Source never names an operating system. A difference between hosts is a fact about a capability, declared in its interface; this replaces clauses scoped `on <platform>` (10.3).

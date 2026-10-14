@@ -1,0 +1,9 @@
+to window of order for customer
+    given order is an Order
+    given customer is a Customer
+    produces Bool
+    let premium_window be all of customer is premium, days_since_payment of order ≤ 90
+    let in_window be any of
+        days_since_payment of order ≤ 30
+        premium_window
+    return in_window

@@ -1,0 +1,3 @@
+to f items
+    given items is a List of Int
+    ensure (for every x in items, x > 0) implies count of items > 0

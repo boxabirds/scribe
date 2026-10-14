@@ -1,0 +1,9 @@
+to totals of orders
+    given orders is a List of Order
+    produces Money
+    ensure result = sum of total_of order for each order in orders where status of order is Paid
+    ensure there is an order in orders where total_of order > 100 and status of order is Paid
+    let found be try fetch User from database where name is valid_name
+    let doubled be (sum of price of item for each item in items) * 2
+    let totals be [total_of order for each order in orders]
+    return sum of total_of order for each order in orders

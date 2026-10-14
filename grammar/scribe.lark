@@ -40,8 +40,10 @@ signature: name [name ("," name)*] ((label | "of") name)*              // DOC; F
 given: "given" name "is" typeexpr _NL
 produces: "produces" typeexpr _NL
 fails: "fails" "with" name_list _NL
-expect: "expect" expr [because] _NL
+expect: "expect" line_condition
 ensure: "ensure" ensure_body ["corrects" STRING] [because] _NL              // SPEC 10.6: one line
+       | "ensure" group                                                    -> ensure_group
+       | "ensure" [because] if_then                                        -> ensure_if_then
 ensure_body: expr
            | "if" "it" "succeeds" "," expr                                  -> on_success
            | "if" "it" "fails" ["with" "anything" "but" name] "," expr       -> on_failure_case
@@ -54,7 +56,7 @@ declassifies: "declassifies" name "to" name because _NL
 deadline: "deadline" expr _NL                                                // SPEC 1: any expression
 runs: "runs" "at" "most" "once" "per" name _NL                                // SPECIAL EX 40
 survives: "survives" "restarts" _NL                                          // SPECIAL EX 40
-holds: "holds" "when" expr _NL
+holds: "holds" "when" line_condition
 because: "because" STRING
 cost: "cost" "at" "most" expr _NL                                             // SPEC 10.1
 assumes_clause: "assumes" STRING "assumed" "owner" name ["monitor" monitor_policy] _NL   // SPEC 10.1
@@ -99,7 +101,7 @@ cap_kind: "files" | "network" | "database"
 typedecl: "type" name ["of" name] ["in" "state" name ("or" name)*] ["is" typeexpr] _NL [_INDENT member+ _DEDENT]
 ?member: "field" name "as" typeexpr _NL               -> field
        | "model" name "as" expr _NL                   -> model
-       | "invariant" expr [because] _NL               -> type_invariant
+       | "invariant" line_condition                   -> type_invariant
 choice: "choice" name _NL _INDENT variant+ _DEDENT
 variant: name ["with" field_decl ("," field_decl)*] _NL                       // SPEC 3.3: parts take commas
 field_decl: name "as" typeexpr
@@ -172,6 +174,7 @@ migration: "migration" name "from" "version" INT "to" "version" INT "turning" na
       | "try" comma_call                                          -> try_
 comma_call: name operand ("," operand)+ label_arg*
 let: "let" name "be" value ["," "or" "else" expr] _NL
+   | "let" name "be" group                                          -> let_group
 var: "var" name "starts" "at" value _NL
 set: "set" place "to" value _NL
 // SPEC 2.1: the update forms; each word is reserved, so none can name an operation
@@ -185,6 +188,7 @@ place: path_place | possessive_place
 path_place: name operand* ["of" path_place]
 possessive_place: name ("'s" name)+
 return_stmt: "return" value _NL
+           | "return" group                                       -> return_group
 // SPEC 6: a failure is a value, so `fail with` takes any expression
 fail: "fail" "with" value _NL
 // SPEC 4.2: a statement that does nothing, for a branch with nothing to do
@@ -193,7 +197,7 @@ if_stmt: "if" expr block ("otherwise" "if" expr block)* ["otherwise" block]
 for_each: "for" "each" name "from" expr range_word expr block
         | "for" "each" name "in" expr block                        -> for_each_in
 repeat_while: "repeat" "while" expr block
-invariant: "invariant" expr [because] _NL
+invariant: "invariant" line_condition
 decreases: "decreases" expr _NL
 choose: "choose" expr _NL _INDENT when+ _DEDENT
 when: "when" pattern block
@@ -220,25 +224,67 @@ elided: ELIDED _NL
 expr_stmt: (call | name | comma_call | "try" application | "try" comma_call) _NL
 
 // ---------------------------------------------------------------- expressions
-// DOC rule 10: a logic chain is all "and" or all "or"; mixing needs parentheses.
-// SPEC 2.3: the symbols are accepted on input and never displayed
-?expr: logic [implies_op logic]                                 -> implication
+// SPEC 1: every line has exactly one reading without any precedence rule beyond
+// school arithmetic, so this grammar needs no disambiguation rules.
+//
+// A condition stands alone: on its own line, after a clause word, or as one item
+// of a condition group. A word that opens a scope (a quantifier, `there is`,
+// `where`, a comprehension's `for each`) covers the rest of its line (SPEC 3), so
+// a quantifier is never an operand. `and` and `or` never mix on one line, and
+// `not` negates a whole condition, never one link of a chain (SPEC 7). The
+// symbols are accepted on input and never displayed (SPEC 2.3).
+?expr: condition
+?condition: quantified
+          | aggregate
+          | where_call
+          | "try" where_call                                  -> try_
+          | logic implies_op logic                            -> implication
+          | not_op comparison                                 -> not_
+          | logic
 implies_op: "implies" | "⇒"
-?logic: negation (and_op negation)+                             -> and_chain
-      | negation (or_op negation)+                              -> or_chain
-      | negation
+?logic: comparison (and_op comparison)+                         -> and_chain
+      | comparison (or_op comparison)+                          -> or_chain
+      | comparison
 and_op: "and" | "∧" | "&&"
 or_op: "or" | "∨" | "||"
-?negation: not_op negation                                      -> not_
-         | quantified
-         | comparison
 not_op: "not" | "¬" | "!"
 for_every: "for" "every" | "∀"
-quantified: for_every name ["in" sum | "from" sum range_word sum | "that" "is" typeexpr] "," expr
-          | ("there" "is" | "∃") [article] name "in" sum "where" where_cond -> exists
+quantified: for_every name ["in" sum | "from" sum range_word sum | "that" "is" typeexpr] "," condition
+          | ("there" "is" | "∃") [article] name "in" sum "where" condition -> exists
+
+// SPEC 2.6: a condition group joins conditions by its header, one per line in an
+// indented block, or several on one line separated by commas. Groups nest. A
+// comma at the end of a line in a block is optional and, if present, must be
+// followed by another item of the same block (SPEC 11).
+group: group_kind "of" (_NL _INDENT group_item* group_last _DEDENT | inline_group _NL)
+group_kind: "all" | "any" | "none"
+inline_group: item_condition ("," item_condition)+
+?group_item: item_condition [","] _NL
+           | group
+?group_last: item_condition _NL
+           | group
+// one condition per item: the group's header is the only thing joining its items,
+// so an item holds no `and` or `or` chain (SPEC 2)
+?item_condition: quantified
+               | aggregate
+               | where_call
+               | "try" where_call                             -> try_
+               | comparison implies_op comparison             -> implication
+               | not_op comparison                            -> not_
+               | comparison
+// SPEC 2: `implies` across lines, as two aligned lines
+if_then: _NL _INDENT "if" condition _NL "then" condition _NL _DEDENT
+// what may follow a clause word or `be`: a condition on the line, a group, or
+// an if/then block
+?line_condition: condition [because] _NL
+               | group
+               | [because] if_then
 
 ?comparison: concat
            | concat (comp_op concat)+                           -> compare
+// a comprehension or a `where` covers the rest of its line, so it may be the
+// last operand of a comparison
+           | concat (comp_op concat)* comp_op (aggregate | where_call) -> compare
            | concat "is" article name "of" concat               -> predicate_of
 // FIX-5: bare "in" is no longer a membership alias; "is in" and "∈" remain.
 comp_op: "is" | "=" | "=="
@@ -251,13 +297,14 @@ comp_op: "is" | "=" | "=="
        | "is" "not" "in"
        | "is" "after" | "is" "not" "after" | "is" "before"
 
-?concat: some_level ("followed" "by" some_level)*
-// SPEC 3.4: `some` takes the whole arithmetic expression after it
-?some_level: "some" some_level                                 -> some
-           | sum
+// SPEC 14: `followed by` joins single terms; arithmetic in an operand takes brackets
+?concat: sum
+       | unary ("followed" "by" unary)+                         -> join
 ?sum: product (("+" | "-") product)*
 ?product: unary (("*" | "/" | "mod") unary)*
+// SPEC 7: `-`, `some` and `try` apply to the next term, as minus does at school
 ?unary: "-" unary -> neg
+      | "some" unary -> some
       | postfix
 ?postfix: application
         | application "at" "entry"                            -> at_entry
@@ -272,16 +319,15 @@ comp_op: "is" | "=" | "=="
 call: name operand+
     | name operand* "of" of_operand label_arg*
     | name operand* label_arg+
-    | name operand* "of" comprehension                         -> aggregate
+aggregate: name operand* "of" comprehension
 // a labelled argument may be a possessive path; an `of` operand may not (SPEC 5.1)
 label_arg: label (of_operand | possessive)
-         | "where" where_cond                                   -> where_arg
+// SPEC 3: `where` covers the rest of its line, so a call with a `where` is the
+// whole condition or value, or sits in brackets
+where_call: name operand* ["of" of_operand] label_arg* "where" condition
 of_operand: name operand* ["of" of_operand]
           | atom
-comprehension: of_operand "for" "each" name "in" of_operand ["where" where_cond]
-// D1: "where" takes the rest of its line; D2: a quantifier takes the rest of its line
-// (both resolved after parsing, see tools/run3.py; D2 added after the Bison counterexample)
-where_cond: expr
+comprehension: of_operand "for" "each" name "in" of_operand ["where" condition]
 label: "from" | "for" | "with" | "in" | "into" | "onto" | "over" | "using"
      | "to" | "by" | "as"
 // FIX-6: a construction lists its parts with commas, not "and".
@@ -290,20 +336,24 @@ label: "from" | "for" | "with" | "in" | "into" | "onto" | "over" | "using"
 // part takes parentheses, as it does in an argument
 construction: article name "from" of_operand ("," of_operand)* ["with" field_init ("," field_init)*]
             | article name "with" field_init ("," field_init)*
-field_init: name "as" expr
+field_init: name "as" comparison
 
 ?operand: name | atom | possessive
 // SPEC 5.1: `account's balance` is `balance of account`; a possessive path never
 // mixes with `of`, so `name of user's manager` is rejected
 possessive: (name | atom) ("'s" name)+
+// SPEC 4: brackets group arithmetic only; logic is grouped by layout
 ?atom: literal
-     | "(" expr ")"
+     | "(" concat ")"
      | "(" comma_call ")"
-     | "(" comprehension ")"                                    -> comprehension_value   // FIX-4
-     | "[" [expr ("," expr)*] "]"                               -> list
+     | "(" aggregate ")"
+     | "(" where_call ")"
+// a comprehension standing alone makes a list, so it is written in list brackets
+     | "[" comprehension "]"                                    -> comprehension_value   // FIX-4, SPEC 4
+     | "[" [comparison ("," comparison)*] "]"                   -> list
      | "result"                                                 -> result
      | "nothing"                                                -> nothing
-?literal: INT | DECIMAL | VERSION | STRING | QUANTITY | DATE
+?literal: INT | DECIMAL | VERSION | STRING | QUANTITY | DATE | HEX | BINARY
 
 version: VERSION | DECIMAL | INT
 
@@ -315,6 +365,9 @@ ELIDED: "⋯"
 PROSE: /⟪[^⟫]*⟫/
 STRING: /"([^"\\]|\\.)*"/
 DATE.3: /\d{4}-\d{2}-\d{2}/
+// SPEC 13: hex and binary literals, with `_` allowed between digits
+HEX.3: /0x[0-9A-Fa-f](_?[0-9A-Fa-f])*/
+BINARY.3: /0b[01](_?[01])*/
 VERSION.2: /\d+\.\d+\.\d+/
 DECIMAL.1: /\d+\.\d+/
 INT: /\d+/
@@ -325,8 +378,6 @@ NAME: /[A-Za-z][A-Za-z0-9_]*/
 name: NAME
     | "about"
     | "added"
-    | "all"
-    | "any"
     | "anything"
     | "assert"
     | "assumed"
@@ -403,4 +454,4 @@ name: NAME
     | "version"
     | "wiring"
     | "write"
-QUANTITY.4: /\d+(\.\d+)?[ ]+(?!(compatibility|declassifies|attenuated|components|everything|idempotent|operations|authority|component|decreases|decrement|increment|interface|invariant|migration|non_empty|otherwise|anything|checking|consumed|contains|corrects|database|deadline|editable|followed|labelled|matching|pipeline|positive|produces|property|protocol|provides|reserved|restarts|sampling|subtract|succeeds|survives|together|workflow|assumed|assumes|backoff|because|changes|domains|example|failure|implies|limited|monitor|network|nothing|removed|through|turning|version|assert|before|cannot|choice|choose|define|domain|ensure|expect|handle|leaves|repeat|result|return|schema|stages|starts|system|varies|wiring|about|added|after|block|build|entry|every|fails|field|files|given|gives|holds|least|lemma|maybe|model|needs|owner|proof|queue|reach|retry|rules|sends|stage|state|there|times|trust|under|until|using|value|where|while|write|cost|each|else|fail|from|hold|host|into|less|more|most|must|once|only|onto|over|port|read|root|runs|skip|some|stop|than|that|tier|time|type|uses|when|with|add|all|and|any|but|can|for|its|let|may|mod|not|one|own|per|set|the|try|use|var|an|as|at|be|by|do|if|in|is|it|no|of|on|or|to|a)(?![A-Za-z0-9_]))[A-Za-z][A-Za-z0-9_]*/
+QUANTITY.4: /\d+(\.\d+)?[ ]+(?!(compatibility|declassifies|attenuated|components|everything|idempotent|operations|authority|component|decreases|decrement|increment|interface|invariant|migration|non_empty|otherwise|anything|checking|consumed|contains|corrects|database|deadline|editable|followed|labelled|matching|pipeline|positive|produces|property|protocol|provides|reserved|restarts|sampling|subtract|succeeds|survives|together|workflow|assumed|assumes|backoff|because|changes|domains|example|failure|implies|limited|monitor|network|nothing|removed|through|turning|version|assert|before|cannot|choice|choose|define|domain|ensure|expect|handle|leaves|repeat|result|return|schema|stages|starts|system|varies|wiring|about|added|after|block|build|entry|every|fails|field|files|given|gives|holds|least|lemma|maybe|model|needs|owner|proof|queue|reach|retry|rules|sends|stage|state|there|times|trust|under|until|using|value|where|while|write|cost|each|else|fail|from|hold|host|into|less|more|most|must|none|once|only|onto|over|port|read|root|runs|skip|some|stop|than|that|then|tier|time|type|uses|when|with|add|all|and|any|but|can|for|its|let|may|mod|not|one|own|per|set|the|try|use|var|an|as|at|be|by|do|if|in|is|it|no|of|on|or|to|a)(?![A-Za-z0-9_]))[A-Za-z][A-Za-z0-9_]*/

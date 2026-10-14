@@ -30,12 +30,15 @@ Decisions from the review of readability and unambiguous presentation
 | # | Decision | Status |
 | --- | --- | --- |
 | 1 | Every line has exactly one reading, visible without knowing any precedence rule beyond school arithmetic; this holds for the stored text and every view | Approved; in spec Section 1 |
-| 2 | Condition groups: `all of`, `any of` and `none of` open blocks that nest; one condition per line inside a block; `implies` across lines is `if` / `then` on two aligned lines; `all`, `any` and `none` reserved | Open |
-| 3 | A word that opens a scope (`for every`, `there is`, `where`, `for each`, `if …,` in `ensure`) covers the rest of its line; any other grouping uses a block. Replaces rules D1 and D2 | Open |
-| 4 | Parentheses group arithmetic only; logic is grouped by layout, and `and` and `or` never mix on one line | Open |
-| 5 | A block indented under a line is part of that line's structure, as for statements; a line never continues onto the next | Open |
-| 6 | Which call a label belongs to, and calls inside lists: trial a rule on the pilot translations before deciding | Open |
-| 7 | `some`, `try` and `not` apply to a single term | Open |
-| 11 | Commas at line ends in condition blocks are optional on input, checked if present, left out of the stored text and drawn by the review view; one-line groups need them | Approved; takes effect with 2 |
-| 12 | `is` only introduces a test (variant, `nothing`, predicate, membership); equality is only `=` and `≠` | Open |
-| 13 | Bit operations are named operations on fixed-width unsigned types (`bitwise_and flags with mask`, `shift_left value by 1`); hex and binary literals | Open |
+| 2 | Condition groups: `all of`, `any of` and `none of` open blocks that nest; one condition per line inside a block; `implies` across lines is `if` / `then` on two aligned lines; `all`, `any` and `none` reserved | Approved; in spec and grammar |
+| 3 | A word that opens a scope (`for every`, `there is`, `where`, `for each`, `if …,` in `ensure`) covers the rest of its line; any other grouping uses a block. Replaces rules D1 and D2 | Approved; in spec and grammar |
+| 4 | Parentheses group arithmetic only; logic is grouped by layout, and `and` and `or` never mix on one line | Approved; in spec and grammar |
+| 5 | A block indented under a line is part of that line's structure, as for statements; a line never continues onto the next | Approved; in spec and grammar |
+| 6 | Which call a label belongs to, and calls inside lists: trial a rule on the pilot translations before deciding | Approved: trial to run |
+| 7 | `some`, `try` and `not` apply to a single term | Approved; in spec and grammar |
+| 11 | Commas at line ends in condition blocks are optional on input, checked if present, left out of the stored text and drawn by the review view; one-line groups need them | Approved; in spec and grammar |
+| 12 | `is` only introduces a test (variant, `nothing`, predicate, membership); equality is only `=` and `≠` | Approved; in spec and grammar |
+| 13 | Bit operations are named operations on fixed-width unsigned types (`bitwise_and flags with mask`, `shift_left value by 1`); hex and binary literals | Approved; in spec and grammar |
+| 14 | `followed by` joins single terms; arithmetic in an operand takes brackets | Approved; in spec and grammar |
+| 15 | The reference grammar has zero LALR(1) conflicts, checked in CI, so it is proven unambiguous | Proposed |
+| 16 | Generated or hand-written parser, decided once 15 holds, by comparing error messages | Proposed |

@@ -84,7 +84,9 @@ def ambiguities(tree):
             yield line, readings
 
 
-def parse_file(parser, expr_parser, path):
+def parse_file(parser, expr_parser, path, rules=True):
+    """Parse one file. With rules=False the disambiguation rules are not applied,
+    so every ambiguity the grammar leaves is reported."""
     src = open(path).read()
     rec = {"file": path, "status": None, "ambiguities": [], "error": None,
            "interpolations": []}
@@ -106,7 +108,8 @@ def parse_file(parser, expr_parser, path):
                         "source": src_line}
         return rec
     rec["resolved"] = Counter()
-    resolve(tree, rec["resolved"])
+    if rules:
+        resolve(tree, rec["resolved"])
     rec["resolved"] = dict(rec["resolved"])
     amb = list(ambiguities(tree))
     lines = src.split("\n")
@@ -119,7 +122,9 @@ def parse_file(parser, expr_parser, path):
     for lineno, inner in interpolations(src):
         r = {"line": lineno, "text": inner}
         try:
-            t = resolve(expr_parser.parse(inner), Counter())
+            t = expr_parser.parse(inner)
+            if rules:
+                t = resolve(t, Counter())
             n = len(list(ambiguities(t)))
             r["status"] = "ambiguous" if n else "ok"
         except UnexpectedInput as e:

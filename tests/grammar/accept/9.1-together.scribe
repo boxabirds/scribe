@@ -7,5 +7,5 @@ to load_dashboard user using services
     uses services
     together
         let profile be fetch profile of user from services
-        let alerts be fetch alerts of user from services, or else none
+        let alerts be fetch alerts of user from services, or else nothing
     return a Dashboard from profile, alerts

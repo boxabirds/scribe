@@ -1,7 +1,8 @@
 # Porting to Scribe
 
 A guide for translating code from other languages into Scribe. It grows as
-porting finds more to say; for now it covers parameters and names.
+porting finds more to say; for now it covers parameters, conditions, bit
+operations and names.
 
 ## Parameters
 
@@ -20,10 +21,53 @@ The label words are `from`, `to`, `in`, `into`, `onto`, `over`, `for`, `with`,
 bare only as a whole statement or a whole value (`let g be gcd a, b`);
 anywhere else it goes in parentheses: `if (gcd a, b) = 1`.
 
+## Conditions
+
+Every line of Scribe has exactly one reading, so a condition never relies on
+precedence between `and`, `or` and `not`. A chain of only `and`, or only `or`,
+fits on one line. Anything that mixes them becomes a condition group:
+`all of`, `any of` or `none of`, with one condition per line beneath it.
+
+| Source | Scribe |
+| --- | --- |
+| `paid and shipped` | `paid and shipped` |
+| `a and (b or c)` | `all of` / `a` / `any of b, c` on the lines below, as shown next |
+| `not (a or b)` | `none of a, b` |
+| `!a && b` | `all of` / `not a` / `b`: `not` never sits inside a chain |
+| `x > 0 ? y : z` | `if` statements; a condition is never a value chooser |
+
+```
+return all of
+    status of order is in [Paid, Shipped]
+    none of order is disputed, customer is suspended
+    any of
+        days_since_payment of order ≤ 30
+        all of customer is premium, days_since_payment of order ≤ 90
+```
+
+Brackets group arithmetic only, never logic. A comma at the end of a line in a
+group is optional; the review view draws it.
+
+## Bit operations
+
+Scribe has no bit operators. Bit operations are named operations on the
+fixed-width unsigned types, so they need no precedence:
+
+| Source | Scribe |
+| --- | --- |
+| `flags & mask` | `bitwise_and flags with mask` |
+| `flags \| bit` | `bitwise_or flags with bit` |
+| `a ^ b` | `bitwise_xor a with b` |
+| `~x` | `bitwise_not x` |
+| `x << 3` | `shift_left x by 3` |
+| `x >> 3` | `shift_right x by 3` |
+| `(x >> n) & 1` | `bit n of x` |
+| `0xFF`, `0b1010` | `0xFF`, `0b1010`; `_` may separate digits: `0xFFFF_FFFF` |
+
 ## Reserved words
 
-Scribe reserves more words than most languages: 102 hard keywords, which can
-never be names, and 80 soft keywords, which are keywords only inside their own
+Scribe reserves more words than most languages: 107 hard keywords, which can
+never be names, and 78 soft keywords, which are keywords only inside their own
 phrase and ordinary names everywhere else. Scribe is written by machines and
 read by people, so a word reserved to make a line unambiguous costs readers
 nothing (specification, Section 2.5).
@@ -93,6 +137,7 @@ make this easier than the list suggests:
 | `some`, `nothing` | Present and absent values of a `maybe` | Rarely names; `some` in some query code | `any_of`, `empty` |
 | `let`, `var` | Bindings | Template variables | `variable`, `binding` |
 | `may` | `may block` | The month (lower case) | `month_may`, or the capitalised variant `May` |
+| `all`, `any`, `none` | Condition groups: `all of`, `any of`, `none of` | Collection helpers, flags | `everything`, `any_found`, `none_found`, `empty` |
 
 ### Other hard keywords
 
@@ -119,3 +164,4 @@ These are rarely names in other languages, so they seldom need renaming.
 | `followed` | `followed by`, joining sequences |
 | `attenuated` | Narrows a capability |
 | `do` | `do nothing`, for a branch with nothing to do |
+| `then` | The second line of a condition written as `if` / `then` |

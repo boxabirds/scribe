@@ -1,0 +1,22 @@
+to may_refund order for customer
+    given order is an Order
+    given customer is a Customer
+    produces Bool
+    expect any of customer is active, customer is trusted
+    return all of
+        status of order is in [Paid, Shipped],
+        customer is active,
+        none of
+            order is flagged_as_fraud,
+            order is disputed,
+            customer is suspended
+        any of
+            days_since_payment of order ≤ 30
+            all of
+                customer is premium,
+                days_since_payment of order ≤ 90
+            all of
+                status of order is Shipped
+                order is not delivered
+                not tracked of order
+        amount of order ≤ refund_limit of customer

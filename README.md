@@ -74,17 +74,20 @@ These tools started as copies of the pilot's. Since then: the grammar build is
 deterministic (the pilot ordered keywords of equal length by Python's set
 order), and the pre-lexer reports a tab at the start of a line as a tab.
 
-### Version 0.3 against the current spec
+### The grammar against the current spec
+
+Every check runs with no disambiguation rules: every line must have exactly
+one reading on its own (spec Section 1).
 
 | Check | Result |
 | --- | --- |
-| Conformance tests, one per construct (`tests/grammar/accept`) | 42 of 42 parse with one reading |
-| Forbidden forms (`tests/grammar/reject`) | 19 of 19 rejected |
-| Spec code blocks | 24 of 27; the other 3 are fragments, not whole programs |
-| Pilot doc examples, repaired | 40 of 42; example 05 separates fields with `and` (spec 3.3), and example 30 names a field without `as` (spec 5.3) |
-| Pilot doc examples, as written | 31 of 42; example 22's `run ReportExporter with reports and partner`, one of the pilot's silent misreadings, is now an error |
-| Pilot translations | 7 of 43, up from 5; two of the new ones parse as a logical `and` the checker must reject (`tests/checker`) |
-| Bison | 206 shift/reduce and 20 reduce/reduce conflicts (v0.2: 172 and 20) |
+| Conformance tests, one per construct (`tests/grammar/accept`) | 49 of 49 parse with one reading |
+| Forbidden forms (`tests/grammar/reject`) | 27 of 27 rejected |
+| Spec code blocks | 25 of 29; the other 4 are fragments of clauses, not whole programs |
+| Pilot doc examples, repaired | 38 of 42; the 4 others use forms the language has since changed: fields joined by `and` (05), a field without `as` (30), `none` as a value (40), a list comprehension in round brackets (46) |
+| Pilot doc examples, as written | 30 of 42 |
+| Pilot translations | 7 of 43; two parse as a logical `and` the checker must reject (`tests/checker`) |
+| Bison | 253 shift/reduce and 20 reduce/reduce conflicts, mostly on label words and type suffixes (v0.2: 172 and 20) |
 
 [grammar/DECISIONS.md](grammar/DECISIONS.md) lists the open questions the
 production parser needs settled.

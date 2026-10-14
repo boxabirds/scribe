@@ -53,7 +53,8 @@ def scribe_files(directory):
 
 
 def statuses(parser, expr_parser, files):
-    return {os.path.basename(f): parse_file(parser, expr_parser, f)["status"] for f in files}
+    # no disambiguation rules: every line must have exactly one reading (spec Section 1)
+    return {os.path.basename(f): parse_file(parser, expr_parser, f, rules=False)["status"] for f in files}
 
 
 def corpus_statuses(parser, expr_parser, directory):
@@ -78,7 +79,7 @@ def spec_statuses(parser, expr_parser):
             key = next(l.strip() for l in text.splitlines() if l.strip())
             path = os.path.join(tmp, f"{line:04d}.scribe")
             open(path, "w").write(text)
-            out[key] = parse_file(parser, expr_parser, path)["status"]
+            out[key] = parse_file(parser, expr_parser, path, rules=False)["status"]
     return out
 
 

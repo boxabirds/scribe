@@ -3,8 +3,10 @@
 hard a
 hard add
 hard after
+hard all
 hard an
 hard and
+hard any
 hard as
 hard assumes
 hard at
@@ -58,6 +60,7 @@ hard mod
 hard model
 hard more
 hard most
+hard none
 hard not
 hard nothing
 hard of
@@ -86,6 +89,7 @@ hard survives
 hard system
 hard than
 hard the
+hard then
 hard there
 hard through
 hard tier
@@ -105,8 +109,6 @@ hard with
 hard workflow
 soft about
 soft added
-soft all
-soft any
 soft anything
 soft assert
 soft assumed

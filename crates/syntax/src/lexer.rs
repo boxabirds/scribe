@@ -22,6 +22,10 @@ pub enum TokenKind {
     Decimal,
     Version,
     Date,
+    /// `0xFF`, with `_` allowed between digits.
+    Hex,
+    /// `0b1010`, with `_` allowed between digits.
+    Binary,
     /// A number followed directly by a word that is not a keyword: `30 seconds`.
     Quantity,
     Str,
@@ -46,6 +50,8 @@ impl TokenKind {
             TokenKind::Decimal => "decimal",
             TokenKind::Version => "version",
             TokenKind::Date => "date",
+            TokenKind::Hex => "hex",
+            TokenKind::Binary => "binary",
             TokenKind::Quantity => "quantity",
             TokenKind::Str => "string",
             TokenKind::Prose => "prose",
@@ -321,9 +327,41 @@ fn fraction(chars: &[char], k: usize) -> Option<usize> {
     }
 }
 
+/// After `0x` or `0b` at `k`, the end of the digits that `valid` accepts, with
+/// single underscores between them; `None` if no digit follows the prefix.
+fn radix_digits(chars: &[char], k: usize, valid: fn(char) -> bool) -> Option<usize> {
+    let mut e = k + 2;
+    if !chars.get(e).is_some_and(|&c| valid(c)) {
+        return None;
+    }
+    e += 1;
+    loop {
+        match (chars.get(e), chars.get(e + 1)) {
+            (Some(&c), _) if valid(c) => e += 1,
+            (Some('_'), Some(&c)) if valid(c) => e += 2,
+            _ => return Some(e),
+        }
+    }
+}
+
 /// The kind and end of the number starting at `k`, in the grammar's order of
-/// priority: quantity, date, version, decimal, integer.
+/// priority: quantity, then hex, binary and date, then version, decimal, integer.
 fn number_at(chars: &[char], k: usize) -> (TokenKind, usize) {
+    if chars[k] == '0' {
+        match chars.get(k + 1) {
+            Some('x') => {
+                if let Some(e) = radix_digits(chars, k, |c| c.is_ascii_hexdigit()) {
+                    return (TokenKind::Hex, e);
+                }
+            }
+            Some('b') => {
+                if let Some(e) = radix_digits(chars, k, |c| c == '0' || c == '1') {
+                    return (TokenKind::Binary, e);
+                }
+            }
+            _ => {}
+        }
+    }
     let int_end = digits(chars, k);
 
     // Quantity: a number, spaces, then a word that is not a keyword.
@@ -435,6 +473,15 @@ mod tests {
                 (TokenKind::Int, "4".into()),
             ]
         );
+    }
+
+    #[test]
+    fn hex_and_binary() {
+        let k = kinds("let a be [0xFF, 0xFFFF_FFFF, 0b1010_0001, 0]\n");
+        assert!(k.contains(&(TokenKind::Hex, "0xFF".into())));
+        assert!(k.contains(&(TokenKind::Hex, "0xFFFF_FFFF".into())));
+        assert!(k.contains(&(TokenKind::Binary, "0b1010_0001".into())));
+        assert!(k.contains(&(TokenKind::Int, "0".into())));
     }
 
     #[test]

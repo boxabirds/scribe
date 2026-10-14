@@ -7,6 +7,6 @@ to classify x
         return "large"
     otherwise if x is at most 10 and x is at least 1
         return "small"
-    otherwise if x is not 50
+    otherwise if x ≠ 50
         return "other"
     return "fifty"

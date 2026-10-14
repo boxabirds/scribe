@@ -1,0 +1,6 @@
+to f p with q
+    given p is a Bool
+    given q is a Bool
+    return all of
+        p and q
+        q

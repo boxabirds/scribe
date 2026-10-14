@@ -1,0 +1,7 @@
+note From the pilot's doc example 18: `is` used for equality. `is` only
+note introduces a test (a variant, `nothing`, a predicate, membership).
+note Expected diagnostic: use `=` for equality; `is` tests a variant, `nothing` or a predicate.
+to total_paid of orders
+    given orders is a List of Order
+    produces Money
+    ensure result is sum of total_of order for each order in orders where status of order is Paid
