@@ -113,6 +113,7 @@ Done when: wave 2 translates most functions without a gap.
 | Package manager and registry; versions computed from the manifest change | |
 | Language server for editors, including the review view | |
 | Documentation from contracts, the book, an index of every diagnostic | |
+| Porting guide from other languages ([docs/porting-guide.md](docs/porting-guide.md)): reserved words and what to use instead, checked against the grammar; grows with phase 5 and wave 2 | started |
 | A compact language reference for AI authors, and an evaluation of how well models write Scribe from it | |
 | The stability promise, including stable impact verdicts across compiler versions | |
 

@@ -1,0 +1,103 @@
+# Porting to Scribe
+
+A guide for translating code from other languages into Scribe. It grows as
+porting finds more to say; for now it covers names.
+
+## Reserved words
+
+Scribe reserves more words than most languages: 102 hard keywords, which can
+never be names, and 80 soft keywords, which are keywords only inside their own
+phrase and ordinary names everywhere else. Scribe is written by machines and
+read by people, so a word reserved to make a line unambiguous costs readers
+nothing (specification, Section 2.5).
+
+When a name in the source collides with a hard keyword, rename it. Three rules
+make this easier than the list suggests:
+
+- **Compound names are fine.** A name is one token, so `add_item`,
+  `file_handle` and `result_count` are all allowed even though `add`,
+  `handle` and `result` are not.
+- **Capitalised names are fine.** Keywords are lower case, and types start
+  with a capital (Section 2.4), so `Set`, `Type`, `Result` and `Interface`
+  can name types.
+- **Soft keywords are fine as names.** `value`, `version`, `queue`, `network`
+  and the other soft keywords can name variables. Only the hard keywords below
+  are a problem.
+
+### Hard keywords that are common names elsewhere
+
+| Keyword | What it does in Scribe | Common as a name for | Use instead |
+| --- | --- | --- | --- |
+| `a`, `an`, `the` | Articles in types: `a List of Int` | Short variables, the first of a pair | `x`, `first`, `left` |
+| `add` | Update: `add price to total` | Operations that append or insert | `add_item`, `insert`, `append`, `plus` |
+| `subtract` | Update: `subtract fee from balance` | Arithmetic helpers | `deduct`, `minus`, `take_away` |
+| `increment` | Update: `increment count` | Counter helpers | `bump`, `advance`, `count_up` |
+| `decrement` | Update: `decrement count` | Counter helpers | `count_down`, `lower` |
+| `result` | The value an operation produces, in contracts | Return values, outcomes | `outcome`, `answer`, `found` |
+| `return` | Ends an operation with its result | Fields holding a returned value | `returned`, `outcome` |
+| `type` | Declares a type | Kinds of thing, discriminators | `kind`, `category`, `variety` |
+| `set` | Changes a variable or field | Collections, setters | `members`, `seen`, `put` |
+| `handle` | Handles failures | File and resource handles | `file_handle`, `descriptor`, `token` |
+| `fail`, `fails`, `failure` | Failures and their handling | Error flags and error values | `failed`, `error`, `problem` |
+| `try` | Passes a failure up | Retry counters, attempts | `attempt`, `try_count` |
+| `stop`, `skip` | Leave or continue a loop | Flags and control variables | `halted`, `should_stop`, `skipped` |
+| `hold` | Holds a resource for a block | Holding state | `held`, `holding`, `keep` |
+| `holds` | Gives a predicate's condition | Holdings, positions | `holdings`, `positions` |
+| `changes` | Says what an operation may change | Diffs, change lists | `edits`, `deltas`, `change_list` |
+| `uses` | Says which capabilities an operation uses | Usage counts | `usage_count`, `usages` |
+| `runs` | `runs at most once per date` | Run counts, executions | `run_count`, `executions` |
+| `expect` | A precondition | Test assertions (JavaScript) | `expected`, `require` |
+| `model` | The abstract state of a type | Data models, ML models | `data_model`, `entity`, `predictor` |
+| `field` | A field of a record | Form fields, columns | `field_name`, `column`, `entry` |
+| `schema` | A versioned data schema | Database schemas | `record_schema`, `shape`, `layout` |
+| `migration` | A schema migration | Database migrations | `schema_change`, `upgrade` |
+| `system` | A system file | The operating system, a subsystem | `platform`, `host`, `subsystem` |
+| `component` | A unit of review and deployment | UI components, parts | `part`, `module`, `widget` |
+| `interface` | An interface's contract | APIs, network interfaces | `api`, `port`, `nic` |
+| `protocol` | A declared conversation | Wire protocols, scheme names | `wire_format`, `scheme`, `proto` |
+| `property` | A generated test | Object properties, attributes | `attribute`, `prop`, `trait_name` |
+| `example` | An exact example in a contract | Samples, fixtures | `sample`, `specimen`, `fixture` |
+| `proof` | Proof hints | Cryptographic proofs | `evidence`, `witness` |
+| `trust` | An escape hatch with an owner | Trust levels, scores | `trust_level`, `confidence` |
+| `tier` | A clause's assurance tier | Pricing or service tiers | `level`, `plan_tier`, `grade` |
+| `deadline` | A time limit monitored at run time | Due dates | `due`, `due_at`, `cutoff` |
+| `choice` | Declares a choice type | User selections | `selection`, `option`, `pick` |
+| `workflow` | Work that survives a restart | Jobs, processes | `job`, `process`, `flow` |
+| `pipeline` | Stages joined by bounded queues | Build or data pipelines | `stages`, `chain`, `flow` |
+| `repeat` | `repeat while` loops | Repetition counts | `repeat_count`, `times` |
+| `when` | A branch of `choose` | Times and moments | `moment`, `at_time`, `occurred_at` |
+| `where` | Filters in comprehensions and quantifiers | Locations | `place`, `location`, `site` |
+| `while`, `until` | Loop and range words | End times | `end_time`, `due`, `limit` |
+| `before`, `after` | Time comparisons | Earlier and later values | `earlier`, `later`, `start_time` |
+| `from`, `to` | Argument labels | Senders and recipients, range ends | `sender`, `recipient`, `start`, `end`, `source`, `target` |
+| `in`, `into`, `onto`, `over`, `for`, `with`, `by`, `as`, `using`, `of` | Argument labels | Inputs, options, units | `input`, `options`, `unit`, a name for what it holds |
+| `it` | `if it succeeds` in contracts | Iterators, the current item | `item`, `current`, `element` |
+| `mod` | Remainder | Modules, modulus | `module_name`, `modulus` |
+| `some`, `nothing` | Present and absent values of a `maybe` | Rarely names; `some` in some query code | `any_of`, `empty` |
+| `let`, `var` | Bindings | Template variables | `variable`, `binding` |
+| `may` | `may block` | The month (lower case) | `month_may`, or the capitalised variant `May` |
+
+### Other hard keywords
+
+These are rarely names in other languages, so they seldom need renaming.
+
+| Keyword | What it does in Scribe |
+| --- | --- |
+| `and`, `or`, `not`, `implies` | Logic |
+| `is` | Tests: equality with words, variants, predicates, membership |
+| `at`, `less`, `more`, `than`, `most`, `least` | Comparison phrases: `is at most`, `cost at most` |
+| `each`, `every`, `there` | `for each`, `for every`, `there is` |
+| `if`, `otherwise`, `on` | Branches, `on failure` |
+| `be`, `starts` | `let x be`, `var x starts at` |
+| `through` | Ranges that include their end |
+| `because` | The reason attached to a clause |
+| `given`, `produces` | Parameters and results in a contract |
+| `ensure` | A guarantee |
+| `assumes` | A fact about the outside world |
+| `idempotent`, `declassifies`, `survives` | Contract clauses |
+| `invariant`, `decreases` | Loop and type reasoning |
+| `define` | Names a predicate |
+| `choose` | Matches every variant of a choice |
+| `together` | Runs lines at once |
+| `followed` | `followed by`, joining sequences |
+| `attenuated` | Narrows a capability |

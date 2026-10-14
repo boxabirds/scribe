@@ -7,7 +7,7 @@ until the specification says so.
 
 | # | Question | Spec | Today | Recommendation |
 | --- | --- | --- | --- | --- |
-| 1 | How are the update forms (`increment count`, `add price to total`, `subtract`, `decrement`) recognised? As keywords they would be reserved everywhere, and `add` is a common operation name | 2.1 | Parsed as ordinary calls | Resolve after parsing, as `is` already is (5.7): a call to `add` with no operation of that name in scope is the update form. No new keywords |
+| 1 | ~~How are the update forms (`increment count`, `add price to total`, `subtract`, `decrement`) recognised?~~ Settled: the four words are hard keywords, because a reserved word costs readers nothing and Scribe's authors are machines | 2.1 | Update statements; the words cannot be names | Done; listed in the porting guide |
 | 2 | Several unlabelled parameters: `to coerce first, second` | 4.1, Proposed | Rejected | Adopt. Signatures were the largest single cause of parse failures in the pilot's translations (34, together with label words the spec does not have) |
 | 3 | `some` with a call: `some item 0 of items` | 3.4 | Needs parentheses: `some (item 0 of items)` | Allow a call after `some` |
 | 4 | What follows `cost at most` | 10.1 | Any expression; the spec gives no example | Start with a quantity (`cost at most 50 milliseconds`); design orders of growth (Section 12.3 compares them) separately |

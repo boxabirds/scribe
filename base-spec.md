@@ -60,6 +60,8 @@ A program's identity comes from its parsed tree, so a change of spelling never c
 | `set total to total + price` | `add price to total` |
 | `set balance of account to balance of account - amount` | `subtract amount from balance of account` |
 
+`increment`, `decrement`, `add` and `subtract` are hard keywords (Section 2.5), so a line that starts with one is always an update, never a call: no operation can be named `add`.
+
 An update form is used only when the place being set is also the left operand, and the place is a plain path: names, fields, and positions given by names or literals. Then the place is read once either way, and the short form means exactly what the long one does. `set balance to fee - balance` stays as written.
 
 ### 2.2 Views
@@ -108,7 +110,9 @@ Two kinds:
 - **Hard keywords** are reserved everywhere: words that start statements and header lines, comparison and logic words, argument labels, and the articles `a`, `an`, `the`.
 - **Soft keywords** are reserved only inside their own phrase and are ordinary names elsewhere: `network`, `version`, `queue`, `value` and similar.
 
-A reserved word cannot be a name. In particular `a`, `result`, `type` and `stop` cannot name variables.
+A reserved word cannot be a name. In particular `a`, `result`, `type`, `stop` and `add` cannot name variables or operations.
+
+A reserved word is judged by what it costs readers, not authors. Scribe is written by machines and read by people, so reserving a word that makes a line unambiguous is cheap. The porting guide (`docs/porting-guide.md`) lists the reserved words that are common names in other languages, with what to use instead.
 
 ### 2.6 Layout and comments
 
@@ -890,7 +894,7 @@ These are the decisions this draft does not settle. Each names what blocks it. A
 | 3 | `allocates` as a contract clause, with the allocator passed as context | Proposed | Measuring how many contracts it adds lines to |
 | 4 | A small rule language for system files in place of fixed English templates | Proposed | Keyword count (Appendix A) |
 | 5 | Possessive paths: accept `account's balance` as a form of `balance of account` | Proposed | A grammar run. `'s` would bind tighter than any call, so `total of cart's lines` means `total of (lines of cart)`. Bare `account balance` is not possible: it already reads as a call of `account`, and it would look almost the same as the name `account_balance` in the review view |
-| 6 | Reduce the keyword set (now 98 hard, 79 soft) | Open | Experiment 1, the comprehension test, extended to compare candidate words for the same idea: for example `hold` against `with`, `using` and `lease` |
+| 6 | Reduce the keyword set (now 102 hard, 80 soft) | Open | Experiment 1, the comprehension test, extended to compare candidate words for the same idea: for example `hold` against `with`, `using` and `lease` |
 | 7 | Parser strategy: the grammar is not LALR(1) | Open | Deciding between a hand-written parser that follows the grammar, and changing the grammar until a generator accepts it |
 | 8 | Code generator for WebAssembly, the version 1 target: a back end of our own, or one built on LLVM or Cranelift | Open | A compile-time benchmark on the pilot corpus |
 | 9 | Solver and proof format for `proven` clauses | Open | Choosing a solver that is fast and gives stable results across versions |
@@ -901,7 +905,7 @@ These are the decisions this draft does not settle. Each names what blocks it. A
 
 The reference grammar is `grammar/scribe.lark` (version 0.3) in this project; `scribe-grammar-v0.2.lark` is the version the pilot measured. It is an Earley grammar: it states the language precisely but is not yet a production parser. `tools/check_grammar.py` tests it against a file per construct in this specification, a file per forbidden form, this specification's code blocks and the pilot corpora.
 
-**Vocabulary.** 177 reserved words: 98 hard keywords, which can never be names, and 79 soft keywords, which are names everywhere except in the position that gives them meaning. The articles `a`, `an` and `the` are hard. Reducing this count is open decision 6.
+**Vocabulary.** 182 reserved words: 102 hard keywords, which can never be names, and 80 soft keywords, which are names everywhere except in the position that gives them meaning. The articles `a`, `an` and `the` are hard. Reducing this count is open decision 6.
 
 **Special rules.** Twelve rules resolve what the grammar alone leaves ambiguous. The four that most affect readers:
 
@@ -963,6 +967,7 @@ What the replay changed in this specification:
 - The aims are reordered: rapid impact assessment first, human readability second, correctness by construction third. Impact assessment is the problem Scribe exists to solve; readability is how it must be solved (1).
 - Version 1 emits WebAssembly only (1, 13).
 - `return` replaces `give back` as the statement that ends an operation with its result (4.2).
+- Reserved words are judged by what they cost readers, not authors: Scribe is written by machines, so a word reserved to make a line unambiguous is cheap. `increment`, `decrement`, `add` and `subtract` are reserved so the update forms can never be read as calls (2.1, 2.5).
 - Source never names an operating system. A difference between hosts is a fact about a capability, declared in its interface; this replaces clauses scoped `on <platform>` (10.3).
 - Scribe is not described as a systems language. Having no garbage collector is a choice about memory management, managed at compile time as in Rust, not about the kind of software Scribe is for (1, 7).
 

@@ -158,7 +158,7 @@ schema: "schema" name "version" INT "compatibility" name _NL _INDENT schema_fiel
 migration: "migration" name "from" "version" INT "to" "version" INT "turning" name "into" name _NL _INDENT ensure+ _DEDENT
 
 // ---------------------------------------------------------------- statements
-?stmt: let | var | set | return_stmt | fail | if_stmt | for_each
+?stmt: let | var | set | update | return_stmt | fail | if_stmt | for_each
      | repeat_while | invariant | decreases | choose | handle | hold
      | together | pipeline | stop | skip | trust | elided
      | expr_stmt
@@ -166,6 +166,11 @@ migration: "migration" name "from" "version" INT "to" "version" INT "turning" na
 let: "let" name "be" expr ["," "or" "else" expr] _NL
 var: "var" name "starts" "at" expr _NL
 set: "set" place "to" expr _NL
+// SPEC 2.1: the update forms; each word is reserved, so none can name an operation
+?update: "increment" place _NL                                  -> increment
+       | "decrement" place _NL                                  -> decrement
+       | "add" sum "to" place _NL                               -> add_to
+       | "subtract" sum "from" place _NL                        -> subtract_from
 place: name ["of" place]                                                      // FIX-7 a settable place is a name or an of-path
 return_stmt: "return" expr _NL
 fail: "fail" "with" name _NL
@@ -371,4 +376,4 @@ name: NAME
     | "version"
     | "wiring"
     | "write"
-QUANTITY.4: /\d+(\.\d+)?[ ]+(?!(compatibility|declassifies|attenuated|components|everything|idempotent|operations|authority|component|decreases|interface|invariant|migration|non_empty|otherwise|anything|checking|consumed|contains|corrects|database|deadline|editable|followed|labelled|matching|pipeline|positive|produces|property|protocol|provides|reserved|restarts|sampling|succeeds|survives|together|workflow|assumed|assumes|backoff|because|changes|domains|example|failure|implies|limited|monitor|network|nothing|removed|through|turning|version|assert|before|cannot|choice|choose|define|domain|ensure|expect|handle|leaves|repeat|result|return|schema|stages|starts|system|varies|wiring|about|added|after|block|build|entry|every|fails|field|files|given|gives|holds|least|lemma|maybe|model|needs|owner|proof|queue|reach|retry|rules|sends|stage|state|there|times|trust|under|until|using|value|where|while|write|cost|each|else|fail|from|hold|host|into|less|more|most|must|once|only|onto|over|port|read|root|runs|skip|some|stop|than|that|tier|time|type|uses|when|with|all|and|any|but|can|for|its|let|may|mod|not|one|own|per|set|the|try|use|var|an|as|at|be|by|if|in|is|it|no|of|on|or|to|a)(?![A-Za-z0-9_]))[A-Za-z][A-Za-z0-9_]*/
+QUANTITY.4: /\d+(\.\d+)?[ ]+(?!(compatibility|declassifies|attenuated|components|everything|idempotent|operations|authority|component|decreases|decrement|increment|interface|invariant|migration|non_empty|otherwise|anything|checking|consumed|contains|corrects|database|deadline|editable|followed|labelled|matching|pipeline|positive|produces|property|protocol|provides|reserved|restarts|sampling|subtract|succeeds|survives|together|workflow|assumed|assumes|backoff|because|changes|domains|example|failure|implies|limited|monitor|network|nothing|removed|through|turning|version|assert|before|cannot|choice|choose|define|domain|ensure|expect|handle|leaves|repeat|result|return|schema|stages|starts|system|varies|wiring|about|added|after|block|build|entry|every|fails|field|files|given|gives|holds|least|lemma|maybe|model|needs|owner|proof|queue|reach|retry|rules|sends|stage|state|there|times|trust|under|until|using|value|where|while|write|cost|each|else|fail|from|hold|host|into|less|more|most|must|once|only|onto|over|port|read|root|runs|skip|some|stop|than|that|tier|time|type|uses|when|with|add|all|and|any|but|can|for|its|let|may|mod|not|one|own|per|set|the|try|use|var|an|as|at|be|by|if|in|is|it|no|of|on|or|to|a)(?![A-Za-z0-9_]))[A-Za-z][A-Za-z0-9_]*/

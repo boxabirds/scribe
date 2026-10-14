@@ -8,7 +8,9 @@ Checks, in order:
   2. every file in tests/grammar/accept parses with exactly one reading;
   3. every file in tests/grammar/reject is rejected;
   4. the code blocks of base-spec.md and the pilot corpora in research/corpus
-     give the results recorded in tests/grammar/expected.json.
+     give the results recorded in tests/grammar/expected.json;
+  5. docs/porting-guide.md lists every hard keyword, and nothing else, and none
+     of the names it suggests instead is itself a hard keyword.
 
 The pilot corpora are a record and are never edited. Where the language has
 renamed something since the pilot, the rename is applied to a temporary copy
@@ -35,6 +37,7 @@ GRAMMAR = os.path.join(ROOT, "grammar", "scribe.lark")
 TESTS = os.path.join(ROOT, "tests", "grammar")
 EXPECTED = os.path.join(TESTS, "expected.json")
 SPEC = os.path.join(ROOT, "base-spec.md")
+PORTING = os.path.join(ROOT, "docs", "porting-guide.md")
 CORPORA = ["doc", "doc-repaired", "exp7/scribe-A", "exp7/scribe-B"]
 
 # Spellings changed since the pilot: (pattern, replacement, specification change)
@@ -77,13 +80,33 @@ def spec_statuses(parser, expr_parser):
     return out
 
 
+def porting_guide_words():
+    """The keywords in the first column of the porting guide's tables, and the
+    names suggested in its last column."""
+    keywords, suggested = set(), set()
+    for line in open(PORTING):
+        if line.startswith("| `"):
+            cells = line.split("|")
+            keywords.update(re.findall(r"`([a-z_]+)`", cells[1]))
+            if len(cells) > 5:
+                suggested.update(re.findall(r"`([A-Za-z_]+)`", cells[-2]))
+    return keywords, suggested
+
+
 def main():
     update = "--update" in sys.argv[1:]
     problems = []
 
     with tempfile.TemporaryDirectory() as tmp:
         built = os.path.join(tmp, "scribe.lark")
-        build(TEMPLATE, built)
+        hard, _, _ = build(TEMPLATE, built)
+        listed, suggested = porting_guide_words()
+        for word in sorted(suggested & set(hard)):
+            problems.append(f"docs/porting-guide.md: suggests `{word}`, which is a hard keyword")
+        for word in sorted(set(hard) - listed):
+            problems.append(f"docs/porting-guide.md: hard keyword `{word}` is not listed")
+        for word in sorted(listed - set(hard)):
+            problems.append(f"docs/porting-guide.md: `{word}` is listed but is not a hard keyword")
         if open(built).read() != open(GRAMMAR).read():
             problems.append("grammar/scribe.lark is stale: run tools/build_grammar.py "
                             "grammar/scribe.lark.tmpl grammar/scribe.lark")

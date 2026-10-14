@@ -1,0 +1,7 @@
+to settle item into cart
+    given item is an Item
+    given cart is an editable Cart
+    add price of item to total of cart
+    subtract discount of item from total of cart
+    increment count of cart
+    decrement remaining of item

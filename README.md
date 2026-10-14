@@ -22,7 +22,7 @@ Version 1 compiles to WebAssembly. The specification is
 | `scribe-grammar-v0.2.lark` | The grammar as the specification cites it (Appendix A) |
 | `grammar/`, `tools/` | The working copy of the grammar and its tools. These change as the language does |
 | `research/` | The record of the pilot (experiments 3 and 7, spec Appendix B.1), kept as it ran. Do not edit |
-| `docs/` | Earlier documents: the syntax philosophy and worked examples, and the change replay (Appendix B.2, B.4) |
+| `docs/` | The [porting guide](docs/porting-guide.md), and earlier documents: the syntax philosophy and worked examples, and the change replay (Appendix B.2, B.4) |
 
 ## Reference grammar
 
