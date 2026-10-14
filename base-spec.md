@@ -16,7 +16,7 @@ Code examples are shown in the **review view**, the default way people read Scri
 Scribe is a language for a world where most code is written by machines and read, reviewed and owned by people. It has three aims, in order:
 
 1. **Rapid impact assessment.** Every operation and component states what it promises, needs and may do, in a form a tool can compare between two versions. The impact of a proposed change is computed from those statements before it is merged, in time that grows with the change and the components that depend on it, not with the size of the codebase.
-2. **Human readability.** Every token a reviewer sees is understood at reading speed. When readability and impact assessment conflict, Scribe looks for a spelling that serves both; only when there is none does impact assessment win, and the cost to readability is recorded as a decision. Against every other aim, readability wins.
+2. **Human readability.** Every token a reviewer sees is understood at reading speed. Every line has exactly one reading, and a reader who knows what the words mean sees it without knowing any rule of precedence beyond school arithmetic: text that can be read two ways is not readable, and needing a manual to read an expression is a failure of design. This holds for the stored text and for every view. When readability and impact assessment conflict, Scribe looks for a spelling that serves both; only when there is none does impact assessment win, and the cost to readability is recorded as a decision. Against every other aim, readability wins.
 3. **Correctness by construction.** No undefined behaviour, no missing-value errors, no data races, no leaked resources, no unhandled failures. Beyond that, contracts are proven to the depth the code deserves.
 
 And two constraints:
@@ -978,6 +978,7 @@ What the replay changed in this specification:
 - Possessive paths are allowed and never mixed with `of` in one path, the same rule that keeps `and` and `or` apart (5.1).
 - Records can be built with fields by name: `a Point with x as 1, y as 2` (5.3). One element can be set: `set item i of heap to x`. `do nothing` fills a branch with nothing to do (4.2).
 - Every statement and every clause is one line; no clause continues onto the next (2.6, 10.6, 12.3).
+- A line that can be read two ways is not readable. Where a reading would otherwise depend on a rule, the language must make the structure visible instead (1). How it does so for expressions is being settled; until then, Appendix A's special rules stand.
 - Any expression goes wherever a value goes. A grammar rule that takes only a name or a literal needs a stated reason; otherwise types decide what fits, and mistakes the grammar no longer catches are the checker's to report (1).
 - A failure is a value, and `fail with` takes any expression (6).
 - Source never names an operating system. A difference between hosts is a fact about a capability, declared in its interface; this replaces clauses scoped `on <platform>` (10.3).
