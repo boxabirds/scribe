@@ -1,0 +1,14 @@
+[package]
+name = "scribe-cli"
+version = "0.1.0"
+description = "The scribe command"
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[[bin]]
+name = "scribe"
+path = "src/main.rs"
+
+[dependencies]
+scribe-syntax = { path = "../syntax" }

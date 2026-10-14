@@ -1,0 +1,9 @@
+[package]
+name = "scribe-syntax"
+version = "0.1.0"
+description = "Lexer and parser for the Scribe language"
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]

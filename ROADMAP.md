@@ -22,7 +22,7 @@ exact oracle.
 | Update `grammar/scribe.lark.tmpl` until every snippet parses with one reading and every negative case is rejected | done |
 | One command that runs all grammar checks and fails on any regression | done |
 | List the open decisions the parser needs settled, with a recommendation each ([grammar/DECISIONS.md](grammar/DECISIONS.md)) | done |
-| Settle those decisions in the spec, then update the grammar and tests to match | now: waiting on decisions |
+| Settle those decisions in the spec, then update the grammar and tests to match | done, except `assume` (decision 6) |
 
 Done when: the spec's own code blocks and the conformance snippets all parse
 with one reading, the negative cases fail, and the pilot corpora still pass.
@@ -31,9 +31,9 @@ with one reading, the negative cases fail, and the pilot corpora still pass.
 
 | Task | Status |
 | --- | --- |
-| Choose the implementation language for the compiler (recommended: Rust) and set up the workspace and CI | |
-| Lexer with the layout rules of Section 2.6 and the hard and soft keywords | |
-| Hand-written parser producing a syntax tree, tested against the Earley grammar on every build: same accept or reject, same tree | |
+| Choose the implementation language for the compiler (Rust) and set up the workspace and CI | done |
+| Lexer with the layout rules of Section 2.6 and the hard and soft keywords; agrees with the reference grammar's lexer token for token on every test, spec and corpus file | done |
+| Hand-written parser producing a syntax tree, tested against the Earley grammar on every build: same accept or reject, same tree | now |
 | Formatter that writes the stored form, with display forms; formatting twice changes nothing, and every view round-trips | |
 | Diagnostics as Section 13.2 describes, and `scribe check --explain` | |
 | Diagnostics for spellings the language has dropped: `give back x` parses as a call to `give`, so name resolution should suggest `return` | |

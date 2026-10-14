@@ -4,7 +4,8 @@ usage: python3 tools/check_grammar.py            check
        python3 tools/check_grammar.py --update   accept the current results as expected
 
 Checks, in order:
-  1. grammar/scribe.lark is what tools/build_grammar.py builds from the template;
+  1. grammar/scribe.lark and grammar/keywords.txt are what tools/build_grammar.py
+     builds from the template;
   2. every file in tests/grammar/accept parses with exactly one reading;
   3. every file in tests/grammar/reject is rejected;
   4. the code blocks of base-spec.md and the pilot corpora in research/corpus
@@ -34,6 +35,7 @@ from spec_blocks import blocks  # noqa: E402
 
 TEMPLATE = os.path.join(ROOT, "grammar", "scribe.lark.tmpl")
 GRAMMAR = os.path.join(ROOT, "grammar", "scribe.lark")
+KEYWORDS = os.path.join(ROOT, "grammar", "keywords.txt")
 TESTS = os.path.join(ROOT, "tests", "grammar")
 EXPECTED = os.path.join(TESTS, "expected.json")
 SPEC = os.path.join(ROOT, "base-spec.md")
@@ -99,7 +101,8 @@ def main():
 
     with tempfile.TemporaryDirectory() as tmp:
         built = os.path.join(tmp, "scribe.lark")
-        hard, _, _ = build(TEMPLATE, built)
+        keywords = os.path.join(tmp, "keywords.txt")
+        hard, _, _ = build(TEMPLATE, built, keywords)
         listed, suggested = porting_guide_words()
         for word in sorted(suggested & set(hard)):
             problems.append(f"docs/porting-guide.md: suggests `{word}`, which is a hard keyword")
@@ -107,9 +110,10 @@ def main():
             problems.append(f"docs/porting-guide.md: hard keyword `{word}` is not listed")
         for word in sorted(listed - set(hard)):
             problems.append(f"docs/porting-guide.md: `{word}` is listed but is not a hard keyword")
-        if open(built).read() != open(GRAMMAR).read():
-            problems.append("grammar/scribe.lark is stale: run tools/build_grammar.py "
-                            "grammar/scribe.lark.tmpl grammar/scribe.lark")
+        for fresh, committed in ((built, GRAMMAR), (keywords, KEYWORDS)):
+            if not os.path.exists(committed) or open(fresh).read() != open(committed).read():
+                problems.append(f"{os.path.relpath(committed, ROOT)} is stale: run tools/build_grammar.py "
+                                "grammar/scribe.lark.tmpl grammar/scribe.lark")
 
     parser = load(GRAMMAR)
     expr_parser = load(GRAMMAR, start="expr")

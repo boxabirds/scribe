@@ -21,8 +21,26 @@ Version 1 compiles to WebAssembly. The specification is
 | `base-spec.md` | The specification |
 | `scribe-grammar-v0.2.lark` | The grammar as the specification cites it (Appendix A) |
 | `grammar/`, `tools/` | The working copy of the grammar and its tools. These change as the language does |
+| `crates/` | The compiler, in Rust |
+| `tests/` | Grammar conformance tests, and checker tests for phase 3 |
 | `research/` | The record of the pilot (experiments 3 and 7, spec Appendix B.1), kept as it ran. Do not edit |
 | `docs/` | The [porting guide](docs/porting-guide.md), and earlier documents: the syntax philosophy and worked examples, and the change replay (Appendix B.2, B.4) |
+
+## The compiler
+
+The compiler is written in Rust (`crates/`). It is at the start of roadmap
+phase 2: the lexer is done, the parser is next.
+
+    cargo test --workspace
+    cargo run -q -p scribe-cli -- lex FILE...
+    python3 tools/compare_lexers.py
+
+`compare_lexers.py` lexes every test file, every code block in the
+specification and every pilot corpus file with both the compiler and the
+reference grammar, and fails on any difference in any token. The keyword list
+is generated once, by the grammar build, into `grammar/keywords.txt`, and the
+compiler embeds that file, so the two cannot disagree about which words are
+reserved. CI runs all of this on every push.
 
 ## Reference grammar
 
