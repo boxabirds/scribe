@@ -1,6 +1,0 @@
-to joined of xs with ys
-    given xs is a List of Int
-    given ys is a List of Int
-    produces a List of Int
-    let both be xs followed by ys
-    return xs followed by (ys followed by [1, 2])

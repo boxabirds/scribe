@@ -16,8 +16,8 @@ better with a label word follow:
 | `withdraw(account, amount)` | `to withdraw amount from account` | `withdraw 50 from savings` |
 | `move(x, y, grid)` | `to move x, y to grid` | `move 3, 4 to board` |
 
-The label words are `from`, `to`, `in`, `into`, `onto`, `over`, `for`, `with`,
-`by`, `as`, `using` and `of`. A call with several unlabelled arguments stands
+The label words are `from`, `to`, `in`, `into`, `for`, `with`, `by`, `as` and
+`of`. A call with several unlabelled arguments stands
 bare only as a whole statement or a whole value (`let g be gcd a, b`);
 anywhere else it goes in parentheses: `if (gcd a, b) = 1`.
 
@@ -66,8 +66,8 @@ fixed-width unsigned types, so they need no precedence:
 
 ## Reserved words
 
-Scribe reserves more words than most languages: 110 hard keywords, which can
-never be names, and 57 soft keywords, which are keywords only inside their own
+Scribe reserves more words than most languages: 77 hard keywords, which can
+never be names, and 7 soft keywords, which are keywords only inside their own
 phrase and ordinary names everywhere else. Scribe is written by machines and
 read by people, so a word reserved to make a line unambiguous costs readers
 nothing (specification, Section 2.5).
@@ -118,14 +118,13 @@ make this easier than the list suggests:
 | `where` | Filters in comprehensions and quantifiers | Locations | `place`, `location`, `site` |
 | `while`, `until` | Loop and range words | End times | `end_time`, `due`, `limit` |
 | `from`, `to` | Argument labels | Senders and recipients, range ends | `sender`, `recipient`, `start`, `end`, `source`, `target` |
-| `in`, `into`, `onto`, `over`, `for`, `with`, `by`, `as`, `using`, `of` | Argument labels | Inputs, options, units | `input`, `options`, `unit`, a name for what it holds |
+| `in`, `into`, `for`, `with`, `by`, `as`, `of` | Argument labels | Inputs, options, units | `input`, `options`, `unit`, a name for what it holds |
 | `it` | `if it succeeds` in contracts | Iterators, the current item | `item`, `current`, `element` |
 | `mod` | Remainder | Modules, modulus | `module_name`, `modulus` |
 | `some`, `nothing` | Present and absent values of a `maybe` | Rarely names; `some` in some query code | `any_of`, `empty` |
 | `let`, `var` | Bindings | Template variables | `variable`, `binding` |
 | `all`, `any`, `none` | Condition groups: `all of`, `any of`, `none of` | Collection helpers, flags | `everything`, `any_found`, `none_found`, `empty` |
 | `only` | `changes only`, `read only` | Filters and flags | `sole`, `exclusive`, `just_one` |
-| `matching` | Type limit: `Text matching email_format` | Flags and filters | `is_match` |
 
 ### Other hard keywords
 
@@ -135,7 +134,7 @@ These are rarely names in other languages, so they seldom need renaming.
 | --- | --- |
 | `and`, `or`, `not` | Logic |
 | `is` | Tests: equality with words, variants, predicates, membership |
-| `at`, `less`, `more`, `than`, `most`, `least` | Comparison phrases: `is at most`, `less than` |
+| `at` | `starts at`, `at entry` |
 | `each`, `every`, `there` | `for each`, `for every`, `there is` |
 | `if`, `otherwise`, `on` | Branches, `on failure` |
 | `be`, `starts` | `let x be`, `var x starts at` |
@@ -146,6 +145,5 @@ These are rarely names in other languages, so they seldom need renaming.
 | `choose` | Matches every variant of an enum |
 | `enum` | Declares an enum: variants that may carry data, as in Rust |
 | `together` | Runs lines at once |
-| `followed` | `followed by`, joining sequences |
 | `do` | `do nothing`, for a branch with nothing to do |
 | `then` | The second line of a condition written as `if` / `then` |

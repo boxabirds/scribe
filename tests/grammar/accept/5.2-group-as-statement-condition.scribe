@@ -1,6 +1,6 @@
 to settle account for amount
     given account is an editable Account
-    given amount is a positive Money
+    given amount is a Money
     if all of
         account is open
         any of

@@ -1,14 +1,12 @@
-type Connection in state Closed or Open
-
-to first_line of path using files
+to first_line of path with files
     given path is a Path
     given files is the Files
     produces Text
     fails with ReadFailed
     uses files
-    hold input as open path for reading using files
+    hold input as open path for reading with files
         return try read_line from input
 
 to close connection
-    given connection is a consumed Connection in state Open
-    produces a Connection in state Closed
+    given connection is a consumed OpenConnection
+    produces a ClosedConnection

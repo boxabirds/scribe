@@ -1,4 +1,4 @@
-type Small is an Int less than limit_of plan
+type Small is an Int with value 0 until limit_of plan
 type Ratio is an Int with value (-100) through count of items
 
 to settle item into cart
@@ -12,4 +12,4 @@ to settle item into cart
     add (price for item in usd) to total of cart
     subtract item's discount from total of cart
     let orders be [(an Order from cart, receipt), other_order]
-    let alerts be fetch alerts of user from services, or else nothing
+    let alerts be fetch alerts of user from services, otherwise nothing

@@ -82,11 +82,11 @@ one reading on its own (spec Section 1).
 
 | Check | Result |
 | --- | --- |
-| Conformance tests, one per construct (`tests/grammar/accept`) | 46 of 46 parse with one reading |
-| Forbidden forms (`tests/grammar/reject`) | 43 of 43 rejected |
+| Conformance tests, one per construct (`tests/grammar/accept`) | 45 of 45 parse with one reading |
+| Forbidden forms (`tests/grammar/reject`) | 45 of 45 rejected |
 | Spec code blocks | 21 of 23; the other 2 are fragments, not whole programs |
-| Pilot doc examples, repaired | 22 of 42; the 20 others use forms the language has since removed or moved to libraries: capability descriptions, labels, `define`, tiers and proof blocks, owners, protocols, pipelines, schemas, manifests' `may` sections, time, system files and workflows. Each file's result is in `tests/grammar/expected.json` |
-| Pilot doc examples, as written | 18 of 42; examples 22 and 30 were two of the pilot's silent misreadings, and are now errors |
+| Pilot doc examples, repaired | 20 of 42; the 22 others use forms the language has since removed or moved to libraries: capability descriptions, labels, `define`, tiers and proof blocks, owners, protocols, pipelines, schemas, manifests' `may` sections, typestate, `matching`, time, system files and workflows. Each file's result is in `tests/grammar/expected.json` |
+| Pilot doc examples, as written | 16 of 42; examples 22 and 30 were two of the pilot's silent misreadings, and are now errors |
 | Pilot translations | 7 of 43; two parse as a logical `and` the checker must reject (`tests/checker`) |
 | Bison | **No LALR(1) conflicts** (v0.2: 172 shift/reduce and 20 reduce/reduce), so no text has two readings; `tools/check_lalr.py` keeps it that way |
 

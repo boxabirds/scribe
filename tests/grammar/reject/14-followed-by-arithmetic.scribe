@@ -1,4 +1,0 @@
-to f a with b
-    given a is a List of Int
-    given b is a List of Int
-    return a followed by b + c

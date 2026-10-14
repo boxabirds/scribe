@@ -40,7 +40,7 @@ ensure: "ensure" ensure_body _NL
        | "ensure" if_then                                                 -> ensure_if_then
 ensure_body: expr
            | "if" "it" "succeeds" "," expr                                  -> on_success
-           | "if" "it" "fails" ["with" "anything" "but" name] "," expr       -> on_failure_case
+           | "if" "it" "fails" ["with" name ("or" name)*] "," expr          -> on_failure_case
            | "if" logic "," expr                                             -> conditional   // SPEC 15
 changes: "changes" "only" place ("," place)* _NL                          // SPEC 13.2: several places
 uses_clause: "uses" name_list _NL
@@ -50,19 +50,15 @@ name_list: name ("," name)*
 // ---------------------------------------------------------------- types
 typeexpr: [article] modifier* type_name type_suffix*
 article: "a" | "an" | "the"
-modifier: "positive" | "editable" | "consumed" | "maybe" | "non_empty"
+modifier: "editable" | "consumed" | "maybe"
 type_name: name ["of" modifier* type_name]
 ?type_suffix: "with" name term range_word term        -> refine_range
-            | "in" "state" name ("or" name)*          -> in_state
             | "as" name                               -> role
-            | "matching" name                         -> matching
-            | "less" "than" term                      -> refine_less
-            | "at" "most" term                        -> refine_at_most
 range: expr range_word expr
 range_word: "until" | "through"
 
 // ---------------------------------------------------------------- declarations
-typedecl: "type" name ["of" name] ["in" "state" name ("or" name)*] ["is" typeexpr] _NL [_INDENT member+ _DEDENT]
+typedecl: "type" name ["of" name] ["is" typeexpr] _NL [_INDENT member+ _DEDENT]
 ?member: name "as" typeexpr _NL                       -> field
        | "model" name "as" expr _NL                   -> model
        | "invariant" line_condition                   -> type_invariant
@@ -97,7 +93,7 @@ need: name "as" name _NL [_INDENT "uses" name_list _NL _DEDENT]
       | comma_call
       | "try" comma_call                                          -> try_
 comma_call: name operand ("," operand)+ label_arg*
-let: "let" name "be" value [OR_ELSE expr] _NL
+let: "let" name "be" value [COMMA_OTHERWISE expr] _NL
    | "let" name "be" group                                          -> let_group
 var: "var" name "starts" "at" value _NL
 set: "set" place "to" value _NL
@@ -217,16 +213,15 @@ tail_comparison: concat (comp_op concat)* comp_op (aggregate | where_call) -> co
 // FIX-5: bare "in" is no longer a membership alias; "is in" and "∈" remain.
 comp_op: "is" | "=" | "=="
        | "is" "not" | "!=" | "≠"
-       | "is" "less" "than" | "<"
-       | "is" "more" "than" | ">"
-       | "is" "at" "most" | "<=" | "≤"
-       | "is" "at" "least" | ">=" | "≥"
+       | "<"
+       | ">"
+       | "<=" | "≤"
+       | ">=" | "≥"
        | "is" "in" | "∈"
        | "is" "not" "in"
 
-// SPEC 14: `followed by` joins single terms; arithmetic in an operand takes brackets
+// SPEC 14: arithmetic in an operand takes brackets
 ?concat: sum
-       | unary ("followed" "by" unary)+                         -> join
 ?sum: product (("+" | "-") product)*
 ?product: unary (("*" | "/" | "mod") unary)*
 // SPEC 7: `-`, `some` and `try` apply to the next term, as minus does at school
@@ -256,7 +251,7 @@ where_call: name operand* ["of" of_operand] label_arg* "where" condition
 of_operand: name operand* ["of" of_operand]
           | atom
 comprehension: of_operand FOR_EACH name "in" of_operand ["where" condition]
-label: "from" | "for" | "with" | "in" | "into" | "onto" | "over" | "using"
+label: "from" | "for" | "with" | "in" | "into"
      | "to" | "by" | "as"
 // FIX-6: a construction lists its parts with commas, not "and".
 // SPEC 5.3: parts by position, then fields by name; or fields by name alone. A

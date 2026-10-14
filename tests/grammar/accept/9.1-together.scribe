@@ -1,4 +1,4 @@
-to load_dashboard user using services
+to load_dashboard user with services
     given user is a UserId
     given services is the DashboardServices
     produces a Dashboard
@@ -6,5 +6,5 @@ to load_dashboard user using services
     uses services
     together
         let profile be fetch profile of user from services
-        let alerts be fetch alerts of user from services, or else nothing
+        let alerts be fetch alerts of user from services, otherwise nothing
     return a Dashboard from profile, alerts

@@ -1,2 +1,2 @@
 type OrderLine
-    field quantity as a positive Int
+    field quantity as an Int

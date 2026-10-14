@@ -48,6 +48,17 @@ RENAMES = [
     (r"(?m)^(\s+)field (\w+) as ", r"\1\2 as ", "draft 0.4: record members have no `field` word"),
     (r"(\bfor every \w+) that is ", r"\1 as ", "draft 0.4: a quantifier over a type is `for every x as T`"),
     (r"(?m)^(\s*)choice ", r"\1enum ", "draft 0.4: `enum` replaces `choice`"),
+    (r"\bis at most\b", "≤", "draft 0.4: comparisons are symbols"),
+    (r"\bis at least\b", "≥", "draft 0.4: comparisons are symbols"),
+    (r"\bis less than\b", "<", "draft 0.4: comparisons are symbols"),
+    (r"\bis more than\b", ">", "draft 0.4: comparisons are symbols"),
+    (r", or else\b", ", otherwise", "draft 0.4: `, otherwise` replaces `, or else`"),
+    (r"\busing\b", "with", "draft 0.4: the label `using` is `with`"),
+    (r"\bonto\b", "to", "draft 0.4: the label `onto` is `to`"),
+    (r"\ban? (?:positive|non_empty) (\w+)",
+     lambda m: ("an " if m.group(1)[0] in "AEIOUaeiou" else "a ") + m.group(1),
+     "draft 0.4: `positive` and `non_empty` are contracts, not type words"),
+    (r"\b(?:positive|non_empty) ", "", "draft 0.4: `positive` and `non_empty` are contracts, not type words"),
 ]
 
 

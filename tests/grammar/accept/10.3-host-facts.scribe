@@ -8,4 +8,4 @@ interface Files
         given target is a Path
         given files is an editable Self
         fails with NotFound, TargetExists
-        ensure if it fails with anything but NotFound, not replaces_existing of files
+        ensure if it fails with TargetExists, not replaces_existing of files

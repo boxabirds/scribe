@@ -1,6 +1,6 @@
 to charge customer for amount
     given customer is a CustomerId
-    given amount is a positive Money
+    given amount is a Money
     produces a Receipt
     fails with Declined
     uses payments

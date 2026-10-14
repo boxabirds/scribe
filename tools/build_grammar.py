@@ -24,14 +24,13 @@ to given produces fails expect ensure changes uses
 let be var starts set return fail try handle on failure if otherwise for each
 increment decrement add subtract do
 all any none then
-matching only
+only
 from until through repeat while invariant decreases stop skip choose when hold
 together trust assert
 type enum component example
 property model interface
 is not and or mod of every there where result it some nothing at
-less more than most least followed
-with in into onto over using by as
+with in into by as
 a an the
 """.split())
 
@@ -40,7 +39,7 @@ a an the
 # sees both words at once. Each is written with its words separated by spaces;
 # the text a reader sees is unchanged.
 JOINED = [
-    ("OR_ELSE", [",", "or", "else"]),
+    ("COMMA_OTHERWISE", [",", "otherwise"]),
     ("FOR_EACH", ["for", "each"]),
     ("AT_ENTRY", ["at", "entry"]),
 ]
@@ -48,7 +47,7 @@ JOINED = [
 
 def joined_terminals():
     lines = []
-    # earlier entries take priority, so `, or else` is tried before `, or`
+    # earlier entries take priority
     for rank, (name, parts) in enumerate(JOINED):
         pattern = ""
         for i, part in enumerate(parts):

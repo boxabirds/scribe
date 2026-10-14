@@ -1,6 +1,6 @@
-type Upload is Bytes at most limit_of plan
+type Upload is Bytes with size 0 through limit_of plan
 
-to import_all from source into store using root
+to import_all from source into store with root
     given source is a Source
     given store is an editable Store
     given root is the Authority

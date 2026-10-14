@@ -287,26 +287,18 @@ fn lex_line(content: &str, line: usize, first_column: usize, out: &mut Vec<Token
             continue;
         }
         if c == ',' {
-            // `, or else` is read as one token (see JOINED in
+            // `, otherwise` is read as one token (see JOINED in
             // tools/build_grammar.py); any other comma, including one that ends
             // the line, is a symbol
             let mut e = k + 1;
             while chars.get(e) == Some(&' ') {
                 e += 1;
             }
-            if let Some(after_or) = word_at(&chars, e, "or") {
-                let mut f = after_or;
-                while chars.get(f) == Some(&' ') {
-                    f += 1;
-                }
-                if f > after_or
-                    && let Some(end) = word_at(&chars, f, "else")
-                {
-                    let text: String = chars[k..end].iter().collect();
-                    out.push(Token { kind: TokenKind::Hard, text, line, column });
-                    k = end;
-                    continue;
-                }
+            if let Some(end) = word_at(&chars, e, "otherwise") {
+                let text: String = chars[k..end].iter().collect();
+                out.push(Token { kind: TokenKind::Hard, text, line, column });
+                k = end;
+                continue;
             }
         }
         if c == '\'' && chars.get(k + 1) == Some(&'s') {
@@ -497,9 +489,9 @@ mod tests {
 
     #[test]
     fn joined_phrases() {
-        let k = kinds("let a be [x for each x in xs], or else nothing\n");
+        let k = kinds("let a be [x for each x in xs], otherwise nothing\n");
         assert!(k.contains(&(TokenKind::Hard, "for each".into())));
-        assert!(k.contains(&(TokenKind::Hard, ", or else".into())));
+        assert!(k.contains(&(TokenKind::Hard, ", otherwise".into())));
         let k = kinds("let a be b, or c\n");
         assert!(k.contains(&(TokenKind::Symbol, ",".into())));
         assert!(k.contains(&(TokenKind::Hard, "or".into())));
@@ -507,7 +499,7 @@ mod tests {
         assert!(k.contains(&(TokenKind::Hard, "at entry".into())));
         let k = kinds("let a be [1, order]\n");
         assert!(k.contains(&(TokenKind::Name, "order".into())));
-        assert!(!k.iter().any(|(_, t)| t.starts_with(", or")));
+        assert!(!k.iter().any(|(_, t)| t.starts_with(", otherwise")));
     }
 
     #[test]

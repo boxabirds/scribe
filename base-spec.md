@@ -83,8 +83,8 @@ Symbols are used only where school mathematics has already taught them to most r
 | Meaning | Stored | Also accepted | Review view |
 | --- | --- | --- | --- |
 | Arithmetic | `+ - * /`, `mod` |  | same |
-| Less than, more than | `<`, `>` | `is less than`, `is more than` | `<`, `>` |
-| At most, at least | `<=`, `>=` | `≤`, `≥`, `is at most`, `is at least` | `≤`, `≥` |
+| Less than, more than | `<`, `>` |  | `<`, `>` |
+| At most, at least | `<=`, `>=` | `≤`, `≥` | `≤`, `≥` |
 | Equal, not equal | `=`, `!=` | `==`, `≠` | `=`, `≠` |
 | And, or, not | `and`, `or`, `not` | `∧`, `&&`, `∨`, `\|\|`, `¬`, `!` | words |
 | Member of | `is in` | `∈` | `is in` |
@@ -140,7 +140,7 @@ Bit operations are named operations on the fixed-width unsigned types, never sym
 ```
 type OrderLine
     product as a ProductId
-    quantity as a positive Int
+    quantity as an Int
     unit_price as Money
 ```
 
@@ -185,10 +185,10 @@ A refinement carries its condition wherever the type goes:
 
 ```
 type Percent is an Int with value 0 through 100
-type Email is Text matching email_format
+type Small is an Int with value 0 until (limit_of plan + 1)
 ```
 
-A limit in a type (`with value … through …`, `less than`, `at most`) is one term: a name, an `of`-path, a literal or brackets, so the word after it always belongs to the type: `type Small is an Int less than (limit_of plan + 1)`.
+A limit in a type is one term: a name, an `of`-path, a literal or brackets, so the word after it always belongs to the type. A condition that is not a range, such as "a well-formed email address", is a distinct type built by a checking operation (8.3), or an `invariant` on a record.
 
 ### 3.6 Units
 
@@ -208,10 +208,11 @@ An operation is a header line, its contract, and its body:
 
 ```
 to withdraw amount from account
-    given amount is a positive Money
+    given amount is Money
     given account is an editable Account
     produces a Receipt
     fails with InsufficientFunds
+    expect amount > 0
     expect account is open
     ensure if it succeeds, balance of account = balance of account at entry - amount
     ensure if it fails, balance of account = balance of account at entry
@@ -223,7 +224,7 @@ to withdraw amount from account
     return receipt_for amount
 ```
 
-The header line names the operation, its first parameter, and further parameters introduced by label words: `to withdraw amount from account`. The label words are a fixed set of single words: `from`, `to`, `in`, `into`, `onto`, `over`, `for`, `with`, `by`, `as`, `using`, `of`. A call uses the same shape: `withdraw 50 from savings`.
+The header line names the operation, its first parameter, and further parameters introduced by label words: `to withdraw amount from account`. The label words are a fixed set of single words: `from`, `to`, `in`, `into`, `for`, `with`, `by`, `as`, `of`. A call uses the same shape: `withdraw 50 from savings`.
 
 An operation may take several unlabelled parameters, separated by commas, before any labelled ones: `to gcd first, second`, called as `gcd 12, 18`. Use a label where one reads better: `to withdraw amount from account`.
 
@@ -249,7 +250,7 @@ Every statement starts with a keyword, or is a call.
 | Loop | `repeat while condition`, with `invariant` and `decreases` lines |
 | Leave or continue a loop | `stop`, `skip` |
 | Do nothing | `do nothing` |
-| Hold a resource | `hold input as open path for reading using files` (Section 7) |
+| Hold a resource | `hold input as open path for reading with files` (Section 7) |
 | Concurrency | `together` (Section 9) |
 
 A name, an element (`set item i of heap to x`), an `of`-path or a possessive path can be set. The amount in `add … to` and `subtract … from` is one term, so `to` and `from` always belong to the update: `add price of item to total`, `add (price for item in usd) to total`.
@@ -289,7 +290,7 @@ Every line has exactly one reading (Section 1), and the only precedence a reader
 
 Brackets group arithmetic only: `(a + b) * c`. They never group logic.
 
-`and` and `or` never mix on one line, and `not` negates a whole condition, never one link of a chain: `not paid and shipped` is an error. `followed by` joins single terms: `a followed by (b + c)`. One condition implying another is written across two aligned lines as `if` and `then`:
+`and` and `or` never mix on one line, and `not` negates a whole condition, never one link of a chain: `not paid and shipped` is an error. One condition implying another is written across two aligned lines as `if` and `then`:
 
 ```
 ensure
@@ -440,23 +441,18 @@ Recursive operations get a stack-depth line in reports ("stack depth unbounded")
 Files, sockets and locks are linear: they must be released exactly once. `hold` releases on every exit from its block, including failures:
 
 ```
-hold input as open path for reading using files
+hold input as open path for reading with files
     return try read_line from input
 ```
 
 A linear value bound with `let` and not released on some path is a compile error naming that path.
 
-State can be tracked in the type, so misuse is a compile error rather than a run-time check:
+State can be tracked with distinct types, as in Rust, so misuse is a compile error rather than a run-time check: `close` consumes an `OpenConnection` and produces a `ClosedConnection`, and nothing can send on a `ClosedConnection`.
 
 ```
-type Connection in state Closed or Open
-
-to send data over connection
-    given connection is an editable Connection in state Open
-
 to close connection
-    given connection is a consumed Connection in state Open
-    produces a Connection in state Closed
+    given connection is a consumed OpenConnection
+    produces a ClosedConnection
 ```
 
 ### 7.4 Shared state
@@ -509,7 +505,7 @@ Concurrent structure is written as a visible shape, and no task outlives the blo
 ### 9.1 Doing several things at once
 
 ```
-to load_dashboard user using services
+to load_dashboard user with services
     given user is a UserId
     given services is the DashboardServices
     produces a Dashboard
@@ -519,11 +515,11 @@ to load_dashboard user using services
     together
         let profile be fetch profile of user from services
         let orders be fetch orders of user from services
-        let alerts be fetch alerts of user from services, or else nothing
+        let alerts be fetch alerts of user from services, otherwise nothing
     return a Dashboard from profile, orders, alerts
 ```
 
-Everything inside `together` starts at once, and the block ends when every line has finished. If a required line fails, the others are cancelled and the failure goes up; `or else` marks a line whose failure is acceptable. Cancellation unwinds through `hold`, so resources are still released. A time limit is not part of the language: it is a standard-library operation on a clock capability. So is a pipeline: stages joined by bounded queues are built from `together` and a channel type in the standard library.
+Everything inside `together` starts at once, and the block ends when every line has finished. If a required line fails, the others are cancelled and the failure goes up; `, otherwise` marks a line whose failure is acceptable, with the value to use instead. Cancellation unwinds through `hold`, so resources are still released. A time limit is not part of the language: it is a standard-library operation on a clock capability. So is a pipeline: stages joined by bounded queues are built from `together` and a channel type in the standard library.
 
 ### 9.2 No shared mutation
 
@@ -573,7 +569,7 @@ to redirect_body for location
     example redirect_body for "/a" is "<a href=\"/a\">See Other</a>.\n\n"
 ```
 
-Properties generalise examples and run as generated tests: `property for every items as a non_empty List of Int, largest of items is in items`.
+Properties generalise examples and run as generated tests: `property for every items as a List of Int, items is empty or largest of items is in items`.
 
 ### 10.3 Host-dependent behaviour
 
@@ -592,7 +588,7 @@ interface Files
         given target is a Path
         given files is an editable Self
         fails with NotFound, TargetExists
-        ensure if it fails with anything but NotFound, not replaces_existing of files
+        ensure if it fails with TargetExists, not replaces_existing of files
 ```
 
 An operation whose contract tests a host-dependent fact holds wherever the fact has the value it tests for; a contract that tests none must hold on every host. Each host binding, the implementation of a capability's interface for one host, gives every fact its value. The toolchain supplies the host bindings, and they are the only place a particular operating system is named.
@@ -612,7 +608,7 @@ The source does not say how hard to check. On every build the compiler proves th
 Two statements belong to the body:
 
 ```
-to sorted_copy of items using native
+to sorted_copy of items with native
     given items is a List of Int
     given native is the NativeSort
     produces a List of Int
@@ -844,7 +840,7 @@ These are the decisions this draft does not settle. Each names what blocks it. A
 | 3 | `allocates` as a contract clause, with the allocator passed as context | Proposed | Measuring how many contracts it adds lines to |
 | 4 | ~~A rule language for system files~~ | Removed | System files are removed; `scribe query` answers reach and flow questions from the code (8.1) |
 | 5 | Possessive paths: `account's balance` | Settled | Allowed, never mixed with `of` in one path (5.1) |
-| 6 | Reduce the keyword set (now 87 hard, 13 soft) | Open | Experiment 1, the comprehension test, extended to compare candidate words for the same idea: for example `hold` against `with`, `using` and `lease` |
+| 6 | Reduce the keyword set (now 77 hard, 7 soft) | Open | Experiment 1, the comprehension test, extended to compare candidate words for the same idea: for example `hold` against `with` and `lease` |
 | 7 | Parser strategy: the grammar is LALR(1) with no conflicts (Appendix A); whether the compiler's parser is generated from it or written by hand | Open | Comparing the error messages each gives on the pilot's real mistakes |
 | 8 | Code generator for WebAssembly, the version 1 target: a back end of our own, or one built on LLVM or Cranelift | Open | A compile-time benchmark on the pilot corpus |
 | 9 | Solver for proving contracts | Open | Choosing a solver that is fast and gives stable results across versions |
@@ -858,13 +854,13 @@ These are the decisions this draft does not settle. Each names what blocks it. A
 
 The reference grammar is `grammar/scribe.lark` (version 0.3) in this project; `scribe-grammar-v0.2.lark` is the version the pilot measured. It is an Earley grammar: it states the language precisely but is not yet a production parser. `tools/check_grammar.py` tests it against a file per construct in this specification, a file per forbidden form, this specification's code blocks and the pilot corpora.
 
-**Vocabulary.** 100 reserved words: 87 hard keywords, which can never be names, and 13 soft keywords, which are names everywhere except in the position that gives them meaning. The articles `a`, `an` and `the` are hard. A few two-word phrases are read by the lexer as one token, so a parser looking one token ahead sees both words: `for each`, `at entry` and `, or else`; a comma that ends a line is read with the line's end. None of this changes the text.
+**Vocabulary.** 84 reserved words: 77 hard keywords, which can never be names, and 7 soft keywords, which are names everywhere except in the position that gives them meaning. The articles `a`, `an` and `the` are hard. A few two-word phrases are read by the lexer as one token, so a parser looking one token ahead sees both words: `for each`, `at entry` and `, otherwise`; a comma that ends a line is read with the line's end. None of this changes the text.
 
 **No special rules.** The grammar is unambiguous by construction. Converted to Bison it has no LALR(1) conflicts, which proves that no text has two readings, and `tools/check_lalr.py` fails the build if one appears. `tools/check_grammar.py` also parses every test, every code block in this specification and the pilot corpora with no disambiguation applied. The pilot's rules D1 and D2 are now the grammar's own structure (Section 5.5), mixing `and` with `or` is a condition group (Section 5.2), and a label word belongs to the outermost call on its line because an argument is one term: a labelled call inside an argument is in brackets.
 
 Constructions list their parts with commas, never `and`, so `and` is always logical.
 
-**Parser class.** LALR(1), with no conflicts (version 0.2 had 172 shift/reduce and 20 reduce/reduce). Reaching zero changed what can be written in a few places, all recorded in Appendix B.3: phrase words such as `matching` and `only` became hard keywords; records built with fields, and comparisons that end in `where` or a comprehension, became whole values; and a value followed by a phrase word (`add … to`, a limit in a type) became one term.
+**Parser class.** LALR(1), with no conflicts (version 0.2 had 172 shift/reduce and 20 reduce/reduce). Reaching zero changed what can be written in a few places, all recorded in Appendix B.3: phrase words such as `only` became hard keywords; records built with fields, and comparisons that end in `where` or a comprehension, became whole values; and a value followed by a phrase word (`add … to`, a limit in a type) became one term.
 
 ## Appendix B: evidence and history
 
@@ -922,13 +918,13 @@ What the replay changed in this specification:
     - conditions that mix `and` and `or` are condition groups, `all of`, `any of` and `none of`, one condition per line, nesting like statement blocks; commas at the ends of their lines are optional, checked if present, and drawn by the review view (2.6, 5.2);
     - a word that opens a scope covers the rest of its line, replacing the pilot's rules D1 and D2 (5.5);
     - brackets group arithmetic only, and a comprehension standing alone is a list in list brackets (5.2, 5.4);
-    - `-`, `some` and `try` apply to the next term; `not` negates only a whole condition; `followed by` joins single terms (5.2);
+    - `-`, `some` and `try` apply to the next term; `not` negates only a whole condition (5.2);
     - equality is only `=` and `≠`, and `is` only introduces a test (2.3);
     - bit operations are named operations, with hex and binary literals (3.1).
 - Any expression goes wherever a value goes. A grammar rule that takes only a name or a literal needs a stated reason; otherwise types decide what fits, and mistakes the grammar no longer catches are the checker's to report (1).
 - A failure is a value, and `fail with` takes any expression (6).
 - The grammar has no LALR(1) conflicts, so it is proven that no text has two readings; the build fails if one appears (Appendix A). Reaching zero meant:
-    - `matching` and `only` are hard keywords, because each follows a value and could otherwise be read as part of it;
+    - `only` is a hard keyword, because each follows a value and could otherwise be read as part of it;
     - a record built with fields is a whole value or in brackets (5.3), and so is a comparison that ends in `where` or a comprehension (5.2); this turned another of the pilot's silent misreadings, `an Order from cart and receipt with status Paid`, into an error;
     - the amount in `add` and `subtract`, and a limit in a type, is one term (3.5, 4.2);
     - an item of a one-line condition group holds no word that covers the rest of the line (5.2) (5.2).
@@ -940,6 +936,7 @@ What the replay changed in this specification:
 - If in doubt, make it a library, as Rust does. Moved out of the language for that reason: capability narrowing (`attenuated`, and the `files`, `network`, `host`, `port`, `under`, `read only` descriptions) is standard-library operations; labels and `declassifies` became distinct types and named conversions; `define` predicates became operations that produce a `Bool`; `implies` went, since aligned `if` / `then` lines say it; pipelines, protocols and schemas with migrations became library code; clauses scoped `in build` went; a component's `may` section went, since all authority starts at the entry point; record members lost the word `field`; and a quantifier over a type is written `for every x as T` (1, 3.2, 5.2, 8, 9.3, 10, 11).
 - A condition group may be the condition of an `if` or `repeat while`, with `then` or `do` on its own line between the two blocks (5.2).
 - `enum` replaces `choice`, following Rust, Swift and Scala 3; no popular language uses `choice` (3.3).
+- Every keyword is a contract word, an instruction (flow, storage, loops) or a word that makes a line read as English, and no two keywords look alike. Removed for that reason: typestate (`in state`; distinct types do it, as in Rust); `matching`, `positive` and `non_empty` (contracts and distinct types say these); the comparison words `less`, `least`, `more`, `most`, `than` (the school symbols `<`, `≤`, `>`, `≥` remain); `followed by` (a library `join`); the labels `onto`, `over` and `using`; `anything but` (name the failures instead); and `, or else`, which looked like `otherwise` and is now `, otherwise` (2.3, 3.5, 4.1, 7.3, 9.1).
 - Scribe is not described as a systems language. Having no garbage collector is a choice about memory management, managed at compile time as in Rust, not about the kind of software Scribe is for (1, 7).
 
 ### B.4 Earlier documents
