@@ -1,0 +1,13 @@
+type Connection
+    socket as a Socket
+    states Closed, Open
+
+to send data to connection
+    given data is Bytes
+    given connection is an editable Open Connection
+    transmit data to connection
+
+to close connection
+    given connection is a consumed Open Connection
+    produces a Closed Connection
+    return release_socket connection

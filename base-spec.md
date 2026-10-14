@@ -450,13 +450,23 @@ hold input as open path for reading with files
 
 A linear value bound with `let` and not released on some path is a compile error naming that path.
 
-State can be tracked with distinct types, as in Rust, so misuse is a compile error rather than a run-time check: `close` consumes an `OpenConnection` and produces a `ClosedConnection`, and nothing can send on a `ClosedConnection`.
+A type can list the states its values move through, and a state is written as an adjective before the type. Using a value in the wrong state is a compile error, not a run-time check, and every change of state is visible in a signature, where impact analysis compares it:
 
 ```
+type Connection
+    socket as a Socket
+    states Closed, Open
+
+to send data to connection
+    given data is Bytes
+    given connection is an editable Open Connection
+
 to close connection
-    given connection is a consumed OpenConnection
-    produces a ClosedConnection
+    given connection is a consumed Open Connection
+    produces a Closed Connection
 ```
+
+Nothing can send to a `Closed Connection`. A conversation between two parties (a protocol) is written the same way: each point in the conversation is a state of the channel, and each message an operation that consumes the channel in one state and produces it in the next.
 
 ### 7.4 Shared state
 
@@ -843,7 +853,7 @@ These are the decisions this draft does not settle. Each names what blocks it. A
 | 3 | `allocates` as a contract clause, with the allocator passed as context | Proposed | Measuring how many contracts it adds lines to |
 | 4 | ~~A rule language for system files~~ | Removed | System files are removed; `scribe query` answers reach and flow questions from the code (8.1) |
 | 5 | Possessive paths: `account's balance` | Settled | Allowed, never mixed with `of` in one path (5.1) |
-| 6 | Reduce the keyword set (now 74 hard, 7 soft) | Open | Experiment 1, the comprehension test, extended to compare candidate words for the same idea: for example `hold` against `with` and `lease` |
+| 6 | Reduce the keyword set (now 78 hard, 4 soft) | Open | Experiment 1, the comprehension test, extended to compare candidate words for the same idea: for example `hold` against `with` and `lease` |
 | 7 | Parser strategy: the grammar is LALR(1) with no conflicts (Appendix A); whether the compiler's parser is generated from it or written by hand | Open | Comparing the error messages each gives on the pilot's real mistakes |
 | 8 | Code generator for WebAssembly, the version 1 target: a back end of our own, or one built on LLVM or Cranelift | Open | A compile-time benchmark on the pilot corpus |
 | 9 | Solver for proving contracts | Open | Choosing a solver that is fast and gives stable results across versions |
@@ -857,7 +867,7 @@ These are the decisions this draft does not settle. Each names what blocks it. A
 
 The reference grammar is `grammar/scribe.lark` (version 0.3) in this project; `scribe-grammar-v0.2.lark` is the version the pilot measured. It is an Earley grammar: it states the language precisely but is not yet a production parser. `tools/check_grammar.py` tests it against a file per construct in this specification, a file per forbidden form, this specification's code blocks and the pilot corpora.
 
-**Vocabulary.** 81 reserved words: 74 hard keywords, which can never be names, and 7 soft keywords, which are names everywhere except in the position that gives them meaning. The articles `a`, `an` and `the` are hard. A few two-word phrases are read by the lexer as one token, so a parser looking one token ahead sees both words: `for each`, `at entry` and `, otherwise`; a comma that ends a line is read with the line's end. None of this changes the text.
+**Vocabulary.** 82 reserved words: 78 hard keywords, which can never be names, and 4 soft keywords, which are names everywhere except in the position that gives them meaning. The articles `a`, `an` and `the` are hard. A few two-word phrases are read by the lexer as one token, so a parser looking one token ahead sees both words: `for each`, `at entry` and `, otherwise`; a comma that ends a line is read with the line's end. None of this changes the text.
 
 **No special rules.** The grammar is unambiguous by construction. Converted to Bison it has no LALR(1) conflicts, which proves that no text has two readings, and `tools/check_lalr.py` fails the build if one appears. `tools/check_grammar.py` also parses every test, every code block in this specification and the pilot corpora with no disambiguation applied. The pilot's rules D1 and D2 are now the grammar's own structure (Section 5.5), mixing `and` with `or` is a condition group (Section 5.2), and a label word belongs to the outermost call on its line because an argument is one term: a labelled call inside an argument is in brackets.
 
@@ -940,6 +950,7 @@ What the replay changed in this specification:
 - A condition group may be the condition of an `if` or `repeat while`, with `then` or `do` on its own line between the two blocks (5.2).
 - `enum` replaces `choice`, following Rust, Swift and Scala 3; no popular language uses `choice` (3.3).
 - Every keyword is a contract word, an instruction (flow, storage, loops) or a word that makes a line read as English, and no two keywords look alike. Removed for that reason: typestate (`in state`; distinct types do it, as in Rust); `matching`, `positive` and `non_empty` (contracts and distinct types say these); the comparison words `less`, `least`, `more`, `most`, `than` (the school symbols `<`, `≤`, `>`, `≥` remain); `followed by` (a library `join`); the labels `onto`, `over` and `using`; `anything but` (name the failures instead); and `, or else`, which looked like `otherwise` and is now `, otherwise` (2.3, 3.5, 4.1, 7.3, 9.1).
+- Typestate is part of the language: a type lists its `states`, and a state reads as an adjective, `an Open Connection`. `editable`, `consumed` and `maybe` became hard keywords so a state name is never mistaken for one (7.3).
 - Look-alike keywords are replaced: the contract `fails with` (next to the statement `fail with`) is `can fail with`; `ensure if it succeeds` and `ensure if it fails` are `ensure on success` and `ensure on failure`; the quantifier `for every` (next to the loop `for each`) is `for all`; and the group `none of` (next to the value `nothing`) is `not any of` (5.2, 5.5, 6, 10.1).
 - Scribe is not described as a systems language. Having no garbage collector is a choice about memory management, managed at compile time as in Rust, not about the kind of software Scribe is for (1, 7).
 

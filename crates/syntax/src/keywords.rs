@@ -72,7 +72,7 @@ mod tests {
     fn classifies_words() {
         assert_eq!(classify("return"), WordKind::Hard);
         assert_eq!(classify("add"), WordKind::Hard);
-        assert_eq!(classify("editable"), WordKind::Soft);
+        assert_eq!(classify("entry"), WordKind::Soft);
         assert_eq!(classify("windows"), WordKind::Name);
         assert_eq!(classify("give"), WordKind::Name);
     }
@@ -80,6 +80,6 @@ mod tests {
     #[test]
     fn list_is_not_empty() {
         let (hard, soft) = counts();
-        assert!(hard > 50 && soft > 5, "{hard} hard, {soft} soft");
+        assert!(hard > 50 && soft > 0, "{hard} hard, {soft} soft");
     }
 }

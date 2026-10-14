@@ -90,3 +90,4 @@ Decisions from the review of readability and unambiguous presentation
 | 29 | `enum` replaces `choice` (Rust, Swift, Scala 3) | Approved; done |
 | 30 | Every keyword is a contract word, an instruction or a readability word, and no two look alike. Removed: `in state` (typestate), `matching`, `positive`, `non_empty`, `less`, `least`, `more`, `most`, `than`, `followed by`, `onto`, `over`, `using`, `anything but`; `, or else` becomes `, otherwise` | Approved; done |
 | 31 | Look-alikes replaced: `fails with` → `can fail with`; `ensure if it succeeds/fails` → `ensure on success/failure`; `for every` → `for all`; `none of` → `not any of` | Approved; done |
+| 32 | Typestate returns: `states Closed, Open` in a type, and a state as an adjective (`an Open Connection`); `editable`, `consumed`, `maybe` become hard. Protocols are a library pattern on typestate, not a keyword | Approved; done |

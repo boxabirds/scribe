@@ -27,7 +27,8 @@ all any then
 only
 from until through repeat while invariant decreases stop skip choose when hold
 together trust assert
-type enum component example
+type enum component example states
+editable consumed maybe
 property model interface
 is not and or mod of there where result some nothing at
 with in into by as

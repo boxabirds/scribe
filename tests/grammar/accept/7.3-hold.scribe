@@ -6,7 +6,3 @@ to first_line of path with files
     uses files
     hold input as open path for reading with files
         return try read_line from input
-
-to close connection
-    given connection is a consumed OpenConnection
-    produces a ClosedConnection

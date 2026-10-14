@@ -48,7 +48,9 @@ uses_clause: "uses" name_list _NL
 name_list: name ("," name)*
 
 // ---------------------------------------------------------------- types
-typeexpr: [article] modifier* type_name type_suffix*
+// SPEC 7.3: a state reads as an adjective before its type: `an Open Connection`
+typeexpr: [article] modifier* [type_state] type_name type_suffix*
+type_state: name
 article: "a" | "an" | "the"
 modifier: "editable" | "consumed" | "maybe"
 type_name: name ["of" modifier* type_name]
@@ -62,6 +64,7 @@ typedecl: "type" name ["of" name] ["is" typeexpr] _NL [_INDENT member+ _DEDENT]
 ?member: name "as" typeexpr _NL                       -> field
        | "model" name "as" expr _NL                   -> model
        | "invariant" line_condition                   -> type_invariant
+       | "states" name ("," name)+ _NL                -> states       // SPEC 7.3: typestate
 enum: "enum" name _NL _INDENT variant+ _DEDENT                            // SPEC 3.3: as in Rust and Swift
 variant: name ["with" field_decl ("," field_decl)*] _NL                       // SPEC 3.3: parts take commas
 field_decl: name "as" typeexpr

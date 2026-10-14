@@ -15,10 +15,12 @@ hard can
 hard changes
 hard choose
 hard component
+hard consumed
 hard decreases
 hard decrement
 hard do
 hard each
+hard editable
 hard ensure
 hard enum
 hard example
@@ -38,6 +40,7 @@ hard into
 hard invariant
 hard is
 hard let
+hard maybe
 hard mod
 hard model
 hard not
@@ -56,6 +59,7 @@ hard set
 hard skip
 hard some
 hard starts
+hard states
 hard stop
 hard subtract
 hard the
@@ -74,10 +78,7 @@ hard when
 hard where
 hard while
 hard with
-soft consumed
-soft editable
 soft entry
-soft maybe
 soft needs
 soft provides
 soft success

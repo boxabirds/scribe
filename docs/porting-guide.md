@@ -66,8 +66,8 @@ fixed-width unsigned types, so they need no precedence:
 
 ## Reserved words
 
-Scribe reserves more words than most languages: 74 hard keywords, which can
-never be names, and 7 soft keywords, which are keywords only inside their own
+Scribe reserves more words than most languages: 78 hard keywords, which can
+never be names, and 4 soft keywords, which are keywords only inside their own
 phrase and ordinary names everywhere else. Scribe is written by machines and
 read by people, so a word reserved to make a line unambiguous costs readers
 nothing (specification, Section 2.5).
@@ -119,6 +119,8 @@ make this easier than the list suggests:
 | `while`, `until` | Loop and range words | End times | `end_time`, `due`, `limit` |
 | `from`, `to` | Argument labels | Senders and recipients, range ends | `sender`, `recipient`, `start`, `end`, `source`, `target` |
 | `in`, `into`, `for`, `with`, `by`, `as`, `of` | Argument labels | Inputs, options, units | `input`, `options`, `unit`, a name for what it holds |
+| `editable`, `consumed`, `maybe` | Parameter conventions and optional values | Flags | `is_editable`, `used_up`, `optional` |
+| `states` | The states a type moves through | State lists | `state_list`, `phases` |
 | `can` | `can fail with`, the failures an operation may produce | Permission flags | `allowed`, `able` |
 | `mod` | Remainder | Modules, modulus | `module_name`, `modulus` |
 | `some`, `nothing` | Present and absent values of a `maybe` | Rarely names; `some` in some query code | `any_of`, `empty` |
