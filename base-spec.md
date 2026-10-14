@@ -36,6 +36,7 @@ Principles that follow from these and decide individual rules:
 | A promise is code, not commentary | Contracts are checked against the body on every build. A contract holds only conditions the compiler can check; explanations go in `note` lines |
 | Never overclaim | Every proof, verdict and report states the unchecked code (`trust` blocks) it rests on |
 | Nothing implicit that matters | No ambient authority, no implicit conversion, no missing value without a `maybe`, no failure without a `fails with` |
+| If in doubt, make it a library | As in Rust, the language is kept minimal. A construct is language only if it cannot be an ordinary type or operation without losing what the compiler must check; everything else (capability narrowing, time, pipelines, serialisation) is a library |
 | Any expression wherever a value goes | No position in the grammar is limited to a name or a literal without a stated reason; types, not keywords, decide what fits. A value in a contract or a grant of authority must be a constant expression, because impact analysis compares it without running code |
 
 ## 2. Source text
@@ -70,7 +71,7 @@ An update form is used only when the place being set is also the left operand, a
 | View | For | What changes |
 | --- | --- | --- |
 | **Review** (default) | Reviewers | `<=`, `>=`, `!=` drawn as `≤`, `≥`, `≠`; display forms applied; underscores in names drawn at about half contrast; a `pure` tag on operations with no `uses` line |
-| **Compact** | Experts | As review, plus logic words drawn as `∧ ∨ ¬ ∈ ∀ ∃ ⇒` |
+| **Compact** | Experts | As review, plus logic words drawn as `∧ ∨ ¬ ∈ ∀ ∃` |
 | **Localised** | Readers of other languages | Keywords replaced one for one; names, strings and notes untouched |
 
 A view must round-trip: rendering stored text into a view and converting it back gives identical bytes. A view that fails this does not ship. Errors, documentation and search always quote the stored text, with the reader's view alongside.
@@ -88,7 +89,6 @@ Symbols are used only where school mathematics has already taught them to most r
 | And, or, not | `and`, `or`, `not` | `∧`, `&&`, `∨`, `\|\|`, `¬`, `!` | words |
 | Member of | `is in` | `∈` | `is in` |
 | For all, there is | `for every`, `there is` | `∀`, `∃` | words |
-| Implies | `implies` | `⇒` | `implies` |
 
 Rules:
 
@@ -139,17 +139,17 @@ Bit operations are named operations on the fixed-width unsigned types, never sym
 
 ```
 type OrderLine
-    field product as a ProductId
-    field quantity as a positive Int
-    field unit_price as Money
+    product as a ProductId
+    quantity as a positive Int
+    unit_price as Money
 ```
 
 A record may state invariants. They hold whenever control leaves an operation of the type:
 
 ```
 type Order
-    field lines as a List of OrderLine
-    field status as an OrderStatus
+    lines as a List of OrderLine
+    status as an OrderStatus
     invariant lines is not empty or status is Draft
 ```
 
@@ -157,8 +157,8 @@ A `model` line gives the abstract state that contracts talk about, so contracts 
 
 ```
 type Queue of T
-    field capacity as a Count
-    field items as a Ring of T
+    capacity as a Count
+    items as a Ring of T
     model contents as sequence_of items
     invariant count of contents ≤ capacity
 ```
@@ -250,7 +250,7 @@ Every statement starts with a keyword, or is a call.
 | Leave or continue a loop | `stop`, `skip` |
 | Do nothing | `do nothing` |
 | Hold a resource | `hold input as open path for reading using files` (Section 7) |
-| Concurrency | `together`, `pipeline` (Section 9) |
+| Concurrency | `together` (Section 9) |
 
 A name, an element (`set item i of heap to x`), an `of`-path or a possessive path can be set. The amount in `add … to` and `subtract … from` is one term, so `to` and `from` always belong to the update: `add price of item to total`, `add (price for item in usd) to total`.
 
@@ -289,10 +289,9 @@ Every line has exactly one reading (Section 1), and the only precedence a reader
 
 Brackets group arithmetic only: `(a + b) * c`. They never group logic.
 
-`and` and `or` never mix on one line, and `not` negates a whole condition, never one link of a chain: `not paid and shipped` is an error. `followed by` joins single terms: `a followed by (b + c)`. `implies` joins two conditions on one line, or is written across two aligned lines as `if` and `then`:
+`and` and `or` never mix on one line, and `not` negates a whole condition, never one link of a chain: `not paid and shipped` is an error. `followed by` joins single terms: `a followed by (b + c)`. One condition implying another is written across two aligned lines as `if` and `then`:
 
 ```
-ensure for every x in items, x > 0 implies x < limit
 ensure
     if for every x in items, x > 0
     then count of items < limit
@@ -370,7 +369,7 @@ Text in double quotes, with `{expression}` interpolation: `"Your order {id of or
 
 ### 5.7 What `is` means
 
-`x is y` is parsed the same way in every case, but what it means depends on what `y` is: a variant (`status is Paid`), `nothing`, a predicate defined with `define` (`items is sorted`), or a pattern that binds a name (`result is some p`). This is the one place where meaning needs name resolution, which happens after parsing.
+`x is y` is parsed the same way in every case, but what it means depends on what `y` is: a variant (`status is Paid`), `nothing`, or a pattern that binds a name (`result is some p`). This is the one place where meaning needs name resolution, which happens after parsing.
 
 ## 6. Failures
 
@@ -475,17 +474,17 @@ to main root
     given root is the Authority
     uses root
 
-    let reports be root attenuated to files under "/reports" read only
-    let partner be root attenuated to network host "export.partner.example" port 443
+    let reports be read_only_directory "/reports" from root
+    let partner be network_endpoint "export.partner.example", 443 from root
     run ReportExporter with [reports, partner]
 ```
 
-Because authority only flows along capabilities, "what can this component reach?" has a static answer, with the path as evidence:
+Narrowing a capability is an ordinary standard-library operation, not syntax; its contract says what the result can reach. Because authority only flows along capabilities, and the arguments that narrow it are constants, "what can this component reach?" has a static answer, with the path as evidence:
 
 ```
 $ scribe query reach ReportExporter network
 ReportExporter can reach: host "export.partner.example" port 443 only
-    path: main > root attenuated > partner > ReportExporter
+    path: main > network_endpoint > partner > ReportExporter
 ```
 
 ### 8.2 Effects
@@ -496,13 +495,12 @@ An operation's effects are what it may do beyond computing its result. They are 
 | --- | --- |
 | Use a capability (files, network, clock, database,    N  another component) | `uses files, clock` |
 | Request memory (**Proposed**) | `allocates` |
-| Turn secret data public | `declassifies secret to public` |
 
 An operation with none of these is pure, and calling an effectful operation from it is a compile error naming the call. Clocks are capabilities, so code that depends on the time says so, and tests pass a fake clock.
 
 ### 8.3 Information flow
 
-Values may carry labels: `given name is Text labelled untrusted`, `given card is a CardNumber labelled secret`. Labelled data cannot reach a place that forbids it. Untrusted text cannot be joined into a database query; it must first pass a check that produces a typed value (`check name as UserName`). Secret data becomes public only through a declared `declassifies`, which appears in every review and impact report.
+Information flow is controlled with distinct types, as in Rust's newtype pattern; there are no labels. Text from outside is an `UntrustedText`, and a database query takes a `UserName`, so untrusted text reaches a query only through a checking operation that produces one: `let checked be try check_user_name name`. Secret data is a distinct type such as `CardNumber`, and it becomes public only through a named conversion operation, which every review and impact report shows wherever it is called.
 
 ## 9. Concurrency
 
@@ -525,27 +523,15 @@ to load_dashboard user using services
     return a Dashboard from profile, orders, alerts
 ```
 
-Everything inside `together` starts at once, and the block ends when every line has finished. If a required line fails, the others are cancelled and the failure goes up; `or else` marks a line whose failure is acceptable. Cancellation unwinds through `hold`, so resources are still released. A time limit is not part of the language: it is a standard-library operation on a clock capability.
+Everything inside `together` starts at once, and the block ends when every line has finished. If a required line fails, the others are cancelled and the failure goes up; `or else` marks a line whose failure is acceptable. Cancellation unwinds through `hold`, so resources are still released. A time limit is not part of the language: it is a standard-library operation on a clock capability. So is a pipeline: stages joined by bounded queues are built from `together` and a channel type in the standard library.
 
 ### 9.2 No shared mutation
 
 Two branches of a `together` block cannot change the same variable; the compiler names both lines. Each branch produces its own result instead. With no shared mutable values there is nothing for a lock to protect, and no data race can be written.
 
-### 9.3 Pipelines
+### 9.3 Pipelines (removed)
 
-```
-pipeline
-    stage read_rows from source
-    queue of at most 100 rows
-    stage parse_row, 4 at a time
-    queue of at most 100 orders
-    stage save_order into store, 2 at a time
-on failure in any stage
-    stop all stages
-    fail with ImportFailed
-```
-
-Every queue is bounded, so a full queue makes the stage before it wait. A stage is an operation call, never a record being built.
+Removed from the language. A pipeline is a standard-library operation built on `together` and a channel type (9.5).
 
 ### 9.4 Work that survives a restart
 
@@ -587,9 +573,9 @@ to redirect_body for location
     example redirect_body for "/a" is "<a href=\"/a\">See Other</a>.\n\n"
 ```
 
-Properties generalise examples and run as generated tests: `property for every items that is a non_empty List of Int, largest of items is in items`.
+Properties generalise examples and run as generated tests: `property for every items as a non_empty List of Int, largest of items is in items`.
 
-### 10.3 Host-dependent behaviour and build scoping
+### 10.3 Host-dependent behaviour
 
 Source never names an operating system or a host. Everything that can behave differently from one host to another reaches code through a capability (Section 8.1), so a difference between hosts is a fact about a capability, and it is stated where the capability is declared.
 
@@ -611,26 +597,13 @@ interface Files
 
 An operation whose contract tests a host-dependent fact holds wherever the fact has the value it tests for; a contract that tests none must hold on every host. Each host binding, the implementation of a capability's interface for one host, gives every fact its value. The toolchain supplies the host bindings, and they are the only place a particular operating system is named.
 
-A clause can also hold in one build mode only:
-
-```
-to write data into stream
-    given data is an editable Bytes
-    given stream is an editable Stream
-    changes only stream
-    in build race
-        changes only stream, data
-```
-
-In a race-detecting build, `write` scribbles over the buffer after it returns, so code that keeps using the buffer is caught.
-
-Contracts are compared once for each host binding and build mode (Section 12).
+Contracts are compared once for each host binding (Section 12).
 
 ### 10.4 Loops, types and predicates
 
 - Loops carry `invariant` lines, and `repeat while` loops a `decreases` line naming a quantity that shrinks on every pass and cannot go below zero. A `for each` over a range always terminates.
 - Types carry `invariant` and `model` lines (Section 3.2).
-- `define` names a predicate so contracts read as sentences: `define items is sorted` with a `holds when` line; then `expect items is sorted`.
+- A predicate is an ordinary operation that produces a `Bool`: `to sorted of items`, then `expect sorted of items`.
 
 ### 10.5 How clauses are checked
 
@@ -698,7 +671,6 @@ component Checkout
 | Section | Says |
 | --- | --- |
 | `needs` | Each component it depends on, and which of its operations it uses. Impact is judged against exactly these |
-| `may` | Authority it holds of its own (usually none: it acts through what it needs) |
 | `provides` | The operations other components may call, with their contracts |
 
 Version numbers, of the component and of what it needs, are not part of the language: they are kept in the component's package file. The toolchain computes the next version from the change to the manifest (Section 12), and a person may raise it but not lower it.
@@ -719,42 +691,27 @@ interface Reader
 
 Each implementation is checked against the interface's contract. A change to an interface's contract affects every implementation and every caller.
 
-### 11.3 Schemas and migrations
+### 11.3 Stored data (schemas removed)
 
-Stored and transmitted data has a schema. Its version is part of the data, because a running program reads values written by older versions:
-
-```
-schema Order version 4
-    id           as an OrderId
-    lines        as a List of OrderLine
-    gift_message as a maybe Text     added in version 4
-    discount     reserved            removed in version 3
-
-migration Order from version 3 to version 4 turning old into new
-    ensure gift_message of new is nothing
-```
-
-A removed field's name is reserved and cannot be reused. A migration is checked against its `ensure` lines over every value of the old version. A new version is compatible if every value of the old one can be read, directly or through a migration.
-
-### 11.4 Protocols
-
-A conversation between two parties is declared once, and both sides are checked against it:
+Removed from the language. A stored or transmitted format is an ordinary type, and reading an older version is an ordinary operation with a contract:
 
 ```
-protocol Upload
-    client sends Begin with size as Bytes at most 1 GiB
-    repeat
-        client sends Chunk with data as Bytes
-        server sends Ack with offset as Bytes
-    until client sends Commit
-    server sends one of Done with checksum as a Hash, or Failed with reason as Text
+to upgrade old
+    given old is an OrderV3
+    produces an OrderV4
+    ensure gift_message of result is nothing
+    ensure lines of result = lines of old
 ```
 
-A new version of a protocol is accepted only if it refines the old one.
+Serialisation and version tags are a standard-library matter. Impact analysis compares these types and operations like any others.
+
+### 11.4 Protocols (removed)
+
+Removed from the language. Checked conversations (session types) are research-grade; a protocol is written as ordinary operations and types, and may return after 1.0 as a library.
 
 ### 11.5 Systems (removed)
 
-Removed from the language. A program is assembled in code: its entry point hands each component its capabilities and calls it (8.1), and each component's `needs` say what it calls. Whole-program questions, such as what can reach a host or where labelled data can flow, are answered from that code by `scribe query`; a project that wants one checked on every change runs the query in its own build.
+Removed from the language. A program is assembled in code: its entry point hands each component its capabilities and calls it (8.1), and each component's `needs` say what it calls. Whole-program questions, such as what can reach a host or where a sensitive type can flow, are answered from that code by `scribe query`; a project that wants one checked on every change runs the query in its own build.
 
 ## 12. Impact analysis
 
@@ -762,12 +719,12 @@ Impact analysis answers one question before a change is merged: **what could thi
 
 ### 12.1 What is compared
 
-`scribe impact` compares two versions of a component: its manifest, every contract in it, its effects and authority, its schemas and protocols, and whether its implementation still meets its contracts. It then checks the result against:
+`scribe impact` compares two versions of a component: its manifest, every contract in it, its effects and authority, and whether its implementation still meets its contracts. It then checks the result against:
 
 1. **every known dependent**, using the clauses that dependent's `needs` entry relies on (written or inferred from its code);
 2. **any possible caller**, using the public contract alone, because most users of a library are outside its repository.
 
-Where a contract tests a host-dependent fact or has clauses scoped `in build <mode>` (Section 10.3), the comparison is made separately for each host binding and build mode, and a verdict names the bindings it applies to. A guarantee that weakens only where file names ignore case is reported as breaking there, not hidden in an average.
+Where a contract tests a host-dependent fact (Section 10.3), the comparison is made separately for each host binding, and a verdict names the bindings it applies to. A guarantee that weakens only where file names ignore case is reported as breaking there, not hidden in an average.
 
 ### 12.2 Verdicts
 
@@ -795,8 +752,6 @@ Each provided operation and each dependent gets exactly one verdict:
 | New or changed `trust` block | Needs review |
 | New capability or effect for the component | Authority change |
 | Removed or renamed operation | Breaking for every caller the same change leaves untouched; compatible for callers the change updates |
-| Changed schema | Compatible if every value of the old version can be read, directly or through a migration; breaking otherwise |
-| Changed protocol | Compatible if the new protocol refines the old; breaking otherwise |
 
 Two points of detail:
 
@@ -846,7 +801,7 @@ Removed from the language. Ordering a rollout so that no component runs alongsid
 | Command | Does |
 | --- | --- |
 | `scribe check` | Parses, formats to the stored form, type-checks, checks ownership, effects, authority and every contract. This is the build's gate |
-| `scribe build` | Check, then compile to WebAssembly (version 1). `in build` modes select debug or release |
+| `scribe build` | Check, then compile to WebAssembly (version 1), in debug or release mode |
 | `scribe test` | Runs `example` and `property` lines and test blocks |
 | `scribe prove` | Proves contracts with the solver and reports any it cannot, with a counterexample where one exists |
 | `scribe impact` | Compares two versions (Section 12) |
@@ -889,7 +844,7 @@ These are the decisions this draft does not settle. Each names what blocks it. A
 | 3 | `allocates` as a contract clause, with the allocator passed as context | Proposed | Measuring how many contracts it adds lines to |
 | 4 | ~~A rule language for system files~~ | Removed | System files are removed; `scribe query` answers reach and flow questions from the code (8.1) |
 | 5 | Possessive paths: `account's balance` | Settled | Allowed, never mixed with `of` in one path (5.1) |
-| 6 | Reduce the keyword set (now 101 hard, 35 soft) | Open | Experiment 1, the comprehension test, extended to compare candidate words for the same idea: for example `hold` against `with`, `using` and `lease` |
+| 6 | Reduce the keyword set (now 87 hard, 14 soft) | Open | Experiment 1, the comprehension test, extended to compare candidate words for the same idea: for example `hold` against `with`, `using` and `lease` |
 | 7 | Parser strategy: the grammar is LALR(1) with no conflicts (Appendix A); whether the compiler's parser is generated from it or written by hand | Open | Comparing the error messages each gives on the pilot's real mistakes |
 | 8 | Code generator for WebAssembly, the version 1 target: a back end of our own, or one built on LLVM or Cranelift | Open | A compile-time benchmark on the pilot corpus |
 | 9 | Solver for proving contracts | Open | Choosing a solver that is fast and gives stable results across versions |
@@ -903,13 +858,13 @@ These are the decisions this draft does not settle. Each names what blocks it. A
 
 The reference grammar is `grammar/scribe.lark` (version 0.3) in this project; `scribe-grammar-v0.2.lark` is the version the pilot measured. It is an Earley grammar: it states the language precisely but is not yet a production parser. `tools/check_grammar.py` tests it against a file per construct in this specification, a file per forbidden form, this specification's code blocks and the pilot corpora.
 
-**Vocabulary.** 136 reserved words: 101 hard keywords, which can never be names, and 35 soft keywords, which are names everywhere except in the position that gives them meaning. The articles `a`, `an` and `the` are hard. A few two-word phrases are read by the lexer as one token, so a parser looking one token ahead sees both words: `for each`, `at entry`, `, or else` and `, or`; a comma that ends a line is read with the line's end. None of this changes the text.
+**Vocabulary.** 101 reserved words: 87 hard keywords, which can never be names, and 14 soft keywords, which are names everywhere except in the position that gives them meaning. The articles `a`, `an` and `the` are hard. A few two-word phrases are read by the lexer as one token, so a parser looking one token ahead sees both words: `for each`, `at entry` and `, or else`; a comma that ends a line is read with the line's end. None of this changes the text.
 
 **No special rules.** The grammar is unambiguous by construction. Converted to Bison it has no LALR(1) conflicts, which proves that no text has two readings, and `tools/check_lalr.py` fails the build if one appears. `tools/check_grammar.py` also parses every test, every code block in this specification and the pilot corpora with no disambiguation applied. The pilot's rules D1 and D2 are now the grammar's own structure (Section 5.5), mixing `and` with `or` is a condition group (Section 5.2), and a label word belongs to the outermost call on its line because an argument is one term: a labelled call inside an argument is in brackets.
 
 Constructions list their parts with commas, never `and`, so `and` is always logical.
 
-**Parser class.** LALR(1), with no conflicts (version 0.2 had 172 shift/reduce and 20 reduce/reduce). Reaching zero changed what can be written in a few places, all recorded in Appendix B.3: phrase words such as `labelled`, `matching` and `only` became hard keywords; records built with fields, and comparisons that end in `where` or a comprehension, became whole values; and a value followed by a phrase word (`add … to`, a limit in a type) became one term.
+**Parser class.** LALR(1), with no conflicts (version 0.2 had 172 shift/reduce and 20 reduce/reduce). Reaching zero changed what can be written in a few places, all recorded in Appendix B.3: phrase words such as `matching` and `only` became hard keywords; records built with fields, and comparisons that end in `where` or a comprehension, became whole values; and a value followed by a phrase word (`add … to`, a limit in a type) became one term.
 
 ## Appendix B: evidence and history
 
@@ -973,15 +928,16 @@ What the replay changed in this specification:
 - Any expression goes wherever a value goes. A grammar rule that takes only a name or a literal needs a stated reason; otherwise types decide what fits, and mistakes the grammar no longer catches are the checker's to report (1).
 - A failure is a value, and `fail with` takes any expression (6).
 - The grammar has no LALR(1) conflicts, so it is proven that no text has two readings; the build fails if one appears (Appendix A). Reaching zero meant:
-    - `labelled`, `matching`, `limited`, `added` and `only` are hard keywords, because each follows a value and could otherwise be read as part of it;
+    - `matching` and `only` are hard keywords, because each follows a value and could otherwise be read as part of it;
     - a record built with fields is a whole value or in brackets (5.3), and so is a comparison that ends in `where` or a comprehension (5.2); this turned another of the pilot's silent misreadings, `an Order from cart and receipt with status Paid`, into an error;
     - the amount in `add` and `subtract`, and a limit in a type, is one term (3.5, 4.2);
-    - an item of a one-line condition group holds no word that covers the rest of the line (5.2), and a pipeline stage is a call (9.3).
+    - an item of a one-line condition group holds no word that covers the rest of the line (5.2) (5.2).
 - The language holds only what the running program does and what is checked about it. How a program is monitored, retried by configuration, grouped into failure domains or rolled out belongs to operations tooling: assumption monitors, a manifest's `failure` section, a system's `failure domains` and `scribe deploy plan` are removed (11.1, 11.5, 12.6). A retry is written in code, where it can be seen.
 - The language describes programs, not organisations. Owners and teams are not part of it: a `trust` block marks what is unchecked, and the repository's own rules say who reviews it (10.5). Durable execution (`workflow`, `runs at most once per`, `survives restarts`) is a platform service, not language (9.4).
 - Source never names an operating system. A difference between hosts is a fact about a capability, declared in its interface; this replaces clauses scoped `on <platform>` (10.3).
 - Source text describes only the program's instructions and what is checked about them. Removed for that reason: cost bounds (`cost at most`); prose, whether a component's `about` section, a `because` reason, an informal quoted clause or an `assumes` fact (explanations go in `note` lines); a `corrects` line, which described an earlier version; assurance tiers and `proof` blocks (the compiler proves what it can and reports how each clause was held; `assert` and `trust` are body statements); version numbers and schema compatibility modes, which belong in the package file; and a system's `components`, `authority` and `wiring`, which repeated what the entry point does in code (10.1, 10.5, 10.6, 11.1, 11.3, 11.5).
 - Every contract feature must be enforceable, and the language has no concept of time. Removed for that reason: `idempotent by`, which nothing can enforce; `deadline`, time comparisons (`is after`, `is before`), date literals and built-in time types, which are standard-library operations on a clock capability; `may block`, which repeated what `uses` shows; `varies by host`, since a host-dependent fact is an ordinary operation of a capability's interface; and system files, whose questions `scribe query` answers from the code (3.6, 9.1, 10.1, 10.3, 11.5).
+- If in doubt, make it a library, as Rust does. Moved out of the language for that reason: capability narrowing (`attenuated`, and the `files`, `network`, `host`, `port`, `under`, `read only` descriptions) is standard-library operations; labels and `declassifies` became distinct types and named conversions; `define` predicates became operations that produce a `Bool`; `implies` went, since aligned `if` / `then` lines say it; pipelines, protocols and schemas with migrations became library code; clauses scoped `in build` went; a component's `may` section went, since all authority starts at the entry point; record members lost the word `field`; and a quantifier over a type is written `for every x as T` (1, 3.2, 5.2, 8, 9.3, 10, 11).
 - A condition group may be the condition of an `if` or `repeat while`, with `then` or `do` on its own line between the two blocks (5.2).
 - Scribe is not described as a systems language. Having no garbage collector is a choice about memory management, managed at compile time as in Rust, not about the kind of software Scribe is for (1, 7).
 

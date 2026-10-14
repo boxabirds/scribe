@@ -20,18 +20,17 @@ import re
 import sys
 
 HARD = set("""
-to given produces fails expect ensure changes uses declassifies
-holds may
+to given produces fails expect ensure changes uses
 let be var starts set return fail try handle on failure if otherwise for each
 increment decrement add subtract do
 all any none then
-labelled matching limited added only
+matching only
 from until through repeat while invariant decreases stop skip choose when hold
-together pipeline trust assert
-type choice define component protocol schema migration example
-property field model interface
-is not and or implies mod of every there where result it some nothing at
-less more than most least followed attenuated
+together trust assert
+type choice component example
+property model interface
+is not and or mod of every there where result it some nothing at
+less more than most least followed
 with in into onto over using by as
 a an the
 """.split())
@@ -42,7 +41,6 @@ a an the
 # the text a reader sees is unchanged.
 JOINED = [
     ("OR_ELSE", [",", "or", "else"]),
-    ("COMMA_OR", [",", "or"]),
     ("FOR_EACH", ["for", "each"]),
     ("AT_ENTRY", ["at", "entry"]),
 ]

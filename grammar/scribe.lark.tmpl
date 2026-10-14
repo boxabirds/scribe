@@ -18,8 +18,7 @@
 
 start: (item)*
 
-?item: operation | define | typedecl | choice | protocol
-     | schema | migration | component | example | property
+?item: operation | typedecl | choice | component | example | property
      | interface
      | stmt
 
@@ -30,8 +29,7 @@ operation: "to" signature _NL [_INDENT clause* stmt* _DEDENT]              // DO
 signature: name [name ("," name)*] ((label | "of") name)*              // DOC; FIX-3; SPEC 4.1 several unlabelled parameters
 
 ?clause: given | produces | fails | expect | ensure | changes | uses_clause
-       | declassifies | holds | example | property
-       | scoped
+       | example | property
 
 given: "given" name "is" typeexpr _NL
 produces: "produces" typeexpr _NL
@@ -46,11 +44,6 @@ ensure_body: expr
            | "if" logic "," expr                                             -> conditional   // SPEC 15
 changes: "changes" "only" place ("," place)* _NL                          // SPEC 13.2: several places
 uses_clause: "uses" name_list _NL
-declassifies: "declassifies" name "to" name _NL
-holds: "holds" "when" line_condition
-// SPEC 10.3: clauses that hold in one build mode only. Source never names a
-// platform: host differences are facts declared on capability interfaces
-scoped: "in" "build" name _NL _INDENT clause+ _DEDENT
 
 name_list: name ("," name)*
 
@@ -60,8 +53,6 @@ article: "a" | "an" | "the"
 modifier: "positive" | "editable" | "consumed" | "maybe" | "non_empty"
 type_name: name ["of" modifier* type_name]
 ?type_suffix: "with" name term range_word term        -> refine_range
-            | "limited" "to" cap_spec                 -> limited
-            | "labelled" name                         -> labelled
             | "in" "state" name ("or" name)*          -> in_state
             | "as" name                               -> role
             | "matching" name                         -> matching
@@ -70,28 +61,14 @@ type_name: name ["of" modifier* type_name]
 range: expr range_word expr
 range_word: "until" | "through"
 
-// capability descriptions, shared by types, attenuation and system grants (EX 19, 20, 22, 32)
-cap_spec: [cap_kind] cap_part+
-cap_kind: "files" | "network" | "database"
-// SPEC 1: marked parts take an operand, not a whole expression, because the
-// next part follows on the same line; an unmarked resource must be a string
-?cap_part: "under" operand -> under
-         | "host" operand  -> host
-         | "port" operand  -> port
-         | STRING          -> resource
-         | "read" "only"  -> read_only
-         | "read" "and" "write" -> read_write
-
 // ---------------------------------------------------------------- declarations
 typedecl: "type" name ["of" name] ["in" "state" name ("or" name)*] ["is" typeexpr] _NL [_INDENT member+ _DEDENT]
-?member: "field" name "as" typeexpr _NL               -> field
+?member: name "as" typeexpr _NL                       -> field
        | "model" name "as" expr _NL                   -> model
        | "invariant" line_condition                   -> type_invariant
 choice: "choice" name _NL _INDENT variant+ _DEDENT
 variant: name ["with" field_decl ("," field_decl)*] _NL                       // SPEC 3.3: parts take commas
 field_decl: name "as" typeexpr
-define: "define" name "is" predicate_phrase _NL _INDENT clause+ _DEDENT
-predicate_phrase: name | article name ["of" name]
 
 example: "example" expr _NL
 // SPEC 11.2: an interface states contracts every implementation must meet
@@ -99,33 +76,18 @@ example: "example" expr _NL
 interface: "interface" name _NL _INDENT operation+ _DEDENT
 property: "property" quantified _NL
 
-// ---------------------------------------------------------------- protocols
-protocol: "protocol" name _NL _INDENT proto_step+ _DEDENT
-?proto_step: role_send
-           | "repeat" _NL _INDENT proto_step+ _DEDENT "until" role_send -> proto_repeat
-role_send: name "sends" message_spec _NL
-         | name "sends" "one" "of" message_spec (COMMA_OR message_spec)+ _NL    -> role_send_choice
-message_spec: name ["with" field_decl ("," field_decl)*]
-
 // ---------------------------------------------------------------- components and systems
 // SPEC 11.1: versions are kept in the package file, outside the language
 component: "component" name _NL _INDENT comp_section+ _DEDENT
 ?comp_section: "needs" _NL _INDENT need+ _DEDENT                  -> needs
-             | "may" _NL _INDENT may_line+ _DEDENT                -> may
              | "provides" _NL _INDENT operation+ _DEDENT          -> provides
 need: name "as" name _NL [_INDENT "uses" name_list _NL _DEDENT]
-?may_line: "nothing" "of" "its" "own" _NL                         -> no_authority   // SPECIAL EX 28
-         | cap_spec _NL
 
-schema: "schema" name "version" INT _NL _INDENT schema_field+ _DEDENT
-?schema_field: name "as" typeexpr ["added" "in" "version" INT] _NL
-             | name "reserved" "removed" "in" "version" INT _NL                -> reserved_field
-migration: "migration" name "from" "version" INT "to" "version" INT "turning" name "into" name _NL _INDENT ensure+ _DEDENT
 
 // ---------------------------------------------------------------- statements
 ?stmt: let | var | set | update | return_stmt | fail | do_nothing | if_stmt | for_each
      | repeat_while | invariant | decreases | choose | handle | hold
-     | together | pipeline | stop | skip | trust | assert_stmt | elided
+     | together | stop | skip | trust | assert_stmt | elided
      | expr_stmt
 
 // SPEC 5.1: a call with several unlabelled arguments stands bare only as a whole
@@ -173,14 +135,9 @@ pattern: "some" name                              -> some_pattern
        | name ["with" name ("," name)*]         -> variant_pattern
 handle: "handle" block on_failure+
 on_failure: "on" "failure" name ("or" name)* ["as" name] block
-          | "on" "failure" "in" "any" "stage" block                -> on_stage_failure   // SPECIAL EX 39
 hold: "hold" name "as" expr block
 together: "together" block
-pipeline: "pipeline" _NL _INDENT pipe_item+ _DEDENT [on_failure]
-// a stage is an operation call, never a record being built (SPEC 15)
-?pipe_item: "stage" logic ["," sum "at" "a" "time"] _NL                        -> stage
-          | "queue" "of" "at" "most" expr _NL                                   -> queue
-stop: "stop" ["all" "stages"] _NL                                               // "all stages" SPECIAL EX 39
+stop: "stop" _NL
 skip: "skip" _NL
 // SPEC 10.5: the checker does not verify a `trust` block, and takes an `assert`
 // inside one as true
@@ -208,10 +165,8 @@ expr_stmt: (call | name | comma_call | "try" application | "try" comma_call) _NL
           | "try" where_call                                  -> try_
           | construction
           | tail_comparison
-          | logic implies_op logic                            -> implication
           | not_op comparison                                 -> not_
           | logic
-implies_op: "implies" | "⇒"
 ?logic: comparison (and_op comparison)+                         -> and_chain
       | comparison (or_op comparison)+                          -> or_chain
       | comparison
@@ -219,7 +174,7 @@ and_op: "and" | "∧" | "&&"
 or_op: "or" | "∨" | "||"
 not_op: "not" | "¬" | "!"
 for_every: "for" "every" | "∀"
-quantified: for_every name ["in" sum | "from" sum range_word sum | "that" "is" typeexpr] "," condition
+quantified: for_every name ["in" sum | "from" sum range_word sum | "as" typeexpr] "," condition
           | ("there" "is" | "∃") [article] name "in" sum "where" condition -> exists
 
 // SPEC 2.6: a condition group joins conditions by its header, one per line in an
@@ -231,8 +186,7 @@ group_kind: "all" | "any" | "none"
 // on one line, an item cannot hold a word that covers the rest of the line
 // (a quantifier, `where`, a comprehension): it would swallow the items after it
 inline_group: inline_item ("," inline_item)+
-?inline_item: comparison implies_op comparison                 -> implication
-            | not_op comparison                                -> not_
+?inline_item: not_op comparison                                -> not_
             | comparison
 ?group_item: item_condition (LINE_COMMA | _NL)
            | group
@@ -245,10 +199,9 @@ inline_group: inline_item ("," inline_item)+
                | where_call
                | tail_comparison
                | "try" where_call                             -> try_
-               | comparison implies_op comparison             -> implication
                | not_op comparison                            -> not_
                | comparison
-// SPEC 2: `implies` across lines, as two aligned lines
+// SPEC 2: one condition implies another, written as two aligned lines
 if_then: _NL _INDENT "if" condition _NL "then" condition _NL _DEDENT
 // what may follow a clause word or `be`: a condition on the line, a group, or
 // an if/then block
@@ -261,7 +214,6 @@ if_then: _NL _INDENT "if" condition _NL "then" condition _NL _DEDENT
 // a comprehension or a `where` covers the rest of its line, so it may be the
 // last operand of a comparison that is a whole condition
 tail_comparison: concat (comp_op concat)* comp_op (aggregate | where_call) -> compare
-           | concat "is" article name "of" concat               -> predicate_of
 // FIX-5: bare "in" is no longer a membership alias; "is in" and "∈" remain.
 comp_op: "is" | "=" | "=="
        | "is" "not" | "!=" | "≠"
@@ -283,7 +235,6 @@ comp_op: "is" | "=" | "=="
       | postfix
 ?postfix: application
         | application AT_ENTRY                                -> at_entry
-        | application "attenuated" "to" cap_spec              -> attenuate   // EX 22
 
 // FIX-3: "of" is an argument label, used at most once and first; its operand
 // may itself be an of-path or a call with positional operands. Every other

@@ -1,0 +1,4 @@
+to import_all from source
+    given source is a Source
+    pipeline
+        stage read_rows from source

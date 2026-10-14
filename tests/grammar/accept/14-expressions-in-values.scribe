@@ -5,8 +5,5 @@ to import_all from source into store using root
     given store is an editable Store
     given root is the Authority
     uses root
-    let partner be root attenuated to network host partner_host port https_port
-    pipeline
-        stage read_rows from source
-        queue of at most batch_size
-        stage parse_row, workers * 2 at a time
+    let partner be network_endpoint partner_host, https_port from root
+    let rows be read_rows from source limited_to batch_size * 2

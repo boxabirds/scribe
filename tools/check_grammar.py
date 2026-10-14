@@ -45,6 +45,8 @@ CORPORA = ["doc", "doc-repaired", "exp7/scribe-A", "exp7/scribe-B"]
 # Spellings changed since the pilot: (pattern, replacement, specification change)
 RENAMES = [
     (r"\bgive back\b", "return", "draft 0.4: `return` replaces `give back`"),
+    (r"(?m)^(\s+)field (\w+) as ", r"\1\2 as ", "draft 0.4: record members have no `field` word"),
+    (r"(\bfor every \w+) that is ", r"\1 as ", "draft 0.4: a quantifier over a type is `for every x as T`"),
 ]
 
 

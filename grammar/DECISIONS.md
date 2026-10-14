@@ -78,3 +78,12 @@ Decisions from the review of readability and unambiguous presentation
 | 17 | System files are removed; `scribe query` answers reach and flow questions from the code | Approved; done |
 | 18 | A condition group as the condition of `if` / `repeat while`, with `then` / `do` on its own line | Approved; done |
 | 19 | "Owner" (memory) is defined in spec 7.1 | Approved; done |
+| 20 | Principle: if in doubt, make it a library, as Rust does | Approved |
+| 21 | Capability narrowing (`attenuated`, `files`, `network`, `database`, `host`, `port`, `under`, `read`, `write`, `limited`) becomes standard-library operations | Approved; done |
+| 22 | A component's `may` section (`nothing of its own`) is removed: all authority starts at the entry point | Approved; done |
+| 23 | Labels and `declassifies` become distinct types and named conversions | Approved; done |
+| 24 | `define` / `holds when` removed: a predicate is an operation that produces a Bool | Approved; done |
+| 25 | `implies` (and `⇒`), `pipeline`, `protocol` and `in build` are removed; pipelines and protocols are library code. `, or` is no longer joined by the lexer | Approved; done |
+| 26 | Record members lose the word `field` | Approved; done |
+| 27 | A quantifier over a type is `for every x as T` | Approved; done |
+| 28 | `schema` and `migration` removed: a stored format is a type, and an upgrade is an operation | Approved; done |

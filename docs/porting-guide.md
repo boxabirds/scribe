@@ -103,23 +103,17 @@ make this easier than the list suggests:
 | `try` | Passes a failure up | Retry counters, attempts | `attempt`, `try_count` |
 | `stop`, `skip` | Leave or continue a loop | Flags and control variables | `halted`, `should_stop`, `skipped` |
 | `hold` | Holds a resource for a block | Holding state | `held`, `holding`, `keep` |
-| `holds` | Gives a predicate's condition | Holdings, positions | `holdings`, `positions` |
 | `changes` | Says what an operation may change | Diffs, change lists | `edits`, `deltas`, `change_list` |
 | `uses` | Says which capabilities an operation uses | Usage counts | `usage_count`, `usages` |
 | `expect` | A precondition | Test assertions (JavaScript) | `expected`, `require` |
 | `model` | The abstract state of a type | Data models, ML models | `data_model`, `entity`, `predictor` |
-| `field` | A field of a record | Form fields, columns | `field_name`, `column`, `entry` |
-| `schema` | A versioned data schema | Database schemas | `record_schema`, `shape`, `layout` |
-| `migration` | A schema migration | Database migrations | `schema_change`, `upgrade` |
 | `component` | A unit of review and versioning | UI components, parts | `part`, `module`, `widget` |
 | `interface` | An interface's contract | APIs, network interfaces | `api`, `port`, `nic` |
-| `protocol` | A declared conversation | Wire protocols, scheme names | `wire_format`, `scheme`, `proto` |
 | `property` | A generated test | Object properties, attributes | `attribute`, `prop`, `trait_name` |
 | `example` | An exact example in a contract | Samples, fixtures | `sample`, `specimen`, `fixture` |
 | `assert` | A condition the compiler proves at that point | Test assertions | `check`, `verify` |
 | `trust` | A block the checker does not verify | Trust levels, scores | `trust_level`, `confidence` |
 | `choice` | Declares a choice type | User selections | `selection`, `option`, `pick` |
-| `pipeline` | Stages joined by bounded queues | Build or data pipelines | `stages`, `chain`, `flow` |
 | `repeat` | `repeat while` loops | Repetition counts | `repeat_count`, `count` |
 | `when` | A branch of `choose` | Times and moments | `moment`, `at_time`, `occurred_at` |
 | `where` | Filters in comprehensions and quantifiers | Locations | `place`, `location`, `site` |
@@ -130,11 +124,9 @@ make this easier than the list suggests:
 | `mod` | Remainder | Modules, modulus | `module_name`, `modulus` |
 | `some`, `nothing` | Present and absent values of a `maybe` | Rarely names; `some` in some query code | `any_of`, `empty` |
 | `let`, `var` | Bindings | Template variables | `variable`, `binding` |
-| `may` | A component's own authority: its `may` section | The month (lower case) | `month_may`, or the capitalised variant `May` |
 | `all`, `any`, `none` | Condition groups: `all of`, `any of`, `none of` | Collection helpers, flags | `everything`, `any_found`, `none_found`, `empty` |
 | `only` | `changes only`, `read only` | Filters and flags | `sole`, `exclusive`, `just_one` |
-| `labelled`, `matching`, `limited` | Type limits: `Text labelled untrusted`, `Text matching email_format` | Flags and filters | `has_label`, `is_match`, `capped` |
-| `added` | Schema history | Change records | `added_at` |
+| `matching` | Type limit: `Text matching email_format` | Flags and filters | `is_match` |
 
 ### Other hard keywords
 
@@ -142,7 +134,7 @@ These are rarely names in other languages, so they seldom need renaming.
 
 | Keyword | What it does in Scribe |
 | --- | --- |
-| `and`, `or`, `not`, `implies` | Logic |
+| `and`, `or`, `not` | Logic |
 | `is` | Tests: equality with words, variants, predicates, membership |
 | `at`, `less`, `more`, `than`, `most`, `least` | Comparison phrases: `is at most`, `less than` |
 | `each`, `every`, `there` | `for each`, `for every`, `there is` |
@@ -151,12 +143,9 @@ These are rarely names in other languages, so they seldom need renaming.
 | `through` | Ranges that include their end |
 | `given`, `produces` | Parameters and results in a contract |
 | `ensure` | A guarantee |
-| `declassifies` | Turns secret data public |
 | `invariant`, `decreases` | Loop and type reasoning |
-| `define` | Names a predicate |
 | `choose` | Matches every variant of a choice |
 | `together` | Runs lines at once |
 | `followed` | `followed by`, joining sequences |
-| `attenuated` | Narrows a capability |
 | `do` | `do nothing`, for a branch with nothing to do |
 | `then` | The second line of a condition written as `if` / `then` |

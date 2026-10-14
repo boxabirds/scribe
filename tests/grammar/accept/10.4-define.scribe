@@ -1,2 +1,0 @@
-define items is sorted
-    holds when for every i from 1 until count of items, item (i - 1) of items ≤ item i of items

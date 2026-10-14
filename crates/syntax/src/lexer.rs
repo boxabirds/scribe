@@ -287,7 +287,7 @@ fn lex_line(content: &str, line: usize, first_column: usize, out: &mut Vec<Token
             continue;
         }
         if c == ',' {
-            // `, or else` and `, or` are read as one token (see JOINED in
+            // `, or else` is read as one token (see JOINED in
             // tools/build_grammar.py); any other comma, including one that ends
             // the line, is a symbol
             let mut e = k + 1;
@@ -299,14 +299,14 @@ fn lex_line(content: &str, line: usize, first_column: usize, out: &mut Vec<Token
                 while chars.get(f) == Some(&' ') {
                     f += 1;
                 }
-                let end = match word_at(&chars, f, "else") {
-                    Some(after_else) if f > after_or => after_else,
-                    _ => after_or,
-                };
-                let text: String = chars[k..end].iter().collect();
-                out.push(Token { kind: TokenKind::Hard, text, line, column });
-                k = end;
-                continue;
+                if f > after_or
+                    && let Some(end) = word_at(&chars, f, "else")
+                {
+                    let text: String = chars[k..end].iter().collect();
+                    out.push(Token { kind: TokenKind::Hard, text, line, column });
+                    k = end;
+                    continue;
+                }
             }
         }
         if c == '\'' && chars.get(k + 1) == Some(&'s') {
@@ -500,8 +500,9 @@ mod tests {
         let k = kinds("let a be [x for each x in xs], or else nothing\n");
         assert!(k.contains(&(TokenKind::Hard, "for each".into())));
         assert!(k.contains(&(TokenKind::Hard, ", or else".into())));
-        let k = kinds("server sends one of Done, or Failed\n");
-        assert!(k.contains(&(TokenKind::Hard, ", or".into())));
+        let k = kinds("let a be b, or c\n");
+        assert!(k.contains(&(TokenKind::Symbol, ",".into())));
+        assert!(k.contains(&(TokenKind::Hard, "or".into())));
         let k = kinds("ensure x = x at entry\n");
         assert!(k.contains(&(TokenKind::Hard, "at entry".into())));
         let k = kinds("let a be [1, order]\n");
