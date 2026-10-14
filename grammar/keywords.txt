@@ -21,6 +21,7 @@ hard example
 hard expect
 hard fail
 hard failure
+hard false
 hard for
 hard function
 hard handle
@@ -49,6 +50,7 @@ hard then
 hard there
 hard through
 hard together
+hard true
 hard trust
 hard try
 hard type

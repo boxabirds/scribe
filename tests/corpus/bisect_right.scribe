@@ -1,6 +1,7 @@
 note Translated from cpython Lib/bisect.py, bisect_right (PSF License Agreement).
-note The optional `key` function is left out: Scribe has no function types yet (spec 4.3).
-function bisect_right(items: List[Int], x: Int, low: Int, high: Int or nothing) -> Int
+note Python's `key` is optional; a function type cannot be `or nothing` (its `or nothing`
+note belongs to the result), so callers that want no key pass `identity`.
+function bisect_right(items: List[Int], x: Int, low: Int, high: Int or nothing, key: function(Int) -> Int) -> Int
     can fail with NegativeLow
     expect is_sorted(items)
     ensure on success, for all i in low until result, items[i] <= x
@@ -16,7 +17,7 @@ function bisect_right(items: List[Int], x: Int, low: Int, high: Int or nothing) 
         invariant low <= lo
         decreases hi - lo
         let mid = (lo + hi) / 2
-        if x < items[mid]
+        if x < key(items[mid])
             hi = mid
         else
             lo = mid + 1

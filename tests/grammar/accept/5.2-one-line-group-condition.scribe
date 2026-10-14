@@ -1,0 +1,6 @@
+function check(negative: Bool, value: Int, cutoff: Int)
+    can fail with OutOfRange
+    if all of not negative, value >= cutoff
+        fail with OutOfRange
+    while any of value < 0, value > cutoff
+        do nothing

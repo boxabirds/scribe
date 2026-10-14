@@ -73,6 +73,7 @@ The code reads like code in the languages most readers already know: calls `f(a,
 | Meaning | Stored | Also accepted | Review view |
 | --- | --- | --- | --- |
 | Arithmetic, remainder | `+ - * /`, `%` |  | same |
+| Bits (fixed-width types only, never mixed with other operators) | `& \| ^ << >>` |  | same |
 | Less than, more than | `<`, `>` |  | `<`, `>` |
 | At most, at least | `<=`, `>=` | `≤`, `≥` | `≤`, `≥` |
 | Equal, not equal | `==`, `!=` | `≠` | `==`, `≠` |
@@ -98,7 +99,7 @@ Rules:
 
 ### 2.5 Keywords
 
-Keywords are reserved everywhere and can never be names, except three that are keywords only in their own position (`of` after `all` or `any`, and `requires` and `exports` in a module). There are 61 in all (Appendix A). Each is a contract word, an instruction (flow, storage, loops), or a word that makes a line read plainly, and no two look alike.
+Keywords are reserved everywhere and can never be names, except three that are keywords only in their own position (`of` after `all` or `any`, and `requires` and `exports` in a module). There are 63 in all (Appendix A). Each is a contract word, an instruction (flow, storage, loops), or a word that makes a line read plainly, and no two look alike.
 
 A reserved word is judged by what it costs readers, not authors. Scribe is written by machines and read by people, so reserving a word that makes a line unambiguous is cheap. The porting guide (`docs/porting-guide.md`) lists the reserved words that are common names in other languages, with what to use instead.
 
@@ -117,9 +118,11 @@ A reserved word is judged by what it costs readers, not authors. Scribe is writt
 
 Integers (`Int`, `Nat`, and fixed widths), decimals, `Bool`, `Text`, `Bytes`, lists (`List[Int]`), maps (`Map[Text, Int]`), and units of measure. A type that takes other types names them in square brackets, as in Python and Scala; angle brackets would clash with "less than". There are no implicit conversions: a conversion is always a named function.
 
-Bit functions are named functions on the fixed-width unsigned types, never symbols and never on `Int`: `bitwise_and(flags, mask)`, `bitwise_or`, `bitwise_xor`, `bitwise_not`, `shift_left(value, 1)`, `shift_right`, `rotate_left`, `rotate_right`, and `bit(flags, 3)`. A shift by the width or more is a contract violation, proven or checked like any other. Integers can be written in hex and binary, with `_` between digits: `0xFF`, `0xFFFF_FFFF`, `0b1010_0001`.
+Bit operations use the symbols almost every language uses, on the fixed-width unsigned types only, never on `Int`: `&`, `|`, `^`, `<<` and `>>`, with `bitwise_not`, `rotate_left` and `rotate_right` as named functions. C's precedence for these is a well-known source of bugs (`x & mask == 0` compares first), so Scribe gives them none: a bit operator chains only with itself, and anything else on the line needs brackets. `x | (to_u64(b & 0x7f) << shift)` and `(x & mask) == 0` are written that way; `x & mask == 0`, `x | y + 1` and `a & b | c` are errors. A shift by the width or more is a contract violation, proven or checked like any other. Integers can be written in hex and binary, with `_` between digits: `0xFF`, `0xFFFF_FFFF`, `0b1010_0001`.
 
-**Open:** the exact numeric tower, fixed-width names, whether `Text` is bytes or characters, and character and byte literals (Section 14).
+`true` and `false` are the two `Bool` values. `/` on integers truncates toward zero, as in Rust, Go and C; `%` takes the sign of the left operand. `text[i]` is the character at position `i`, as a one-character `Text`; there is no slice syntax, so the rest of a text is `drop(text, 1)` and its start `take(text, n)`.
+
+**Open:** the exact numeric tower, fixed-width names, and whether `Text` is indexed by bytes or by characters (Section 14).
 
 ### 3.2 Records
 
@@ -279,7 +282,25 @@ Every statement starts with a keyword, or is an assignment or a call.
 
 Scribe has no anonymous functions and no closures that outlive the call they are created in. A block passed to a statement (`together`, `handle`, `hold`) runs before the statement ends. Where other languages store a callback, Scribe uses a named type holding the data, or an interface (Section 11.2).
 
-**Proposed:** function types, so a function can be passed as a parameter, with its effects and failures carried in the type, for example `key: function(Order) -> Money`. This is the most common gap found in real code (Appendix B).
+A function can be passed as a value. Its type is written `function(Item) -> Int`, and it is called like any function, `key(item)`:
+
+```
+function bisect(items: List[Int], x: Int, key: function(Int) -> Int) -> Int
+    var lo = 0
+    var hi = count(items)
+    while lo < hi
+        decreases hi - lo
+        let mid = (lo + hi) / 2
+        if x < key(items[mid])
+            hi = mid
+        else
+            lo = mid + 1
+    return lo
+```
+
+A function passed this way may not fail and may not use a capability, so the function that receives it keeps its own contract whatever it is given. A callback that fails or uses a capability is an interface (Section 11.2). `or nothing` after a function type belongs to its result: `function(Text) -> User or nothing`.
+
+**Open:** carrying failures and capabilities in a function type, which real callbacks often need (Section 14).
 
 ## 5. Expressions
 
@@ -329,7 +350,7 @@ return all of
 
 On one line, an item holds no quantifier, since a quantifier covers the rest of its line and would take in the items after it; such an item goes on its own line. A comma at the end of a line in a group is optional. If one is written, another item of the same group must follow it, so a comma that disagrees with the indentation is an error. The formatter leaves these commas out of the stored text; the review view draws them, and draws a labelled rule beside each group. A group can follow `expect`, `ensure`, `invariant`, `let … =` and `return`.
 
-A group can also be the condition of an `if` or a `while`. Then `then` (for `if`) or `do` (for `while`) stands on its own line between the condition's block and the statement's, so the two blocks are never confused:
+A group can also be the condition of an `if` or a `while`. A one-line group is followed directly by the statement's block: `if all of not negative, value >= cutoff`, then the indented block. A group written as a block is followed by `then` (for `if`) or `do` (for `while`) on its own line between the condition's block and the statement's, so the two blocks are never confused:
 
 ```
 if all of
@@ -861,7 +882,7 @@ These are the decisions this draft does not settle. Each names what blocks it. A
 | 3 | `allocates` as a contract clause, with the allocator passed as context | Proposed | Measuring how many contracts it adds lines to |
 | 4 | ~~A rule language for system files~~ | Removed | System files are removed; `scribe query` answers reach and flow questions from the code (8.1) |
 | 5 | Possessive paths: `account's balance` | Settled | Allowed, never mixed with `of` in one path (5.1) |
-| 6 | Reduce the keyword set (now 58 keywords and 3 positional ones) | Open | Experiment 1, the comprehension test, extended to compare candidate words for the same idea, for example `hold` against `using` |
+| 6 | Reduce the keyword set (now 60 keywords and 3 positional ones) | Open | Experiment 1, the comprehension test, extended to compare candidate words for the same idea, for example `hold` against `using` |
 | 7 | Parser strategy | Settled | Written by hand, by recursive descent, as Rust, Go, Swift and TypeScript are, for error messages in the reader's terms; checked tree for tree against the reference grammar on every build |
 | 8 | Code generator for WebAssembly, the version 1 target: a back end of our own, or one built on LLVM or Cranelift | Open | A compile-time benchmark on the pilot corpus |
 | 9 | Solver for proving contracts | Open | Choosing a solver that is fast and gives stable results across versions |
@@ -870,12 +891,13 @@ These are the decisions this draft does not settle. Each names what blocks it. A
 | 12 | Type rules for failures as values: how a failure `enum` relates to `can fail with`, and how impact analysis compares a failure's fields | Open | Roadmap phase 5, with the translation wave that needs them |
 | 13 | ~~Cost bounds (`cost at most`)~~ | Removed | A cost bound is not an instruction the program carries out; speed is measured by tools outside the language |
 | 14 | A condition group as the condition of an `if` or `while` | Settled | `then` or `do` on its own line between the two blocks (5.2) |
+| 15 | Function types that carry failures and capabilities (4.3) | Open | The checker (roadmap phase 3), so the rules can be tried on real callbacks |
 
 ## Appendix A: grammar notes
 
 The reference grammar is `grammar/scribe.lark` (version 0.4) in this project; `scribe-grammar-v0.2.lark` is the version the pilot measured. It is an Earley grammar: it states the language precisely but is not yet a production parser. `tools/check_grammar.py` tests it against a file per construct in this specification, a file per forbidden form, and this specification's code blocks. The pilot corpora in `research/corpus` use the pilot's English-sentence syntax, which this draft replaced, and are kept as a record.
 
-**Vocabulary.** 61 reserved words: 58 keywords, which can never be names, and 3 that are keywords only in their own position (`of` in a condition group, `requires` and `exports` in a module). A comma that ends a line is read with the line's end. Nothing else is joined or rewritten by the lexer.
+**Vocabulary.** 63 reserved words: 60 keywords, which can never be names, and 3 that are keywords only in their own position (`of` in a condition group, `requires` and `exports` in a module). A comma that ends a line is read with the line's end. Nothing else is joined or rewritten by the lexer.
 
 **No special rules.** The grammar is unambiguous by construction. Converted to Bison it has no LALR(1) conflicts, which proves that no text has two readings, and `tools/check_lalr.py` fails the build if one appears. `tools/check_grammar.py` also parses every test and every code block in this specification with no disambiguation applied. Calls are written with brackets, so which arguments belong to which call is always visible; mixing `and` with `or` is a condition group (Section 5.2); and a quantifier covers the rest of its line (Section 5.5).
 
@@ -960,6 +982,7 @@ What the replay changed in this specification:
 - A value that may be absent is `a User or nothing`, with no `maybe` and no `some`: a `User` is already a valid `User or nothing`, and testing `is nothing` tells the compiler which it is (3.4). `match` replaces `choose`, as in Rust, Scala and Python (3.3). A module declares what it `requires` and `exports`, as Java modules do, replacing `component`, `needs` and `provides` (11.1). Conditions in contracts may call only pure operations (10.5).
 - Look-alike keywords are replaced: the contract `fails with` (next to the statement `fail with`) is `can fail with`; `ensure if it succeeds` and `ensure if it fails` are `ensure on success` and `ensure on failure`; the quantifier `for every` (next to the loop `for each`) is `for all`; and the group `none of` (next to the value `nothing`) is `not any of` (5.2, 5.5, 6, 10.1).
 - Draft 0.5: the code reads like code. The English-sentence syntax of earlier drafts (label words between arguments, `of`-paths, `given … is a …` lines, articles, `let x be`) followed AppleScript, HyperTalk, Inform 7 and COBOL, and the decades of evidence on those languages is that English-like code reads well a line at a time and badly at scale. Calls are `f(a, b)` with named arguments where they help, fields are `a.b`, parameters are typed in the header with `:` (`function withdraw(amount: Money, account: editable Account) -> Receipt`), `==` is equality and `=` binds or assigns, `old(x)` replaces `x at entry`, and control flow uses the familiar words `if`/`else`, `for … in`, `while`, `break`, `continue`, `match`/`case`. English stays where it carries meaning: contracts, condition groups and the logic words. Reserved words fall from 80 to 61 (2–6).
+- From real code (`tests/corpus`): function types, `function(Item) -> Int`, for functions that neither fail nor use a capability (4.3); a one-line condition group as an `if` or `while` condition, with no `then` line (5.2); the bit operators `& | ^ << >>`, which chain only with themselves so C's precedence bugs cannot be written (3.1); `true` and `false`; integer `/` truncating toward zero; and `text[i]` (3.1).
 - Scribe is not described as a systems language. Having no garbage collector is a choice about memory management, managed at compile time as in Rust, not about the kind of software Scribe is for (1, 7).
 
 ### B.4 Earlier documents

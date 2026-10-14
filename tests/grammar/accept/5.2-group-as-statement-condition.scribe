@@ -5,7 +5,6 @@ function settle(account: editable Account, amount: Money)
     then
         account.balance = account.balance - amount
     else if not any of account.is_frozen, account.is_closed
-    then
         flag(account)
     else
         do nothing

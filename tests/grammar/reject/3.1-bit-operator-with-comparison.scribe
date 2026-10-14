@@ -1,0 +1,2 @@
+function f(x: Int, mask: Int) -> Bool
+    return x & mask == 0

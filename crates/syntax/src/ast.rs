@@ -38,12 +38,20 @@ pub struct Param {
 pub struct TypeExpr {
     /// `editable` or `consumed`
     pub modifiers: Vec<String>,
+    /// A function type, `function(Item) -> Int`; then `name` is empty
+    pub function: Option<FunctionType>,
     /// A typestate: `Open` in `Open Connection`
     pub state: Option<String>,
     pub name: String,
     /// Type parameters: `Int` in `List[Int]`
     pub args: Vec<TypeExpr>,
     pub or_nothing: bool,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct FunctionType {
+    pub params: Vec<TypeExpr>,
+    pub result: Option<Box<TypeExpr>>,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -347,6 +355,16 @@ fn param_sexpr(p: &Param) -> String {
 
 pub fn type_sexpr(t: &TypeExpr) -> String {
     let mut parts: Vec<String> = t.modifiers.clone();
+    if let Some(f) = &t.function {
+        parts.push(list(
+            "function",
+            [
+                list("params", f.params.iter().map(type_sexpr)),
+                f.result.as_ref().map_or("-".into(), |r| type_sexpr(r)),
+            ],
+        ));
+        return list("type", parts);
+    }
     if let Some(s) = &t.state {
         parts.push(format!("state={s}"));
     }
@@ -568,6 +586,16 @@ pub fn type_text(t: &TypeExpr) -> String {
         out.push_str(m);
         out.push(' ');
     }
+    if let Some(f) = &t.function {
+        out.push_str("function(");
+        out.push_str(&f.params.iter().map(type_text).collect::<Vec<_>>().join(", "));
+        out.push(')');
+        if let Some(r) = &f.result {
+            out.push_str(" -> ");
+            out.push_str(&type_text(r));
+        }
+        return out;
+    }
     if let Some(s) = &t.state {
         out.push_str(s);
         out.push(' ');
@@ -592,8 +620,15 @@ pub fn signature_text(name: &str, params: &[Param], result: &Option<TypeExpr>) -
     }
 }
 
+pub fn is_bit_operator(op: &str) -> bool {
+    matches!(op, "&" | "|" | "^" | "<<" | ">>")
+}
+
+/// How tightly an expression binds. A bit operation binds least of all, so it
+/// is always bracketed inside any other operation (Section 3.1).
 fn precedence(e: &Expr) -> u8 {
     match e {
+        Expr::Binary(op, _, _) if is_bit_operator(op) => 0,
         Expr::Binary(op, _, _) if op == "+" || op == "-" => 1,
         Expr::Binary(_, _, _) => 2,
         _ => 3,
@@ -621,16 +656,24 @@ pub fn expr_text(e: &Expr) -> String {
         Expr::And(es) => es.iter().map(expr_text).collect::<Vec<_>>().join(" and "),
         Expr::Or(es) => es.iter().map(expr_text).collect::<Vec<_>>().join(" or "),
         Expr::Compare(first, rest) => {
-            let mut out = expr_text(first);
+            let mut out = operand_text(first, 1);
             for (op, e) in rest {
                 let op = match op.as_str() {
                     "is-not" => "is not",
                     "not-in" => "not in",
                     o => o,
                 };
-                out.push_str(&format!(" {op} {}", expr_text(e)));
+                out.push_str(&format!(" {op} {}", operand_text(e, 1)));
             }
             out
+        }
+        Expr::Binary(op, a, b) if is_bit_operator(op) => {
+            // a chain of one bit operator; any other operation is bracketed
+            let left = match a.as_ref() {
+                Expr::Binary(o, _, _) if o == op => expr_text(a),
+                _ => operand_text(a, 3),
+            };
+            format!("{left} {op} {}", operand_text(b, 3))
         }
         Expr::Binary(op, a, b) => {
             let p = precedence(e);
@@ -734,5 +777,9 @@ mod text_tests {
         round_trip("[o.total for o in orders where o.status is Paid]");
         round_trip("0 <= low <= high");
         round_trip("found is not nothing");
+        round_trip("x | (to_u64(b & 0x7f) << shift)");
+        round_trip("a & b & c");
+        round_trip("(x & mask) == 0");
+        round_trip("true");
     }
 }

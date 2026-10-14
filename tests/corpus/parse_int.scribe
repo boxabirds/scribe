@@ -12,9 +12,9 @@ function parse_int(text: Text, base: Int, bit_size: Int) -> I64
         fail with Syntax
     var digits = text
     var negative = false
-    if first_char(text) == "+"
+    if text[0] == "+"
         digits = drop(text, 1)
-    else if first_char(text) == "-"
+    else if text[0] == "-"
         digits = drop(text, 1)
         negative = true
 
@@ -22,9 +22,8 @@ function parse_int(text: Text, base: Int, bit_size: Int) -> I64
     var size = bit_size
     if size == 0
         size = int_size
-    let cutoff = shift_left(to_u64(1), size - 1)
+    let cutoff = to_u64(1) << (size - 1)
     if all of not negative, unsigned >= cutoff
-    then
         fail with Range(clamped: to_i64(cutoff - 1))
     if negative and unsigned > cutoff
         fail with Range(clamped: -to_i64(cutoff))

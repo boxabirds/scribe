@@ -1,0 +1,9 @@
+function decode(b: U8, x: U64, shift: Int) -> U64
+    let low = b & 0x7f
+    let mask = 0xFF | 0x100 | 0x200
+    let flipped = x ^ mask
+    let moved = x << 3
+    let back = x >> shift
+    if (x & mask) == 0
+        return x
+    return x | (to_u64(b & 0x7f) << shift)

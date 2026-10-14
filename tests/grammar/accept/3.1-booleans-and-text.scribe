@@ -1,0 +1,5 @@
+function first_is_sign(text: Text) -> Bool
+    var negative = false
+    if text[0] == "-"
+        negative = true
+    return negative or text[0] == "+"

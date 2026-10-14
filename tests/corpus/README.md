@@ -34,24 +34,20 @@ Worked well:
 - Typestate makes `Once`'s "at most once" a compile error.
 - Rust's `unsafe` blocks map one for one onto `trust` blocks.
 
-Struggled:
+Struggled, and what changed (draft 0.5, decision 36):
 
-1. **Function values.** Three of eight (`bisect_right`'s `key`,
-   `read_continued_line`'s validator, `Once.Do`'s action) take a function as a
-   parameter. Interfaces stood in, at a cost in lines. Spec 4.3 (function
-   types) is Proposed and should be settled before the checker.
+1. **Function values.** Three of eight take a function as a parameter.
+   Function types (`key: function(Int) -> Int`) now cover `bisect_right`.
+   The other two, `read_continued_line`'s validator and `Once.Do`'s action,
+   can fail or have effects, which a function type does not yet carry
+   (spec 4.3, open decision 15), so they still use interfaces.
 2. **Shared mutable state.** `Once` across tasks and tokio's atomic state need
-   spec 7.4, which is Open. Both were translated in a single-task form.
-3. **Bit operations with fixed-width conversions are long.**
-   Go's `x |= uint64(b&0x7f) << s` became
-   `x = bitwise_or(x, shift_left(to_u64(bitwise_and(b, 0x7f)), shift))`.
-4. **A one-line condition group as an `if` condition needs a `then` line.**
-   Go's `if !neg && un >= cutoff` became
-   `if all of not negative, unsigned >= cutoff`, then `then` on its own line.
-   The `then` line exists to separate a multi-line group from its block; a
-   one-line group does not need it.
-5. **Text by character.** With no slices and no character literals (spec 3.1,
-   Open), `s[1:]` became `drop(s, 1)` and `s[0] == '+'` became
-   `first_char(s) == "+"`.
-6. **Smaller gaps.** The spec does not say whether `/` on integers truncates
-   (Python's `//`), and `true` and `false` are not yet defined anywhere.
+   spec 7.4, which is Open. Both are translated in a single-task form.
+3. **Bit operations** were long as named functions. With `&`, `|`, `^`, `<<`
+   and `>>`, Go's `x |= uint64(b&0x7f) << s` is
+   `x = x | (to_u64(b & 0x7f) << shift)`.
+4. **A one-line condition group as an `if` condition** needed a `then` line;
+   now it goes straight to its block.
+5. **Text by character** is `text[i]`; the rest of a text is still
+   `drop(text, n)`, since there is no slice syntax.
+6. **Integer division and `true` / `false`** are now specified.

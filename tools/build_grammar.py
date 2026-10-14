@@ -23,7 +23,7 @@ HARD = set("""
 function can fail with expect ensure on success failure changes only uses example property
 type enum module interface model invariant states editable consumed
 let var return do nothing if else then for in while match case handle hold together
-break continue trust assert decreases result old try
+break continue trust assert decreases result old try true false
 all any not and or is there where until through as
 """.split())
 

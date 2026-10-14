@@ -46,7 +46,10 @@ name_list: name ("," name)*
 // ---------------------------------------------------------------- types
 // SPEC 3: a convention, then a state (SPEC 7.3: `Open Connection`), then the type;
 // SPEC 3.4: `or nothing` when the value may be absent
-typeexpr: modifier* [type_state] type_name ["or" "nothing"]
+typeexpr: modifier* (function_type | [type_state] type_name ["or" "nothing"])
+// SPEC 4.3: a function as a value; it may not fail or use a capability. A
+// result type that may be absent reads `function(Text) -> User or nothing`
+function_type: "function" "(" [typeexpr ("," typeexpr)*] ")" ["->" typeexpr]
 modifier: "editable" | "consumed"
 type_state: name
 type_name: name ["[" typeexpr ("," typeexpr)* "]"]
@@ -91,10 +94,12 @@ do_nothing: "do" "nothing" _NL
 // `do` (for `while`) on its own line, so the two blocks are told apart
 if_stmt: "if" if_body ("else" "if" if_body)* ["else" block]
 if_body: expr block
-       | group "then" block
+       | block_group "then" block
+       | line_group block
 for_stmt: "for" name "in" (range | expr) block
 while_stmt: "while" expr block
-          | "while" group "do" block
+          | "while" block_group "do" block
+          | "while" line_group block
 invariant: "invariant" line_condition
 decreases: "decreases" expr _NL
 match: "match" expr _NL _INDENT case+ _DEDENT
@@ -123,6 +128,7 @@ expr_stmt: postfix _NL
 ?condition: quantified
           | not_op comparison                                  -> not_
           | logic
+          | bits
 ?logic: comparison (and_op comparison)+                        -> and_chain
       | comparison (or_op comparison)+                         -> or_chain
       | comparison
@@ -137,7 +143,10 @@ quantified: for_all name ("in" (range | sum) | ":" typeexpr) "," condition
 // indented block, or several on one line separated by commas. Groups nest. A
 // comma at the end of a line in a block is optional and, if present, must be
 // followed by another item of the same block.
-group: group_kind "of" (_NL _INDENT group_item* group_last _DEDENT | inline_group _NL)
+?group: block_group
+      | line_group _NL
+block_group: group_kind "of" _NL _INDENT group_item* group_last _DEDENT
+line_group: group_kind "of" inline_group
 group_kind: "all" | "any" | "not" "any"
 // on one line, an item cannot hold a quantifier: it would swallow the items after it
 inline_group: inline_item ("," inline_item)+
@@ -168,6 +177,13 @@ comp_op: "==" | "!=" | "≠"
 // ---------------------------------------------------------------- expressions
 ?sum: product (("+" | "-") product)*
 ?product: unary (("*" | "/" | "%") unary)*
+// SPEC 3.1: bit operators chain one kind at a time, and never mix with another
+// operator on one line: `x | (y << 2)`, never `x | y << 2` or `x & mask == 0`
+?bits: unary ("&" unary)+                                      -> bit_and
+     | unary ("|" unary)+                                      -> bit_or
+     | unary ("^" unary)+                                      -> bit_xor
+     | unary ("<<" unary)+                                     -> shift_left
+     | unary (">>" unary)+                                     -> shift_right
 // SPEC 5.2: `-` and `try` apply to the next term, as minus does at school
 ?unary: "-" unary                                              -> neg
       | "try" unary                                            -> try_
@@ -183,9 +199,12 @@ comp_op: "==" | "!=" | "≠"
 ?atom: literal
      | name
      | "(" sum ")"
+     | "(" bits ")"
      | "[" [comparison ("," comparison)*] "]"                  -> list
      | "[" comparison "for" name "in" sum ["where" condition] "]" -> comprehension
      | "result"                                                -> result
+     | "true"                                                  -> true
+     | "false"                                                 -> false
      | "nothing"                                               -> nothing
      | "old" "(" expr ")"                                      -> old
 ?literal: INT | DECIMAL | STRING | QUANTITY | HEX | BINARY
@@ -213,5 +232,5 @@ name: NAME
     | "exports"
     | "of"
     | "requires"
-QUANTITY.4: /\d+(\.\d+)?[ ]+(?!(decreases|interface|invariant|consumed|continue|editable|function|property|requires|together|changes|example|exports|failure|nothing|success|through|assert|ensure|expect|handle|module|result|return|states|break|match|model|there|trust|until|where|while|case|else|enum|fail|hold|only|then|type|uses|with|all|and|any|can|for|let|not|old|try|var|as|do|if|in|is|of|on|or)(?![A-Za-z0-9_]))[A-Za-z][A-Za-z0-9_]*/
+QUANTITY.4: /\d+(\.\d+)?[ ]+(?!(decreases|interface|invariant|consumed|continue|editable|function|property|requires|together|changes|example|exports|failure|nothing|success|through|assert|ensure|expect|handle|module|result|return|states|break|false|match|model|there|trust|until|where|while|case|else|enum|fail|hold|only|then|true|type|uses|with|all|and|any|can|for|let|not|old|try|var|as|do|if|in|is|of|on|or)(?![A-Za-z0-9_]))[A-Za-z][A-Za-z0-9_]*/
 

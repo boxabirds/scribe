@@ -281,6 +281,33 @@ impl<'a> Parser<'a> {
         while self.is_kw("editable") || self.is_kw("consumed") {
             modifiers.push(self.advance().unwrap().text.clone());
         }
+        if self.is_kw("function") {
+            self.advance();
+            self.expect_sym("(")?;
+            let mut params = Vec::new();
+            if !self.is_sym(")") {
+                params.push(self.type_expr()?);
+                while self.is_sym(",") {
+                    self.advance();
+                    params.push(self.type_expr()?);
+                }
+            }
+            self.expect_sym(")")?;
+            let result = if self.is_sym("->") {
+                self.advance();
+                Some(Box::new(self.type_expr()?))
+            } else {
+                None
+            };
+            return Ok(TypeExpr {
+                modifiers,
+                function: Some(FunctionType { params, result }),
+                state: None,
+                name: String::new(),
+                args: Vec::new(),
+                or_nothing: false,
+            });
+        }
         let first = self.name()?;
         let (state, name) = if self.is_name_at(0) { (Some(first), self.name()?) } else { (None, first) };
         let mut args = Vec::new();
@@ -297,7 +324,7 @@ impl<'a> Parser<'a> {
         if or_nothing {
             self.pos += 2;
         }
-        Ok(TypeExpr { modifiers, state, name, args, or_nothing })
+        Ok(TypeExpr { modifiers, function: None, state, name, args, or_nothing })
     }
 
     fn range_from(&mut self, low: Expr) -> Parse<Range> {
@@ -577,6 +604,16 @@ impl<'a> Parser<'a> {
     }
 
     fn group(&mut self) -> Parse<Group> {
+        let (group, block) = self.group_parts()?;
+        if !block {
+            self.end_of_line()?;
+        }
+        Ok(group)
+    }
+
+    /// A group, and whether it was a block; a one-line group is left before
+    /// the end of its line, which an `if` or `while` reads as its block's.
+    fn group_parts(&mut self) -> Parse<(Group, bool)> {
         let kind = if self.is_kw("not") {
             self.pos += 2;
             "not any".to_string()
@@ -608,18 +645,17 @@ impl<'a> Parser<'a> {
                 }
             }
             self.advance();
-        } else {
-            items.push(GroupItem::Condition(self.inline_item()?));
-            while self.is_sym(",") {
-                self.advance();
-                items.push(GroupItem::Condition(self.inline_item()?));
-            }
-            if items.len() < 2 {
-                return Err(self.expected("`,` and another condition"));
-            }
-            self.end_of_line()?;
+            return Ok((Group { kind, items }, true));
         }
-        Ok(Group { kind, items })
+        items.push(GroupItem::Condition(self.inline_item()?));
+        while self.is_sym(",") {
+            self.advance();
+            items.push(GroupItem::Condition(self.inline_item()?));
+        }
+        if items.len() < 2 {
+            return Err(self.expected("`,` and another condition"));
+        }
+        Ok((Group { kind, items }, false))
     }
 
     fn item_condition(&mut self) -> Parse<Expr> {
@@ -744,8 +780,10 @@ impl<'a> Parser<'a> {
             "while" => {
                 self.advance();
                 let condition = if self.at_group() {
-                    let g = self.group()?;
-                    self.expect_kw("do")?;
+                    let (g, block) = self.group_parts()?;
+                    if block {
+                        self.expect_kw("do")?;
+                    }
                     Condition::Group(g)
                 } else {
                     Condition::Expr(self.expr()?)
@@ -880,8 +918,10 @@ impl<'a> Parser<'a> {
 
     fn if_body(&mut self) -> Parse<(Condition, Vec<Stmt>)> {
         if self.at_group() {
-            let g = self.group()?;
-            self.expect_kw("then")?;
+            let (g, block) = self.group_parts()?;
+            if block {
+                self.expect_kw("then")?;
+            }
             let body = self.block()?;
             return Ok((Condition::Group(g), body));
         }
@@ -921,7 +961,47 @@ impl<'a> Parser<'a> {
             }
             return Ok(Expr::Not(Box::new(c)));
         }
-        self.logic()
+        let first = self.unary()?;
+        if self.at_bit_operator() {
+            return self.bits_from(first);
+        }
+        let s = self.sum_from(first)?;
+        let c = self.comparison_from(s)?;
+        self.logic_from(c)
+    }
+
+    fn at_bit_operator(&self) -> bool {
+        ["&", "|", "^", "<<", ">>"].iter().any(|s| self.is_sym(s))
+    }
+
+    fn at_any_operator(&self) -> bool {
+        self.at_bit_operator()
+            || self.at_and()
+            || self.at_or()
+            || ["+", "-", "*", "/", "%", "==", "!=", "≠", "<", ">", "<=", "≤", ">=", "≥", "∈"]
+                .iter()
+                .any(|s| self.is_sym(s))
+            || self.is_kw("is")
+            || self.is_kw("in")
+    }
+
+    /// A chain of one bit operator, whose operands are single terms. Nothing
+    /// else may join it on the line without brackets (Section 3.1).
+    fn bits_from(&mut self, first: Expr) -> Parse<Expr> {
+        let op = self.peek().unwrap().text.clone();
+        let mut left = first;
+        while self.is_sym(&op) {
+            self.advance();
+            let right = self.unary()?;
+            left = Expr::Binary(op.clone(), Box::new(left), Box::new(right));
+        }
+        if self.at_any_operator() {
+            return Err(self.error_here(format!(
+                "a bit operator does not mix with {} on one line; put one side in brackets",
+                Self::describe(self.peek())
+            )));
+        }
+        Ok(left)
     }
 
     fn quantified(&mut self) -> Parse<Expr> {
@@ -1042,7 +1122,13 @@ impl<'a> Parser<'a> {
     // ------------------------------------------------------------ expressions
 
     fn sum(&mut self) -> Parse<Expr> {
-        let mut left = self.product()?;
+        let first = self.unary()?;
+        self.sum_from(first)
+    }
+
+    /// A sum whose first term has already been read.
+    fn sum_from(&mut self, first: Expr) -> Parse<Expr> {
+        let mut left = self.product_from(first)?;
         while self.is_sym("+") || self.is_sym("-") {
             let op = self.advance().unwrap().text.clone();
             let right = self.product()?;
@@ -1052,7 +1138,12 @@ impl<'a> Parser<'a> {
     }
 
     fn product(&mut self) -> Parse<Expr> {
-        let mut left = self.unary()?;
+        let first = self.unary()?;
+        self.product_from(first)
+    }
+
+    fn product_from(&mut self, first: Expr) -> Parse<Expr> {
+        let mut left = first;
         while self.is_sym("*") || self.is_sym("/") || self.is_sym("%") {
             let op = self.advance().unwrap().text.clone();
             let right = self.unary()?;
@@ -1144,9 +1235,14 @@ impl<'a> Parser<'a> {
                 self.expect_sym(")")?;
                 Ok(Expr::Old(Box::new(e)))
             }
+            TokenKind::Hard if t.text == "true" || t.text == "false" => {
+                self.advance();
+                Ok(Expr::Literal(t.text.clone()))
+            }
             TokenKind::Symbol if t.text == "(" => {
                 self.advance();
-                let e = self.sum()?;
+                let first = self.unary()?;
+                let e = if self.at_bit_operator() { self.bits_from(first)? } else { self.sum_from(first)? };
                 if !self.is_sym(")") {
                     return Err(self.error_here(format!(
                         "brackets group arithmetic only; expected `)`, found {}",
@@ -1251,6 +1347,22 @@ mod tests {
     fn a_call_needs_brackets() {
         let e = error("function f(items: List[Int]) -> Int\n    return count of items\n");
         assert!(e.message.contains("`count(...)`"), "{}", e.message);
+    }
+
+    #[test]
+    fn bit_operators_never_mix_without_brackets() {
+        assert!(tree("let x = a | (b << 2)\n").contains("(let x (| a (<< b 2)))"));
+        let e = error("let x = a & mask == 0\n");
+        assert!(e.message.contains("bit operator does not mix"), "{}", e.message);
+    }
+
+    #[test]
+    fn function_types_and_one_line_group_conditions() {
+        let t = tree(
+            "function f(key: function(Int) -> Int, ok: Bool)\n    if all of ok, key(1) > 0\n        do nothing\n",
+        );
+        assert!(t.contains("(param key (type (function (params (type Int)) (type Int))))"), "{t}");
+        assert!(t.contains("(branch (group all ok (compare (call key 1) > 0))"), "{t}");
     }
 
     #[test]

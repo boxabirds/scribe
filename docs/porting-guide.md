@@ -16,7 +16,9 @@ it uses, and its contract.
 | Rust `fn gcd(a: u64, b: u64) -> u64` | `function gcd(a: Nat, b: Nat) -> Nat` |
 | Rust `fn push(v: &mut Vec<i32>, x: i32)` | `function push(v: editable List[Int], x: Int)` |
 | Rust `fn close(c: Conn)` (takes ownership) | `function close(c: consumed Connection)` |
-| Python `def f(x: int) -> int | None` | `function f(x: Int) -> Int or nothing` |
+| Python `def f(x: int) -> int \| None` | `function f(x: Int) -> Int or nothing` |
+| Python `key=lambda x: x.age` (a function value) | `key: function(Person) -> Int`, passed a named function |
+| Any `true`, `false` | `true`, `false` |
 | Swift `move(amount, from: a, to: b)` | `move(amount, from: a, to: b)` |
 | Any `x = y` where `x` exists | `x = y` |
 | Any `const x = 1` / `let x = 1` | `let x = 1` |
@@ -71,23 +73,22 @@ group is optional; the review view draws it.
 
 ## Bit operations
 
-Scribe has no bit operators. Bit operations are named functions on the
-fixed-width unsigned types, so they need no precedence:
+Scribe has C's bit operators on the fixed-width unsigned types, without C's
+precedence: a bit operator chains only with itself, and anything else on the
+line needs brackets.
 
 | Source | Scribe |
 | --- | --- |
-| C `flags & mask` | `bitwise_and(flags, mask)` |
-| C `flags \| bit` | `bitwise_or(flags, bit)` |
-| C `a ^ b` | `bitwise_xor(a, b)` |
+| C `flags & mask` | `flags & mask` |
+| C `x & mask == 0` (a classic bug: `==` binds first) | `(x & mask) == 0` |
+| Go `x \|= uint64(b&0x7f) << s` | `x = x \| (to_u64(b & 0x7f) << s)` |
+| C `a & b \| c` | `(a & b) \| c` |
 | C `~x` | `bitwise_not(x)` |
-| C `x << 3` | `shift_left(x, 3)` |
-| C `x >> 3` | `shift_right(x, 3)` |
-| C `(x >> n) & 1` | `bit(x, n)` |
 | Literals `0xFF`, `0b1010` | `0xFF`, `0b1010`; `_` may separate digits: `0xFFFF_FFFF` |
 
 ## Reserved words
 
-Scribe has 58 keywords, which can never be names, and three words that are
+Scribe has 60 keywords, which can never be names, and three words that are
 keywords only in their own position (`of` after `all` or `any`, and `requires`
 and `exports` in a module). Scribe is written by machines and read by people,
 so a word reserved to make a line unambiguous costs readers nothing
@@ -141,6 +142,7 @@ These are rarely names in other languages, so they seldom need renaming.
 | `function` | Declares a function |
 | `enum` | Declares an enum: variants that may carry data, as in Rust |
 | `let`, `var` | Fixed binding and variable |
+| `true`, `false` | The two `Bool` values |
 | `return` | Ends a function with its result |
 | `if`, `else`, `then` | Branches; `then` follows a condition group |
 | `for`, `in`, `while`, `do` | Loops; `in` also tests membership; `do` follows a condition group and in `do nothing` |

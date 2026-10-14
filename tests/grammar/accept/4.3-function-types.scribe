@@ -1,0 +1,18 @@
+function bisect(items: List[Int], x: Int, key: function(Int) -> Int) -> Int
+    var lo = 0
+    var hi = count(items)
+    while lo < hi
+        decreases hi - lo
+        let mid = (lo + hi) / 2
+        if x < key(items[mid])
+            hi = mid
+        else
+            lo = mid + 1
+    return lo
+
+function find(users: List[User], lookup: function(Text) -> User or nothing) -> User or nothing
+    return lookup("ada")
+
+function run_all(actions: List[function()])
+    for action in actions
+        action()

@@ -77,6 +77,13 @@ def name_list(t):
 
 def typeexpr(t):
     parts = [words(m)[0] for m in trees(t, "modifier")]
+    for f in trees(t, "function_type"):
+        types = trees(f, "typeexpr")
+        has_result = any(isinstance(x, Token) and x.value == "->" for x in kids(f))
+        params = types[:-1] if has_result else types
+        result = typeexpr(types[-1]) if has_result else "-"
+        parts.append(sx("function", sx("params", *[typeexpr(p) for p in params]), result))
+        return sx("type", *parts)
     for s in trees(t, "type_state"):
         parts.append("state=" + name(trees(s, "name")[0]))
     tn = trees(t, "type_name")[0]
@@ -92,7 +99,13 @@ def range_(t):
     return sx("range", expr(low), words(word)[0], expr(high))
 
 
+GROUPS = ("group", "block_group", "line_group")
+BITS = ("bit_and", "bit_or", "bit_xor", "shift_left", "shift_right")
+
+
 def group(t):
+    while data(t) == "group":
+        t = trees(t)[0]
     kind = "-".join(words(trees(t, "group_kind")[0]))
     items = []
     for c in trees(t):
@@ -103,13 +116,13 @@ def group(t):
             continue
         while data(c) in ("group_item", "group_last"):
             c = trees(c)[0]
-        items.append(group(c) if data(c) == "group" else expr(c))
+        items.append(group(c) if data(c) in GROUPS else expr(c))
     return sx("group " + kind, *items)
 
 
 def line_condition(t):
     if isinstance(t, Tree):
-        if t.data == "group":
+        if t.data in GROUPS:
             return group(t)
         if t.data == "if_then":
             a, b = trees(t)
@@ -182,6 +195,13 @@ def expr(t):
         cs = [x for x in c if not (isinstance(x, Token) and x.type != "NAME")]
         element, var, source = expr(cs[0]), name(cs[1]), expr(cs[2])
         return sx("comprehension", element, var, source, expr(cs[3]) if len(cs) > 3 else "-")
+    if d in BITS:
+        left = expr(c[0])
+        for i in range(1, len(c), 2):
+            left = sx(c[i].value, left, expr(c[i + 1]))
+        return left
+    if d in ("true", "false"):
+        return d
     if d == "result":
         return "result"
     if d == "nothing":
@@ -198,7 +218,7 @@ def block(t):
 
 
 def condition_or_group(t):
-    return group(t) if data(t) == "group" else expr(t)
+    return group(t) if data(t) in GROUPS else expr(t)
 
 
 def stmt(t):

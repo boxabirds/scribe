@@ -4,6 +4,7 @@
   "enum OrderStatus": "ok",
   "enum PortFailure": "ok",
   "for all x in items, x ≤ result": "fail",
+  "function bisect(items: List[Int], x: Int, key: function(Int) -> Int) -> Int": "ok",
   "function describe(found: User or nothing) -> Text": "ok",
   "function describe(status: OrderStatus) -> Text": "ok",
   "function load_dashboard(user: UserId, services: DashboardServices) -> Dashboard": "ok",

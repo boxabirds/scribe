@@ -21,8 +21,8 @@ function read_uvarint(reader: editable ByteReader) -> U64
             if b < 0x80
                 if i == max_varint_len_64 - 1 and b > 1
                     fail with Overflow(partial: x)
-                return bitwise_or(x, shift_left(to_u64(b), shift))
-            x = bitwise_or(x, shift_left(to_u64(bitwise_and(b, 0x7f)), shift))
+                return x | (to_u64(b) << shift)
+            x = x | (to_u64(b & 0x7f) << shift)
             shift = shift + 7
         on failure EndOfData
             if i > 0
