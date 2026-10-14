@@ -13,7 +13,7 @@ Code examples are shown in the **review view**, the default way people read Scri
 
 ## 1. Purpose and principles
 
-Scribe is a systems language for a world where most code is written by machines and read, reviewed and owned by people. It has three aims, in order:
+Scribe is a language for a world where most code is written by machines and read, reviewed and owned by people. It has three aims, in order:
 
 1. **Rapid impact assessment.** Every operation and component states what it promises, needs and may do, in a form a tool can compare between two versions. The impact of a proposed change is computed from those statements before it is merged, in time that grows with the change and the components that depend on it, not with the size of the codebase.
 2. **Human readability.** Every token a reviewer sees is understood at reading speed. When readability and impact assessment conflict, Scribe looks for a spelling that serves both; only when there is none does impact assessment win, and the cost to readability is recorded as a decision. Against every other aim, readability wins.
@@ -22,7 +22,7 @@ Scribe is a systems language for a world where most code is written by machines 
 And two constraints:
 
 - **Fast, predictable compilation**, closer to Zig than to Rust.
-- **No garbage collector** and no hidden allocation.
+- **No garbage collector** and no hidden allocation. Memory is managed at compile time: the compiler checks ownership from each parameter's convention (Section 7), and nothing is reclaimed at run time except where an owner's block ends.
 
 Version 1 compiles to WebAssembly.
 
@@ -946,6 +946,7 @@ What the replay changed in this specification:
 - Update forms such as `subtract amount from balance of account` (2).
 - The aims are reordered: rapid impact assessment first, human readability second, correctness by construction third. Impact assessment is the problem Scribe exists to solve; readability is how it must be solved (1).
 - Version 1 emits WebAssembly only (1, 13).
+- Scribe is not described as a systems language. Having no garbage collector is a choice about memory management, managed at compile time as in Rust, not about the kind of software Scribe is for (1, 7).
 
 ### B.4 Earlier documents
 
