@@ -54,3 +54,8 @@ repeat it, run from that folder. Its grammar and tools match
 `results/checksums-final.txt`, and re-running experiment 3 reproduces the
 recorded output byte for byte (33 of 42 doc examples as written, 42 of 42
 repaired).
+
+11 of experiment 7's 48 source excerpts are not in this repository, because
+their licences (GPL, LGPL, Redis's, and one project with no licence) do not
+allow it. [research/corpus/exp7/source/NOTICE.md](research/corpus/exp7/source/NOTICE.md)
+lists every excerpt with its licence, and how to restore the missing ones.
